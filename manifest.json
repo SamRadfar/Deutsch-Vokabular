@@ -1,0 +1,25 @@
+{
+  "name": "Deutsch Vokabular",
+  "short_name": "Vokabular",
+  "description": "واژه‌نامه تخصصی آلمانی",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f0f4fb",
+  "theme_color": "#3a56d4",
+  "lang": "de",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
