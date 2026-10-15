@@ -13,7 +13,7 @@ interface Props {
 
 /** Header authentication control: sign-in button, or the signed-in account menu. */
 export function AccountControl({ totalEntries, learnedCount, onOpenMigration }: Props) {
-  const { state, signIn } = useAuth();
+  const { state, signIn, cancelSignIn } = useAuth();
   const [infoOpen, setInfoOpen] = useState(false);
   const infoId = useId();
 
@@ -37,7 +37,12 @@ export function AccountControl({ totalEntries, learnedCount, onOpenMigration }: 
     case 'signed-out':
       return <button type="button" className="auth-btn" onClick={() => void signIn()} lang="fa">ورود با گوگل</button>;
     case 'signing-in':
-      return <button type="button" className="auth-btn" disabled aria-busy="true" lang="fa">در حال ورود…</button>;
+      return (
+        <span className="auth-signing" lang="fa" dir="rtl">
+          <span className="auth-btn auth-btn--busy" role="status" aria-live="polite">در حال ورود…</span>
+          <button type="button" className="auth-btn auth-btn--muted" onClick={cancelSignIn}>لغو</button>
+        </span>
+      );
     case 'signed-in':
     case 'signing-out':
       return <AccountMenu user={state.user} signingOut={state.status === 'signing-out'} totalEntries={totalEntries} learnedCount={learnedCount} onOpenMigration={onOpenMigration} />;

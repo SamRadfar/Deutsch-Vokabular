@@ -91,3 +91,36 @@ describe('AuthProvider state machine', () => {
     expect(auth.calls.signIn).toBe(1);
   });
 });
+
+describe('cancelling a stuck sign-in', () => {
+  function CancelProbe() {
+    const { state, error, signIn, cancelSignIn } = useAuth();
+    return (
+      <div>
+        <output data-testid="status">{state.status}</output>
+        <output data-testid="error">{error?.code ?? ''}</output>
+        <button onClick={() => void signIn()}>in</button>
+        <button onClick={cancelSignIn}>cancel</button>
+      </div>
+    );
+  }
+
+  it('returns to signed-out; a late result of the cancelled attempt cannot clobber a new attempt', async () => {
+    const user = userEvent.setup();
+    const auth = createFakeAuth();
+    render(<AuthProvider service={auth}><CancelProbe /></AuthProvider>);
+    await waitFor(() => expect(status()).toBe('signed-out'));
+    auth.holdNextSignIn();
+    await user.click(screen.getByText('in'));
+    expect(status()).toBe('signing-in');
+    await user.click(screen.getByText('cancel'));
+    expect(status()).toBe('signed-out');
+    // New attempt fails with popup-blocked …
+    auth.willFailSignIn('auth/popup-blocked');
+    await user.click(screen.getByText('in'));
+    await waitFor(() => expect(screen.getByTestId('error').textContent).toBe('auth/popup-blocked'));
+    // … and the held first attempt finally succeeds: the user is signed in via onAuthStateChanged.
+    await act(async () => auth.completeHeldSignIn());
+    await waitFor(() => expect(status()).toBe('signed-in'));
+  });
+});

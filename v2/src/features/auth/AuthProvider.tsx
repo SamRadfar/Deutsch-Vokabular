@@ -8,6 +8,8 @@ interface AuthContextValue {
   error: AuthError | null;
   signIn(): Promise<void>;
   signOut(): Promise<void>;
+  /** Leave a sign-in that appears stuck (e.g. a popup that never reports back). */
+  cancelSignIn(): void;
   dismissError(): void;
 }
 
@@ -45,9 +47,13 @@ export function AuthProvider({ service, unavailable, children }: Props) {
     });
   }, [service]);
 
+  // Each sign-in attempt gets a number; a cancelled (stale) attempt can never change state later.
+  const attempt = useRef(0);
+
   const signIn = useCallback(async () => {
     if (!service || busy.current) return;
     if (stateRef.current.status !== 'signed-out') return;
+    const mine = ++attempt.current;
     busy.current = true;
     setError(null);
     setState({ status: 'signing-in' });
@@ -55,10 +61,11 @@ export function AuthProvider({ service, unavailable, children }: Props) {
       await service.signInWithGoogle();
       // Success is reported through onAuthStateChanged.
     } catch (e) {
+      if (mine !== attempt.current) return; // cancelled meanwhile
       setError(toAuthError(e));
       setState((prev) => (prev.status === 'signing-in' ? { status: 'signed-out' } : prev));
     } finally {
-      busy.current = false;
+      if (mine === attempt.current) busy.current = false;
     }
   }, [service]);
 
@@ -79,9 +86,17 @@ export function AuthProvider({ service, unavailable, children }: Props) {
     }
   }, [service]);
 
+  const cancelSignIn = useCallback(() => {
+    // Invalidate the running attempt. The provider call may still succeed later; the user then
+    // arrives through onAuthStateChanged like any restored session.
+    attempt.current++;
+    busy.current = false;
+    setState((prev) => (prev.status === 'signing-in' ? { status: 'signed-out' } : prev));
+  }, []);
+
   const dismissError = useCallback(() => setError(null), []);
 
-  const value = useMemo(() => ({ state, error, signIn, signOut, dismissError }), [state, error, signIn, signOut, dismissError]);
+  const value = useMemo(() => ({ state, error, signIn, signOut, cancelSignIn, dismissError }), [state, error, signIn, signOut, cancelSignIn, dismissError]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

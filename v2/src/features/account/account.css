@@ -150,3 +150,6 @@ html[data-theme='dark'] .auth-banner--error { background: #3a1513; color: #fda29
   .auth-btn { height: 40px; }
   .account__button { width: 40px; height: 40px; }
 }
+
+.auth-signing { display: inline-flex; gap: 6px; align-items: center; }
+.auth-btn--busy { display: inline-flex; align-items: center; cursor: progress; color: var(--tm); }
