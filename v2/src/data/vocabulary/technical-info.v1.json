@@ -1,0 +1,773 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "legacyWord": "der U-Wert",
+      "entryIds": [],
+      "formula": {
+        "label": "فرمول",
+        "value": "U = λ / d"
+      },
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "U",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "W/(m²·K)",
+          "kind": "plain"
+        },
+        {
+          "key": "قانون",
+          "value": "هرچه کمتر باشد عایق بهتر است",
+          "kind": "persian"
+        }
+      ]
+    },
+    {
+      "legacyWord": "der R-Wert",
+      "entryIds": [],
+      "formula": {
+        "label": "فرمول",
+        "value": "R = d / λ"
+      },
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "R",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "m²·K/W",
+          "kind": "plain"
+        },
+        {
+          "key": "رابطه",
+          "value": "R = 1/U",
+          "kind": "plain"
+        }
+      ]
+    },
+    {
+      "legacyWord": "die Wärmeleitfähigkeit",
+      "entryIds": [],
+      "formula": null,
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "λ (lambda)",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "W/(m·K)",
+          "kind": "plain"
+        },
+        {
+          "key": "بتن",
+          "value": "≈ 2.0",
+          "kind": "plain"
+        },
+        {
+          "key": "هوا",
+          "value": "≈ 0.025",
+          "kind": "plain"
+        }
+      ]
+    },
+    {
+      "legacyWord": "die Wärmedämmung",
+      "entryIds": [],
+      "formula": null,
+      "rows": [
+        {
+          "key": "معیار",
+          "value": "λ < 0.060 W/(m·K)",
+          "kind": "plain"
+        },
+        {
+          "key": "هدف",
+          "value": "کاهش U-Wert",
+          "kind": "persian"
+        }
+      ]
+    },
+    {
+      "legacyWord": "die Wärmebrücke",
+      "entryIds": [],
+      "formula": null,
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "Ψ (psi)",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "W/(m·K)",
+          "kind": "plain"
+        },
+        {
+          "key": "خطر",
+          "value": "میعان، کپک، خوردگی",
+          "kind": "persian"
+        }
+      ]
+    },
+    {
+      "legacyWord": "der Wärmeverlust",
+      "entryIds": [],
+      "formula": {
+        "label": "فرمول",
+        "value": "Q = U · A · ΔT"
+      },
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "Q",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "Watt (W)",
+          "kind": "plain"
+        },
+        {
+          "key": "متغیرها",
+          "value": "U · A · ΔT",
+          "kind": "plain"
+        }
+      ]
+    },
+    {
+      "legacyWord": "der Jahresheizwärmebedarf",
+      "entryIds": [],
+      "formula": null,
+      "rows": [
+        {
+          "key": "واحد",
+          "value": "kWh/(m²·a)",
+          "kind": "plain"
+        },
+        {
+          "key": "Passivhaus",
+          "value": "< 15 kWh/(m²·a)",
+          "kind": "plain"
+        },
+        {
+          "key": "نماد",
+          "value": "QH",
+          "kind": "symbol"
+        }
+      ]
+    },
+    {
+      "legacyWord": "das Passivhaus",
+      "entryIds": [],
+      "formula": null,
+      "rows": [
+        {
+          "key": "انرژی",
+          "value": "< 15 kWh/(m²·a)",
+          "kind": "plain"
+        },
+        {
+          "key": "گرمایش",
+          "value": "< 10 W/m²",
+          "kind": "plain"
+        }
+      ]
+    },
+    {
+      "legacyWord": "der Taupunkt",
+      "entryIds": [],
+      "formula": {
+        "label": "فرمول",
+        "value": "Td ≈ T − (100−RH)/5"
+      },
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "Td",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "°C",
+          "kind": "plain"
+        },
+        {
+          "key": "خطر",
+          "value": "زیر Td → میعان و کپک",
+          "kind": "persian"
+        }
+      ]
+    },
+    {
+      "legacyWord": "der sd-Wert",
+      "entryIds": [],
+      "formula": {
+        "label": "فرمول",
+        "value": "sd = μ · d"
+      },
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "sd",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "متر (m)",
+          "kind": "persian"
+        },
+        {
+          "key": "تعریف",
+          "value": "ضخامت معادل لایه هوا",
+          "kind": "persian"
+        }
+      ]
+    },
+    {
+      "legacyWord": "das Schalldämmmaß (Rw)",
+      "entryIds": [],
+      "formula": null,
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "Rw",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "dB",
+          "kind": "plain"
+        },
+        {
+          "key": "حداقل",
+          "value": "Rw ≥ 53 dB",
+          "kind": "plain"
+        }
+      ]
+    },
+    {
+      "legacyWord": "der Dezibel (dB)",
+      "entryIds": [],
+      "formula": {
+        "label": "فرمول",
+        "value": "L = 20 · log(p / p₀)"
+      },
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "dB",
+          "kind": "symbol"
+        },
+        {
+          "key": "مقیاس",
+          "value": "لگاریتمی",
+          "kind": "persian"
+        },
+        {
+          "key": "انسان",
+          "value": "0 – 130 dB",
+          "kind": "plain"
+        }
+      ]
+    },
+    {
+      "legacyWord": "die Kraft",
+      "entryIds": [
+        "dv_f6b139ef79"
+      ],
+      "formula": {
+        "label": "فرمول",
+        "value": "F = m · a"
+      },
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "F",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "Newton (N)",
+          "kind": "plain"
+        }
+      ]
+    },
+    {
+      "legacyWord": "das Moment",
+      "entryIds": [],
+      "formula": {
+        "label": "فرمول",
+        "value": "M = F · l"
+      },
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "M",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "kN·m",
+          "kind": "plain"
+        }
+      ]
+    },
+    {
+      "legacyWord": "das Biegemoment",
+      "entryIds": [
+        "dv_4c9a2cac86"
+      ],
+      "formula": {
+        "label": "فرمول",
+        "value": "M = F × l"
+      },
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "M",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "kN·m",
+          "kind": "plain"
+        },
+        {
+          "key": "اثر",
+          "value": "بالا: فشار — پایین: کشش",
+          "kind": "persian"
+        }
+      ]
+    },
+    {
+      "legacyWord": "die Querkraft",
+      "entryIds": [
+        "dv_fdb99010b9"
+      ],
+      "formula": null,
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "V یا Q",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "kN",
+          "kind": "plain"
+        },
+        {
+          "key": "جهت",
+          "value": "عمود بر محور",
+          "kind": "persian"
+        }
+      ]
+    },
+    {
+      "legacyWord": "die Normalkraft",
+      "entryIds": [
+        "dv_2cbbcb7604"
+      ],
+      "formula": null,
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "N",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "kN",
+          "kind": "plain"
+        },
+        {
+          "key": "انواع",
+          "value": "کشش (+) · فشار (−)",
+          "kind": "persian"
+        }
+      ]
+    },
+    {
+      "legacyWord": "die Spannung",
+      "entryIds": [
+        "dv_8766ba503d"
+      ],
+      "formula": {
+        "label": "فرمول",
+        "value": "σ = F / A"
+      },
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "σ (sigma)",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "N/mm² (MPa)",
+          "kind": "plain"
+        },
+        {
+          "key": "انواع",
+          "value": "فشاری · کششی · برشی",
+          "kind": "persian"
+        }
+      ]
+    },
+    {
+      "legacyWord": "die Druckspannung",
+      "entryIds": [
+        "dv_107ef6398b"
+      ],
+      "formula": {
+        "label": "فرمول",
+        "value": "σd = F / A"
+      },
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "σd",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "N/mm²",
+          "kind": "plain"
+        },
+        {
+          "key": "بتن",
+          "value": "30–100 N/mm²",
+          "kind": "plain"
+        }
+      ]
+    },
+    {
+      "legacyWord": "die Zugspannung",
+      "entryIds": [
+        "dv_d817d93806"
+      ],
+      "formula": {
+        "label": "فرمول",
+        "value": "σt = F / A"
+      },
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "σt",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "N/mm²",
+          "kind": "plain"
+        },
+        {
+          "key": "بتن",
+          "value": "ضعیف: ~3 N/mm²",
+          "kind": "persian"
+        }
+      ]
+    },
+    {
+      "legacyWord": "die Dehnung",
+      "entryIds": [
+        "dv_c6cd64949f"
+      ],
+      "formula": {
+        "label": "فرمول",
+        "value": "ε = ΔL / L₀"
+      },
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "ε (epsilon)",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "بدون واحد",
+          "kind": "persian"
+        },
+        {
+          "key": "قانون هوک",
+          "value": "σ = E · ε",
+          "kind": "plain"
+        }
+      ]
+    },
+    {
+      "legacyWord": "der Elastizitätsmodul (E-Modul)",
+      "entryIds": [
+        "dv_21a8d19f27"
+      ],
+      "formula": {
+        "label": "فرمول",
+        "value": "E = σ / ε"
+      },
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "E",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "N/mm²",
+          "kind": "plain"
+        },
+        {
+          "key": "فولاد",
+          "value": "210,000 N/mm²",
+          "kind": "plain"
+        },
+        {
+          "key": "بتن",
+          "value": "≈ 30,000 N/mm²",
+          "kind": "plain"
+        }
+      ]
+    },
+    {
+      "legacyWord": "die Durchbiegung",
+      "entryIds": [
+        "dv_dc2ec3cb5f"
+      ],
+      "formula": {
+        "label": "فرمول",
+        "value": "f = 5·q·L⁴/(384·E·I)"
+      },
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "f",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "mm",
+          "kind": "plain"
+        },
+        {
+          "key": "محدودیت",
+          "value": "f ≤ L/300",
+          "kind": "plain"
+        }
+      ]
+    },
+    {
+      "legacyWord": "das Trägheitsmoment",
+      "entryIds": [],
+      "formula": {
+        "label": "فرمول",
+        "value": "I = b · h³ / 12"
+      },
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "I",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "cm⁴",
+          "kind": "plain"
+        },
+        {
+          "key": "اثر",
+          "value": "بیشتر → خیز کمتر",
+          "kind": "persian"
+        }
+      ]
+    },
+    {
+      "legacyWord": "die Steifigkeit",
+      "entryIds": [
+        "dv_d654a149dc"
+      ],
+      "formula": {
+        "label": "فرمول",
+        "value": "EI = E · I"
+      },
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "EI",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "N·mm²",
+          "kind": "plain"
+        },
+        {
+          "key": "تعریف",
+          "value": "مقاومت در برابر تغییرشکل",
+          "kind": "persian"
+        }
+      ]
+    },
+    {
+      "legacyWord": "die Knicklast",
+      "entryIds": [
+        "dv_4fd796738a"
+      ],
+      "formula": {
+        "label": "فرمول",
+        "value": "Fk = π²·E·I / L²"
+      },
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "Fk",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "kN",
+          "kind": "plain"
+        },
+        {
+          "key": "قانون",
+          "value": "اویلر — ستون لاغر",
+          "kind": "persian"
+        }
+      ]
+    },
+    {
+      "legacyWord": "der Wasserzementwert (w/z)",
+      "entryIds": [
+        "dv_e6b5618238"
+      ],
+      "formula": {
+        "label": "فرمول",
+        "value": "w/z = m_w / m_z"
+      },
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "w/z",
+          "kind": "symbol"
+        },
+        {
+          "key": "محدوده",
+          "value": "0.35 – 0.60",
+          "kind": "plain"
+        },
+        {
+          "key": "قانون",
+          "value": "کمتر → مقاومت بیشتر",
+          "kind": "persian"
+        }
+      ]
+    },
+    {
+      "legacyWord": "die Druckfestigkeit",
+      "entryIds": [
+        "dv_be929632da"
+      ],
+      "formula": null,
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "fck",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "N/mm²",
+          "kind": "plain"
+        },
+        {
+          "key": "کلاس‌ها",
+          "value": "C20/25 · C30/37",
+          "kind": "plain"
+        }
+      ]
+    },
+    {
+      "legacyWord": "die Streckgrenze",
+      "entryIds": [
+        "dv_3ae98d1df6"
+      ],
+      "formula": null,
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "fy",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "N/mm²",
+          "kind": "plain"
+        },
+        {
+          "key": "S235",
+          "value": "235 N/mm²",
+          "kind": "plain"
+        },
+        {
+          "key": "S355",
+          "value": "355 N/mm²",
+          "kind": "plain"
+        }
+      ]
+    },
+    {
+      "legacyWord": "die Zugfestigkeit",
+      "entryIds": [
+        "dv_9b65adb93f"
+      ],
+      "formula": null,
+      "rows": [
+        {
+          "key": "نماد",
+          "value": "fu",
+          "kind": "symbol"
+        },
+        {
+          "key": "واحد",
+          "value": "N/mm²",
+          "kind": "plain"
+        },
+        {
+          "key": "S235",
+          "value": "fu = 360 N/mm²",
+          "kind": "plain"
+        }
+      ]
+    },
+    {
+      "legacyWord": "das Gefälle",
+      "entryIds": [
+        "dv_520d101748"
+      ],
+      "formula": null,
+      "rows": [
+        {
+          "key": "بام مسطح",
+          "value": "≥ 2%",
+          "kind": "plain"
+        },
+        {
+          "key": "بام شیبدار",
+          "value": "≥ 5%",
+          "kind": "plain"
+        },
+        {
+          "key": "محاسبه",
+          "value": "h / L × 100",
+          "kind": "plain"
+        }
+      ]
+    }
+  ]
+}
