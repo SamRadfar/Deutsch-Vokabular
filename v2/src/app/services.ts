@@ -8,6 +8,8 @@ import { createDefaultLocalStore } from '../features/progress/localStore';
 import type { ProgressServices } from '../features/progress/ProgressProvider';
 
 export interface AppServices {
+  /** Shown in the header so it is always visible which backend the app talks to. */
+  environmentLabel?: string;
   auth: AuthService | null;
   authUnavailable?: { reason: AuthUnavailableReason; details: string[] };
   progress: ProgressServices | null;
@@ -25,6 +27,7 @@ export function createAppServices(): AppServices {
   const handles = getFirebase(config.options, config.emulators);
   const db = handles.then((h) => h.db);
   return {
+    environmentLabel: config.environment === 'emulator' ? 'emulator' : `${config.environment === 'development' ? 'dev' : config.environment}: ${config.options.projectId}`,
     auth: createFirebaseAuthService(handles.then((h) => h.auth)),
     progress: {
       createRemote: () => createFirestoreProgressRemote(db),

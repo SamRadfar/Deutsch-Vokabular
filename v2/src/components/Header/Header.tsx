@@ -7,6 +7,8 @@ interface Props {
   totalEntries: number;
   /** Learned count of the signed-in user; null when progress is not available. */
   learnedCount: number | null;
+  /** Active backend, e.g. "dev: deutsch-vokabular-v2-dev" or "emulator". */
+  environmentLabel?: string | undefined;
   theme: ThemePreference;
   onToggleTheme(): void;
   /** Sync status + account control. */
@@ -15,7 +17,7 @@ interface Props {
   navigation: ReactNode;
 }
 
-export function Header({ totalEntries, learnedCount, theme, onToggleTheme, account, navigation }: Props) {
+export function Header({ totalEntries, learnedCount, environmentLabel, theme, onToggleTheme, account, navigation }: Props) {
   const pct = learnedCount !== null && totalEntries ? Math.round((learnedCount / totalEntries) * 100) : 0;
   return (
     <header className="hdr">
@@ -38,7 +40,7 @@ export function Header({ totalEntries, learnedCount, theme, onToggleTheme, accou
           ) : (
             <span className="pill" lang="fa" dir="rtl" aria-label={`${totalEntries} واژه`}>{totalEntries} واژه</span>
           )}
-          <span className="preview-badge" title="Development preview — not the production app">v2 preview</span>
+          <span className="preview-badge" title="Development preview — not the production app" data-testid="env-badge">v2 preview{environmentLabel ? ` · ${environmentLabel}` : ''}</span>
           <ThemeToggle theme={theme} onToggle={onToggleTheme} />
           {account}
         </div>

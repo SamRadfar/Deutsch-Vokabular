@@ -53,6 +53,8 @@ test('signed out: browsing works and no progress checkboxes are offered', async 
   await expect(page.getByRole('button', { name: 'ورود با گوگل' })).toBeVisible();
   await expect(page.locator(`[data-entry-id="${first.id}"]`)).toBeVisible();
   await expect(page.getByRole('checkbox')).toHaveCount(0);
+  // The active backend is always visible (never confuse emulator, dev and production).
+  await expect(page.getByTestId('env-badge')).toContainText('emulator');
   expect(errors).toEqual([]);
 });
 

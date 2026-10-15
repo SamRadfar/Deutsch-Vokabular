@@ -42,14 +42,14 @@ export function App({ repository = getVocabularyRepository(), speechService, ser
     <AuthProvider service={resolved.auth} {...(resolved.authUnavailable ? { unavailable: resolved.authUnavailable } : {})}>
       <ProgressProvider services={resolved.progress} knownIds={knownIds}>
         <PronunciationProvider {...(speechService ? { service: speechService } : {})}>
-          <AppContent repository={repository} />
+          <AppContent repository={repository} environmentLabel={resolved.environmentLabel} />
         </PronunciationProvider>
       </ProgressProvider>
     </AuthProvider>
   );
 }
 
-function AppContent({ repository }: { repository: VocabularyRepository }) {
+function AppContent({ repository, environmentLabel }: { repository: VocabularyRepository; environmentLabel: string | undefined }) {
   const { theme, toggle } = useTheme();
   const nav = useVocabularyNavigation(repository.categories);
   const category = nav.activeCategory;
@@ -76,6 +76,7 @@ function AppContent({ repository }: { repository: VocabularyRepository }) {
       <Header
         totalEntries={repository.totalEntries}
         learnedCount={learnedCount}
+        environmentLabel={environmentLabel}
         theme={theme}
         onToggleTheme={toggle}
         account={(
