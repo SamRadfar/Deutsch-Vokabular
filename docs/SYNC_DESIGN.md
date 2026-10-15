@@ -49,6 +49,10 @@ cannot overwrite it.
 
 ## 4. Read path and conflict resolution
 
+**Read cost.** The first sync on a device (or after 7 days) reads the user's whole progress
+collection; afterwards the listener only queries documents with `updatedAt` newer than the newest
+server time stored locally (`FIREBASE_VALIDATION.md` §4).
+
 The listener (`onSnapshot`, metadata changes included) delivers **server-confirmed** documents
 only. Latency-compensated local echoes (`hasPendingWrites`) are skipped. For each document:
 

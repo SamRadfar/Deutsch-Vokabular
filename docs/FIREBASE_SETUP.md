@@ -1,180 +1,168 @@
-# Firebase setup for Deutsch Vokabular 2.0
+# Firebase setup for Deutsch Vokabular 2.0 (development project)
 
 Audience: the product owner, who has access to the Firebase/Google Cloud console.
 Everything here is a **manual action**. The code never creates projects, enables providers,
-changes rules or deploys anything by itself.
+changes rules or deploys anything by itself. Exact console labels may differ slightly from the
+wording here.
 
-> **Public vs. secret.** The Firebase *web* configuration (API key, auth domain, project id,
-> app id, …) is **public by design**. It is embedded in every browser bundle and only identifies
-> the project. Protection comes from Firebase Authentication plus Firestore Security Rules.
-> **Secrets** are service-account JSON files, private keys, OAuth *client secrets* and the
-> Anthropic API key. They must never be put into the repository, a `.env` file used by Vite,
-> documentation, chat messages or the browser.
+> **Public vs. secret.** The Firebase *web app* configuration (API key, auth domain, project id,
+> app id, sender id, bucket) is **public by design**. It is part of every browser bundle and only
+> identifies the project. Protection comes from Firebase Authentication plus Firestore Security
+> Rules. **Never** share or store service-account JSON files, private keys, OAuth *client secrets*,
+> refresh tokens, Google passwords or the Anthropic API key — not in the repository, not in
+> `.env.local`, not in documentation, not in chat. The only thing to hand over is the public web
+> app config from step 2.
 
-## 0. Choose the Firebase project (decision needed)
+## Target architecture
 
-| Option | Pros | Cons |
+| | Legacy app | Deutsch Vokabular 2.0 |
 |---|---|---|
-| **A. New project** for v2 (recommended), e.g. `deutsch-vokabular-v2` | Clean rules; no risk of breaking the legacy `syncCodes` sync; separate quotas and billing | A second project to maintain |
-| B. Reuse the legacy project (`firebaseConfig` in `index.html`) | One project | The rules **must be merged** with the unknown legacy rules (§7). A mistake breaks the legacy app's sync |
+| Firebase project | existing (`deutsch-wortschatz-c7a11`), **untouched** | **separate**: first `deutsch-vokabular-v2-dev`, later a production project |
+| Website | GitHub Pages (unchanged) | local dev now; hosting is decided later (`HOSTING_EVALUATION.md`) |
+| Data | `syncCodes/{code}` (untouched) | `users/{uid}/…` with per-user rules |
 
-Migration does **not** need the legacy project, because v2 imports from browser storage or a
-JSON backup and never reads `syncCodes`.
+A **separate development project** is the safest option. It cannot affect the legacy app's data
+or rules, it has its own quotas and test users, and it can be deleted entirely after testing. The
+app refuses the legacy project id in every mode (`FIREBASE_VALIDATION.md` §2).
 
-## 1. Register the web app
+## 1. Create the development project (Spark, no billing)
 
-1. Firebase Console → *Project settings* → *General* → *Your apps* → **Add app → Web**.
-2. Give it a nickname (e.g. `v2-web`). Firebase Hosting is **not** needed now.
-3. Copy the values from the displayed `firebaseConfig` into `v2/.env.local`, which is git-ignored.
-   Use `v2/.env.example` as the template:
+1. <https://console.firebase.google.com> → **Create a project**.
+2. Name: `deutsch-vokabular-v2-dev`. The project **id** must contain `-dev`; Firebase may append
+   a suffix such as `-1a2b3`, which is fine. Note the final project id.
+3. Google Analytics: **disable** (not needed).
+4. Plan: stay on **Spark** (no payment method needed). **Do not** upgrade to Blaze; that would
+   need a billing account and is not required.
 
-| Variable | From `firebaseConfig` | Public? |
-|---|---|---|
-| `VITE_FIREBASE_API_KEY` | `apiKey` | yes |
-| `VITE_FIREBASE_AUTH_DOMAIN` | `authDomain` (e.g. `<project>.firebaseapp.com`) | yes |
-| `VITE_FIREBASE_PROJECT_ID` | `projectId` | yes |
-| `VITE_FIREBASE_APP_ID` | `appId` | yes |
-| `VITE_FIREBASE_MESSAGING_SENDER_ID` (optional) | `messagingSenderId` | yes |
-| `VITE_FIREBASE_STORAGE_BUCKET` (optional) | `storageBucket` | yes |
+## 2. Register the web app and copy the public config
 
-Without these values the app runs in browse-only mode. «ورود با گوگل» then explains that sign-in
-is not configured, and no progress checkbox is shown. Values that look like private keys or
-client secrets are rejected at start-up.
+1. Project overview → **Add app** → **Web** (`</>`).
+2. Nickname: `v2-web-dev`. Do **not** tick "Also set up Firebase Hosting".
+3. Copy the shown `firebaseConfig` values into `v2/.env.local` (git-ignored; template:
+   `v2/.env.example`):
 
-**Recommended hardening:** in Google Cloud Console → *APIs & Services* → *Credentials*, restrict
-the browser API key to HTTP referrers `http://localhost:*/*` and
-`https://samradfar.github.io/*`.
+```dotenv
+VITE_FIREBASE_ENV=development
+VITE_FIREBASE_API_KEY=<apiKey>
+VITE_FIREBASE_AUTH_DOMAIN=<projectId>.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=<projectId>
+VITE_FIREBASE_APP_ID=<appId>
+VITE_FIREBASE_MESSAGING_SENDER_ID=<messagingSenderId>   # optional
+VITE_FIREBASE_STORAGE_BUCKET=<storageBucket>            # optional
+VITE_FIREBASE_USE_EMULATORS=false
+```
 
-## 2. Enable Google sign-in
+The app validates the file at start-up and refuses inconsistent values with a named reason
+(e.g. auth domain from another project, legacy project, missing `-dev`).
+`git status` must **not** list `.env.local`.
 
-1. Firebase Console → *Authentication* → *Get started* (first time) → *Sign-in method*.
-2. **Google** → *Enable*. Set a *project support email* → *Save*.
-3. Google Cloud Console → *Google Auth Platform / OAuth consent screen*: app name
-   "Deutsch Vokabular" and a support email. The app only uses the default scopes
-   (`openid`, `email`, `profile`), which need no Google verification. A logo or brand
-   display may require brand verification.
+## 3. Enable Google sign-in
 
-## 3. Authorized domains
+1. **Build → Authentication → Get started**.
+2. **Sign-in method → Add new provider → Google → Enable**.
+3. **Project support email:** choose your own address. It is shown to users on Google's consent
+   screen. The public-facing name can be set in the next step.
+4. **Save.** (Web SDK configuration needs no client id or secret here. Do not copy secrets anywhere.)
+5. Optional: Google Cloud Console → *Google Auth Platform / OAuth consent screen* → app name
+   "Deutsch Vokabular (dev)". The app only uses the default scopes (`openid`, `email`, `profile`),
+   which need no Google verification.
 
-Firebase Console → *Authentication* → *Settings* → **Authorized domains**:
+## 4. Authorized domains
 
-| Domain | When |
+**Authentication → Settings → Authorized domains:**
+
+| Domain | Needed for |
 |---|---|
-| `localhost` | Present by default; needed for `npm run dev` / `npm run preview` |
+| `localhost` | Already listed by default; required for `npm run dev` (http://localhost:5173) and `npm run preview` (http://localhost:4173). Add it if missing |
 | `127.0.0.1` | Only if you open the dev server via the IP address |
-| `samradfar.github.io` | Before any production use on GitHub Pages (Phase 4) |
-| Any custom domain | If one is introduced later |
+| `<projectId>.firebaseapp.com` | Listed by default (the auth handler domain) |
+| A staging/production domain | Later, when hosting is approved (`HOSTING_EVALUATION.md`) |
 
-Signing in from a domain that is missing here fails with a clear Persian message
-(`auth/unauthorized-domain`).
+## 5. Create Cloud Firestore
 
-## 4. Create Cloud Firestore
+1. **Build → Firestore Database → Create database**.
+2. Edition and mode: the standard/native Firestore database.
+3. **Location:** `europe-west3` (Frankfurt), a single region close to the users. It **cannot be
+   changed later.** (`eur3` multi-region offers higher availability at higher cost, which is not
+   needed for development.)
+4. Start in **production mode** (deny all). The app shows sync errors until the reviewed rules are
+   deployed (step 7). That is intended.
 
-1. Firebase Console → *Firestore Database* → **Create database**.
-2. Choose a **location**. It cannot be changed later. Suggested: `europe-west3` (Frankfurt),
-   near the users in Germany.
-3. Start in **production mode** (deny all). Nothing works for clients until the reviewed rules
-   are deployed (§7). That is the safe default.
-
-Data layout written by v2 (details: `docs/SYNC_DESIGN.md`):
-
-```
-users/{uid}                     { schemaVersion, profile: { displayName, photoURL }, updatedAt }
-users/{uid}/progress/{wordId}   { schemaVersion, wordId, learned, updatedAt, clientUpdatedAt, opId, deviceId, origin }
-users/{uid}/migrations/{sha256} { schemaVersion, inputHash, source, legacyContentCommit, contentVersion, counts, status, completedAt }
-```
-
-No email address is stored in Firestore. Users are identified by the Firebase `uid`.
-
-## 5. Local development with a real project (real Google account)
+## 6. Check the configuration locally (before rules)
 
 ```bash
 cd v2
-cp .env.example .env.local      # then fill in the public values from §1
 npm ci
-npm run dev                     # http://localhost:5173/
+npm run dev        # http://localhost:5173
 ```
 
-Click «ورود با گوگل»; a real Google popup opens. This is the **only** way to verify real Google
-OAuth. Automated tests use the emulator (§6) and do not prove it. The rules (§7) must be deployed
-to that project, otherwise every progress read/write is denied (`permission-denied`, shown as a
-sync error).
+- The header badge must read **`v2 preview · dev: <projectId>`**.
+- «ورود با گوگل» → real Google popup → signed in. Progress shows a sync error
+  (`permission-denied`) until step 7. That proves the deny-all default.
 
-## 6. Firebase Emulator Suite (no real accounts, used by the tests)
+## 7. Security Rules for the dev project (approval required)
 
-Requirements: Node ≥ 22.12, **Java 21+** on `PATH` (e.g. Eclipse Temurin 21; on the
-development machine a portable JRE lives in `C:\Users\safar\.local-tools\jdk-21…`).
+The rules are in `v2/firestore.rules` and tested on the emulator (`npm run test:emulator`).
+They are written for **this separate project**, so no merging with legacy rules is needed.
+
+1. Review `v2/firestore.rules` (owner-only access, schema validation, no deletes, create-only
+   migration records).
+2. Install the CLI login once: `npx firebase login`. This is your own interactive Google login; no
+   token is shared.
+3. Dry run (runs the emulator rules tests, deploys nothing):
+   `npm run rules:deploy:dev -- --project <projectId>`
+4. Deploy (owner, after approval):
+   `npm run rules:deploy:dev -- --project <projectId> --confirm`
+5. Firebase Console → Firestore → *Rules* shows the new rules and a publish date.
+
+The script refuses the legacy project, `demo-` ids and ids without `-dev`. **Never** deploy these
+rules to the legacy project: that would replace its rules and break legacy sync.
+
+## 8. Live validation
+
+Follow `FIREBASE_VALIDATION.md` §7 (authentication, Firestore, scenarios A–D, clean-up).
+Use dedicated test Google accounts.
+
+## 9. Billing, quotas and monitoring
+
+Spark (no-cost, no payment method; checked on firebase.google.com/pricing, 2026-10-15):
+
+| Service | No-cost quota |
+|---|---|
+| Firestore | 1 GiB stored; **50 K reads/day**, 20 K writes/day, 20 K deletes/day; 10 GiB/month egress |
+| Authentication | 50 K monthly active users |
+| Hosting (if chosen later) | 10 GB storage, 360 MB/day transfer |
+| App Check | no cost, subject to provider limits |
+
+On Spark, reaching a quota **stops** the service for the rest of the day instead of charging.
+Watch **Firestore → Usage**. Budget alerts require a billing account (Blaze); before any future
+Blaze upgrade, create a budget with email alerts first. The app reduces reads with incremental
+sync (`FIREBASE_VALIDATION.md` §4).
+
+Recommended hardening (owner, optional for dev):
+- Google Cloud Console → *APIs & Services → Credentials*: restrict the browser API key to the
+  referrers `http://localhost:*/*` (dev) and later the real domain.
+- **App Check** (reCAPTCHA): start in monitoring mode, enforce later.
+
+## 10. Emulator (no real accounts; used by the automated tests)
+
+Requires Java 21+ (development machine: portable JRE in `C:\Users\safar\.local-tools\`).
 
 ```bash
 cd v2
-npm run test:emulator          # Firestore rules tests + real-SDK sync tests
-npm run test:e2e:emulator      # browser tests against an emulator-configured build
+npm run test:emulator                       # rules + real-SDK sync tests
+npm run test:e2e:emulator                   # browser tests (Chromium desktop + mobile)
+E2E_BROWSERS=all npm run test:e2e:emulator  # + Edge, Firefox, WebKit desktop, iPhone emulation
 ```
 
-Both use the demo project `demo-deutsch-vokabular`. `demo-` projects can never reach real
-Google services. To click through the app manually against the emulators:
+Emulator configs use `VITE_FIREBASE_ENV=emulator` with the `demo-deutsch-vokabular` project.
 
-```bash
-npx firebase emulators:start --only auth,firestore --project demo-deutsch-vokabular
-# second terminal — run the app against the emulators instead of a real project:
-VITE_FIREBASE_API_KEY=demo-api-key VITE_FIREBASE_AUTH_DOMAIN=demo-deutsch-vokabular.firebaseapp.com \
-VITE_FIREBASE_PROJECT_ID=demo-deutsch-vokabular VITE_FIREBASE_APP_ID=demo-app \
-VITE_FIREBASE_USE_EMULATORS=true npm run dev
-```
+> Correction: Phase 3 claimed that the first emulator sign-in "completes in the popup but does not
+> report back". The real cause was an app-side race on desktop browsers, now fixed
+> (`FIREBASE_VALIDATION.md` §3).
 
-The emulator shows its own fake Google account picker.
+## 11. Sign-in method: popup vs. redirect
 
-> Correction (validation phase): the Phase 3 note that the first emulator sign-in "completes in
-> the popup but does not report back" was wrong. The popup stayed open because the app's auth
-> iframe was not ready yet on **desktop** (Firebase initialises it lazily there). This is fixed in
-> the app (`eagerPopupResolver`, docs/FIREBASE_VALIDATION.md §3); the test warm-up was removed.
-
-## 7. Firestore Security Rules: review, merge, deploy (product owner)
-
-The rules are in `v2/firestore.rules` and tested by `npm run test:emulator`
-(isolation, schema validation, no deletes, create-only migration records).
-
-**They are not deployed.** Deploying a rules file **replaces all rules of the project.**
-
-* **Option A (new project):** review the file, then deploy:
-  ```bash
-  cd v2
-  npx firebase login
-  npx firebase deploy --only firestore:rules --project <your-project-id>
-  ```
-* **Option B (legacy project):** first export the currently deployed rules (Firebase Console →
-  Firestore → *Rules*) and keep a copy. Then add the existing `syncCodes` block **unchanged**
-  next to the `users/{uid}` block in `v2/firestore.rules`, extend
-  `tests/emulator/firestore.rules.test.ts` so it asserts the legacy behaviour still works, run
-  the tests, and only then deploy. The current legacy rules have **not been reviewed**. If they
-  are open (`allow read, write: if true`), that is a separate security issue for the legacy app.
-
-The test `this rules file alone denies syncCodes` exists to make this trap visible.
-
-## 8. Sign-in method: popup vs. redirect (findings)
-
-| Aspect | Popup (implemented) | Redirect (not implemented) |
-|---|---|---|
-| Desktop browsers | Works | Works only if the auth helper shares the app's domain |
-| Browsers that block third-party storage (Safari 16.1+, Firefox, Chrome with storage partitioning) | Works | **Breaks** unless `authDomain` serves `/__/auth/*` from the same site as the app (Firebase Hosting, a reverse proxy, or self-hosted helper files) |
-| GitHub Pages (`samradfar.github.io`) | Works | Not possible: Pages cannot proxy `/__/auth/*` to `<project>.firebaseapp.com` |
-| In-app browsers (Instagram, Telegram, …) | Often blocked → Persian hint to open the page in Chrome/Safari | Unreliable |
-| Popup blocker | The popup is opened synchronously inside the click; a blocked popup shows a Persian hint | — |
-
-Conclusion: popup only. A redirect fallback becomes possible once the app is served from
-Firebase Hosting (or a domain that can proxy `/__/auth/*`). That is a Phase 4 hosting decision.
-
-## 9. Production prerequisites (before Phase 4 deployment)
-
-- [ ] Project chosen (§0), web app registered, `.env` values available to the build
-      (e.g. GitHub Actions variables; they are public, but keep them out of the repository
-      for clarity).
-- [ ] Google provider enabled, consent screen configured (§2).
-- [ ] `samradfar.github.io` (or the final domain) in *Authorized domains* (§3).
-- [ ] Firestore created in the chosen region (§4).
-- [ ] Rules reviewed, merged if needed, emulator tests green, **deployed by the owner** (§7).
-- [ ] Real Google sign-in verified on desktop Chrome, Safari (macOS and iOS) and Android Chrome (§5).
-- [ ] API key restricted by HTTP referrer (§1).
-- [ ] Budget alert in Google Cloud Billing (the free Spark plan has no cost; Blaze does).
-- [ ] Privacy notice: what is stored (uid, display name, photo URL, learned flags).
-- [ ] Optional hardening: Firebase App Check (reCAPTCHA Enterprise) to limit abuse of the project.
+Popup is implemented. Redirect sign-in needs one of Firebase's documented workarounds in Chrome
+115+, Firefox 109+ and Safari 16.1+. The simplest is hosting on Firebase Hosting with the app
+domain as `authDomain`; see `HOSTING_EVALUATION.md`.

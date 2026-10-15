@@ -19,6 +19,9 @@ The production app is the single file `index.html` on `main` (unchanged).
 - **Phase 3 (auth + sync, branch `feature/pro-v2-auth-sync`):** Google sign-in, personal progress
   (IndexedDB + Firestore, per-user Security Rules, offline queue) and an explicit legacy migration.
   Not deployed; Firebase must be configured manually ([docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md)).
+- **Phase 3B (Firebase validation, branch `chore/pro-v2-firebase-validation`):** environment
+  safeguards, desktop sign-in race fix, incremental sync, cross-browser emulator tests, hosting
+  evaluation. **Waiting for a real Firebase dev project** ([docs/FIREBASE_VALIDATION.md](docs/FIREBASE_VALIDATION.md)).
 
 ## Quick start
 
@@ -43,4 +46,6 @@ cd v2 && npm ci && npm run dev   # v2 preview → http://localhost:5173/
 | [docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md) | Manual Firebase configuration (product owner) |
 | [docs/SYNC_DESIGN.md](docs/SYNC_DESIGN.md) | Progress storage, sync and conflict handling |
 | [docs/MIGRATION_GUIDE.md](docs/MIGRATION_GUIDE.md) | How users move legacy progress |
+| [docs/FIREBASE_VALIDATION.md](docs/FIREBASE_VALIDATION.md) | Validation status, findings, live test protocol |
+| [docs/HOSTING_EVALUATION.md](docs/HOSTING_EVALUATION.md) | GitHub Pages vs Firebase Hosting (recommendation) |
 | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Workflow, commands, rules |

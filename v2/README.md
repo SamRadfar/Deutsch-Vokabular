@@ -19,7 +19,8 @@ and follow [`../docs/FIREBASE_SETUP.md`](../docs/FIREBASE_SETUP.md).
 | Unit + component tests (Vitest, jsdom) | `npm test` |
 | Browser tests (Playwright; builds and previews automatically) | `npm run test:e2e` |
 | Firestore rules + real-SDK sync tests on the emulators (Java 21+) | `npm run test:emulator` |
-| Browser tests against the emulators (Java 21+) | `npm run test:e2e:emulator` |
+| Browser tests against the emulators (Java 21+) | `npm run test:e2e:emulator` (add `E2E_BROWSERS=all` for Edge, Firefox, WebKit, iPhone emulation) |
+| Guarded rules deployment to the **dev** project (owner, after approval) | `npm run rules:deploy:dev -- --project <id> [--confirm]` |
 | Production build → `v2/dist/` | `npm run build` |
 | Preview the production build | `npm run preview`, then open <http://localhost:4173/> |
 | Absolute base path, e.g. for GitHub Pages | `V2_BASE=/Deutsch-Vokabular/ npm run build` (default `./` works under any sub-path) |
