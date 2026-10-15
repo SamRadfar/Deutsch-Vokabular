@@ -1,0 +1,94 @@
+rules_version = '2';
+
+// Deutsch Vokabular 2.0 — rules for per-user data (users/{uid}/…).
+//
+// ⚠ NOT DEPLOYED. Deploying this file on its own REPLACES every existing rule in the project,
+// including whatever currently allows the legacy app's `syncCodes/{code}` documents — the
+// legacy app would stop syncing. Merge procedure: docs/FIREBASE_SETUP.md §7.
+//
+// Principles: deny by default; a signed-in user can read/write only users/{their uid}/…;
+// documents are schema-validated; timestamps must be server time; nothing can be deleted
+// from the client; migration records are create-only.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    function isWordId(id) { return id.matches('^dv_[0-9a-f]{10}$'); }
+    function boundedString(v, max) { return v is string && v.size() > 0 && v.size() <= max; }
+    function nullableString(v, max) { return v == null || (v is string && v.size() <= max); }
+    function smallCount(v) { return v is int && v >= 0 && v <= 100000; }
+
+    match /users/{uid} {
+      allow get: if isOwner(uid);
+      allow list: if false;
+      allow create, update: if isOwner(uid) && validUser(request.resource.data);
+      allow delete: if false;
+
+      function validUser(d) {
+        return d.keys().hasOnly(['schemaVersion', 'profile', 'preferences', 'updatedAt'])
+          && d.schemaVersion == 1
+          && d.updatedAt == request.time
+          && (!('profile' in d) || (
+                d.profile is map
+                && d.profile.keys().hasOnly(['displayName', 'photoURL'])
+                && nullableString(d.profile.get('displayName', null), 200)
+                && nullableString(d.profile.get('photoURL', null), 2000)))
+          && (!('preferences' in d) || (
+                d.preferences is map
+                && d.preferences.keys().hasOnly(['theme'])
+                && (!('theme' in d.preferences) || d.preferences.theme in ['light', 'dark'])));
+      }
+
+      // One document per built-in vocabulary entry the user has touched.
+      match /progress/{wordId} {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validProgress(wordId, request.resource.data);
+        allow delete: if false; // "not learned" is stored as learned == false (keeps LWW order)
+      }
+
+      function validProgress(wordId, d) {
+        let fields = ['schemaVersion', 'wordId', 'learned', 'updatedAt', 'clientUpdatedAt', 'opId', 'deviceId', 'origin'];
+        return isWordId(wordId)
+          && d.keys().hasAll(fields) && d.keys().hasOnly(fields)
+          && d.schemaVersion == 1
+          && d.wordId == wordId
+          && d.learned is bool
+          && d.updatedAt == request.time
+          && d.clientUpdatedAt is int
+          && boundedString(d.opId, 64)
+          && boundedString(d.deviceId, 64)
+          && d.origin in ['toggle', 'migration'];
+      }
+
+      // Proof that a legacy dataset was imported; id = SHA-256 of the imported input.
+      match /migrations/{migrationId} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid) && validMigration(migrationId, request.resource.data);
+        allow update, delete: if false;
+      }
+
+      function validMigration(id, d) {
+        let fields = ['schemaVersion', 'inputHash', 'source', 'legacyContentCommit', 'contentVersion', 'counts', 'status', 'completedAt'];
+        let countFields = ['matchedEntries', 'imported', 'alreadyLearned', 'conflictsSkipped', 'ambiguousKeys', 'orphanedKeys'];
+        return id.matches('^[0-9a-f]{64}$')
+          && d.keys().hasAll(fields) && d.keys().hasOnly(fields)
+          && d.schemaVersion == 1
+          && d.inputHash == id
+          && d.source in ['same-origin', 'backup-file']
+          && boundedString(d.legacyContentCommit, 40)
+          && boundedString(d.contentVersion, 20)
+          && d.status == 'completed'
+          && d.completedAt == request.time
+          && d.counts is map
+          && d.counts.keys().hasAll(countFields) && d.counts.keys().hasOnly(countFields)
+          && smallCount(d.counts.matchedEntries) && smallCount(d.counts.imported)
+          && smallCount(d.counts.alreadyLearned) && smallCount(d.counts.conflictsSkipped)
+          && smallCount(d.counts.ambiguousKeys) && smallCount(d.counts.orphanedKeys);
+      }
+    }
+
+    // Everything else (including the legacy syncCodes collection) is denied by THIS file.
+  }
+}

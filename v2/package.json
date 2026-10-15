@@ -15,7 +15,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "content:generate": "node scripts/generate-content.mjs"
+    "content:generate": "node scripts/generate-content.mjs",
+    "test:emulator": "firebase emulators:exec --only auth,firestore --project demo-deutsch-vokabular \"vitest run --config vitest.emulator.config.ts\""
   },
   "dependencies": {
     "firebase": "13.0.0",
