@@ -294,3 +294,63 @@ describe('pending local change vs. remote snapshot (deterministic)', () => {
     await until(() => !laptop.getView().learned.has(ids[13]!), 2000, 'laptop converges');
   });
 });
+
+describe('read cost: incremental synchronisation', () => {
+  it('first start reads everything; the next start reads only documents changed since the local copy', async () => {
+    const cloud = createFakeCloud();
+    const laptopLocal = createMemoryStore();
+    const writer = engine('alice', createMemoryStore(), cloud.device('writer'));
+    await writer.start();
+    for (const id of ids.slice(500, 520)) void writer.setLearned(id, true);
+    await until(() => settled(writer), 3000);
+
+    const laptop = engine('alice', laptopLocal, cloud.device('laptop'));
+    await laptop.start();
+    await until(() => laptop.getView().learned.size === 20, 3000);
+    laptop.stop();
+    const fullReads = cloud.readLog.filter((r) => r.device === 'laptop').length;
+    expect(fullReads).toBe(20);
+
+    await writer.setLearned(ids[520]!, true); // one change while the laptop is closed
+    await until(() => settled(writer));
+
+    const laptopAgain = engine('alice', laptopLocal, cloud.device('laptop-again'));
+    await laptopAgain.start();
+    await until(() => laptopAgain.getView().learned.size === 21, 3000, 'incremental change arrives');
+    const incremental = cloud.readLog.filter((r) => r.device === 'laptop-again');
+    expect(incremental.map((r) => r.wordId)).toEqual([ids[520]]); // 1 read instead of 21
+    expect(incremental[0]!.since).toBeTypeOf('number');
+  });
+
+  it('falls back to a full read when the last full sync is older than the interval', async () => {
+    const cloud = createFakeCloud();
+    const local = createMemoryStore();
+    let clock = 1_000_000_000_000;
+    const now = () => clock;
+    const writer = engine('alice', createMemoryStore(), cloud.device('w'));
+    await writer.start();
+    for (const id of ids.slice(600, 605)) void writer.setLearned(id, true);
+    await until(() => settled(writer));
+    const first = engine('alice', local, cloud.device('d1'), { now, fullResyncIntervalMs: 1000 });
+    await first.start();
+    await until(() => first.getView().learned.size === 5);
+    first.stop();
+    clock += 5000; // interval elapsed
+    const second = engine('alice', local, cloud.device('d2'), { now, fullResyncIntervalMs: 1000 });
+    await second.start();
+    await until(() => cloud.readLog.filter((r) => r.device === 'd2').length === 5, 3000, 'full re-read');
+    expect(cloud.readLog.filter((r) => r.device === 'd2').every((r) => r.since === undefined)).toBe(true);
+  });
+
+  it('without a local copy (new device / cleared storage) it always reads everything', async () => {
+    const cloud = createFakeCloud();
+    const writer = engine('alice', createMemoryStore(), cloud.device('w'));
+    await writer.start();
+    await writer.setLearned(ids[700]!, true);
+    await until(() => settled(writer));
+    const fresh = engine('alice', createMemoryStore(), cloud.device('fresh'));
+    await fresh.start();
+    await until(() => fresh.getView().learned.has(ids[700]!));
+    expect(cloud.readLog.filter((r) => r.device === 'fresh')[0]!.since).toBeUndefined();
+  });
+});

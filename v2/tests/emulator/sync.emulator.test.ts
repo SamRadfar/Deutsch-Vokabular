@@ -97,6 +97,43 @@ describe('cross-device synchronisation (emulator)', () => {
   });
 });
 
+describe('read cost through the real adapter', () => {
+  it('a restart with a local copy uses an incremental query and receives only changed documents', async () => {
+    const sub = `incr-${Date.now()}`;
+    const writerDev = await device(sub);
+    const writer = startEngine(writerDev.uid, writerDev.remote);
+    await writer.start();
+    const five = ids.slice(800, 805);
+    for (const id of five) void writer.setLearned(id, true);
+    await until(() => settled(writer), 15_000, 'writer confirmed');
+
+    const local = createMemoryStore();
+    const readerDev = await device(sub);
+    const counting = (label: string, sink: string[][]) => ({
+      ...readerDev.remote,
+      subscribe: (uid: string, h: Parameters<typeof readerDev.remote.subscribe>[1], o?: Parameters<typeof readerDev.remote.subscribe>[2]) =>
+        readerDev.remote.subscribe(uid, { ...h, onDocs: (docs) => { sink.push([label, ...docs.map((d) => d.wordId)]); h.onDocs(docs); } }, o),
+    });
+    const firstBatches: string[][] = [];
+    const first = new ProgressSyncEngine({ uid: readerDev.uid, local, remote: counting('first', firstBatches), deviceId: 'r1', knownIds, retryBaseMs: 50, firstSnapshotTimeoutMs: 3000 });
+    engines.push(first);
+    await first.start();
+    await until(() => first.getView().learned.size === 5, 15_000, 'full read');
+    first.stop();
+    expect(firstBatches.flatMap((b) => b.slice(1)).sort()).toEqual([...five].sort());
+
+    await writer.setLearned(ids[805]!, true);
+    await until(() => settled(writer), 15_000);
+
+    const secondBatches: string[][] = [];
+    const second = new ProgressSyncEngine({ uid: readerDev.uid, local, remote: counting('second', secondBatches), deviceId: 'r2', knownIds, retryBaseMs: 50, firstSnapshotTimeoutMs: 3000 });
+    engines.push(second);
+    await second.start();
+    await until(() => second.getView().learned.size === 6, 15_000, 'incremental change');
+    expect(secondBatches.flatMap((b) => b.slice(1))).toEqual([ids[805]]);
+  });
+});
+
 describe('isolation and rules through the real adapter', () => {
   it('a different account cannot subscribe to or write another user’s progress', async () => {
     const alice = await device(`iso-alice-${Date.now()}`);

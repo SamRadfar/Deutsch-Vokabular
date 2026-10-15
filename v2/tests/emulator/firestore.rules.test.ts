@@ -88,6 +88,8 @@ describe('progress: schema validation', () => {
     ['oversized opId', { opId: 'x'.repeat(65) }],
     ['empty deviceId', { deviceId: '' }],
     ['non-integer clientUpdatedAt', { clientUpdatedAt: 'now' }],
+    ['negative clientUpdatedAt', { clientUpdatedAt: -1 }],
+    ['absurd future clientUpdatedAt', { clientUpdatedAt: 10000000000000 }],
   ];
   for (const [name, overrides] of cases) {
     it(`rejects ${name}`, async () => {

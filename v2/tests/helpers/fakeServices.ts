@@ -7,10 +7,11 @@ import { createFakeCloud } from './fakeCloud';
 export function createFakeAccountRemote() {
   const records = new Map<string, MigrationRecord>();
   const profiles = new Map<string, unknown>();
-  const remote: AccountRemote & { records: typeof records; profiles: typeof profiles } = {
+  const remote: AccountRemote & { records: typeof records; profiles: typeof profiles; profileWrites: number } = {
     records,
     profiles,
-    async saveProfile(uid, profile) { profiles.set(uid, profile); },
+    profileWrites: 0,
+    async saveProfile(uid, profile) { remote.profileWrites++; profiles.set(uid, profile); },
     async getMigrationRecord(uid, hash) { return records.get(`${uid}/${hash}`) ?? null; },
     async createMigrationRecord(uid, record) {
       const key = `${uid}/${record.inputHash}`;

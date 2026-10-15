@@ -22,9 +22,17 @@ export interface RemoteSubscriptionHandlers {
   onError(error: RemoteError): void;
 }
 
+export interface SubscribeOptions {
+  /**
+   * Incremental sync: only documents whose server time is strictly greater than this (ms).
+   * Omitted = full read of the user's progress collection.
+   */
+  since?: number;
+}
+
 /** Boundary to the cloud store; implemented for Firestore and by in-memory test doubles. */
 export interface ProgressRemote {
-  subscribe(uid: string, handlers: RemoteSubscriptionHandlers): () => void;
+  subscribe(uid: string, handlers: RemoteSubscriptionHandlers, options?: SubscribeOptions): () => void;
   /** Resolves when the server has accepted the write; rejects with a RemoteError. */
   write(uid: string, write: ProgressWrite): Promise<void>;
 }

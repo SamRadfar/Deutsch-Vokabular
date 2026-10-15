@@ -4,7 +4,7 @@
 // reconnected (writes then flush in order), and errors can be injected per write.
 
 import type { ProgressWrite } from '../../src/features/progress/model';
-import type { ProgressRemote, RemoteError, RemoteProgressDoc, RemoteSubscriptionHandlers } from '../../src/features/progress/remote';
+import type { ProgressRemote, RemoteError, RemoteProgressDoc, RemoteSubscriptionHandlers, SubscribeOptions } from '../../src/features/progress/remote';
 
 interface ServerDoc extends RemoteProgressDoc { deviceId: string }
 
@@ -12,20 +12,23 @@ export function createFakeCloud() {
   const docs = new Map<string, Map<string, ServerDoc>>(); // uid → wordId → doc
   let clock = 1_000_000;
   const writeLog: Array<{ device: string; uid: string; write: ProgressWrite }> = [];
+  /** Every document delivered to any subscriber (read-cost accounting). */
+  const readLog: Array<{ device: string; uid: string; wordId: string; since: number | undefined }> = [];
 
   function device(name: string) {
     let online = true;
-    const subs = new Set<{ uid: string; h: RemoteSubscriptionHandlers; seen: Map<string, number> }>();
+    const subs = new Set<{ uid: string; h: RemoteSubscriptionHandlers; seen: Map<string, number>; since: number | undefined }>();
     const queued: Array<() => void> = [];
     let nextError: RemoteError | null = null;
     let failNext = 0;
 
-    const deliver = (sub: { uid: string; h: RemoteSubscriptionHandlers; seen: Map<string, number> }) => {
+    const deliver = (sub: { uid: string; h: RemoteSubscriptionHandlers; seen: Map<string, number>; since: number | undefined }) => {
       if (!online) return;
       const changed: RemoteProgressDoc[] = [];
       for (const d of docs.get(sub.uid)?.values() ?? []) {
         if ((sub.seen.get(d.wordId) ?? -1) < d.serverUpdatedAt) {
           sub.seen.set(d.wordId, d.serverUpdatedAt);
+          readLog.push({ device: name, uid: sub.uid, wordId: d.wordId, since: sub.since });
           changed.push({ wordId: d.wordId, learned: d.learned, opId: d.opId, origin: d.origin, serverUpdatedAt: d.serverUpdatedAt });
         }
       }
@@ -39,8 +42,12 @@ export function createFakeCloud() {
       inject(uid: string, doc: RemoteProgressDoc): void;
       readonly subscriptions: number;
     } = {
-      subscribe(uid, h) {
-        const sub = { uid, h, seen: new Map<string, number>() };
+      subscribe(uid, h, options: SubscribeOptions = {}) {
+        const sub = { uid, h, seen: new Map<string, number>(), since: options.since };
+        // Incremental query: documents at or before `since` are not part of the result set.
+        if (options.since !== undefined) {
+          for (const d of docs.get(uid)?.values() ?? []) if (d.serverUpdatedAt <= options.since) sub.seen.set(d.wordId, d.serverUpdatedAt);
+        }
         subs.add(sub);
         deliver(sub);
         return () => subs.delete(sub);
@@ -90,6 +97,7 @@ export function createFakeCloud() {
       return new Map([...(docs.get(uid) ?? new Map<string, ServerDoc>())].map(([k, v]) => [k, v.learned]));
     },
     writeLog,
+    readLog,
   };
 }
 

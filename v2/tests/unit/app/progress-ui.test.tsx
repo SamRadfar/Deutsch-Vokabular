@@ -167,3 +167,15 @@ describe('learned progress UI', () => {
     expect(checkbox(first.word).closest('article')).toHaveClass('vcard');
   });
 });
+
+describe('Firestore write cost', () => {
+  it('writes the profile once, not on every session start', async () => {
+    const env = await signedInApp();
+    await waitFor(() => expect(env.account.profileWrites).toBe(1));
+    env.unmount();
+    render(<App services={env.services} speechService={fakeSpeech()} />);
+    await waitFor(() => expect(checkbox(first.word)).toBeInTheDocument());
+    await new Promise((r) => setTimeout(r, 50));
+    expect(env.account.profileWrites).toBe(1);
+  });
+});

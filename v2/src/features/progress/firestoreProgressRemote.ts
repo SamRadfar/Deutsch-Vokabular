@@ -25,14 +25,20 @@ export function parseProgressDoc(id: string, data: DocumentData): RemoteProgress
 export function createFirestoreProgressRemote(dbPromise: Promise<Firestore>): ProgressRemote {
   const fsModule = import('firebase/firestore');
   return {
-    subscribe(uid, handlers) {
+    subscribe(uid, handlers, options = {}) {
       let unsubscribe: (() => void) | null = null;
       let cancelled = false;
       Promise.all([dbPromise, fsModule])
         .then(([db, fs]) => {
           if (cancelled) return;
+          const col = fs.collection(db, ...paths.progressCollection(uid));
+          // Incremental: only documents changed after the newest server time already stored
+          // locally (uses Firestore's automatic single-field index on updatedAt).
+          const source = options.since !== undefined
+            ? fs.query(col, fs.where('updatedAt', '>', fs.Timestamp.fromMillis(Math.floor(options.since))))
+            : col;
           unsubscribe = fs.onSnapshot(
-            fs.collection(db, ...paths.progressCollection(uid)),
+            source,
             { includeMetadataChanges: true },
             (snap) => {
               const docs: RemoteProgressDoc[] = [];

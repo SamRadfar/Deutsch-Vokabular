@@ -71,12 +71,24 @@ export function ProgressProvider({ services, knownIds, children }: { services: P
     };
   }, [engine]);
 
-  // Minimal profile document (best effort; progress works without it).
+  // Minimal profile document (best effort; progress works without it). Written only when the
+  // display name or photo changed since the last successful write from this device — not on
+  // every session start (Firestore cost, docs/FIREBASE_VALIDATION.md §6).
+  const uidForProfile = user?.uid;
+  const displayName = user?.displayName ?? null;
+  const photoURL = user?.photoURL ?? null;
   useEffect(() => {
-    if (!user || !services) return;
-    services.account.saveProfile(user.uid, { displayName: user.displayName, photoURL: user.photoURL }).catch(() => {});
-    // Re-save only when the profile fields change, not on every auth event.
-  }, [user?.uid, user?.displayName, user?.photoURL, services]);
+    if (!uidForProfile || !services || !store) return;
+    let cancelled = false;
+    void (async () => {
+      const local = await store;
+      const signature = JSON.stringify([displayName, photoURL]);
+      if ((await local.getMeta<string>(uidForProfile, 'profileSaved')) === signature || cancelled) return;
+      await services.account.saveProfile(uidForProfile, { displayName, photoURL });
+      await local.setMeta(uidForProfile, 'profileSaved', signature);
+    })().catch(() => {});
+    return () => { cancelled = true; };
+  }, [uidForProfile, displayName, photoURL, services, store]);
 
   const subscribe = useCallback((l: () => void) => (engine ? engine.subscribe(l) : noopSubscribe()), [engine]);
   const getView = useCallback(() => (engine ? engine.getView() : nullView()), [engine]);

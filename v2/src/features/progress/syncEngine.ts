@@ -36,7 +36,15 @@ export interface SyncEngineOptions {
   retryMaxMs?: number;
   /** Max time the UI waits for the first server snapshot before using local data. */
   firstSnapshotTimeoutMs?: number;
+  /**
+   * A full read of the progress collection happens at least this often (and whenever there is no
+   * local copy); otherwise only documents newer than the local copy are read. Default: 7 days.
+   */
+  fullResyncIntervalMs?: number;
 }
+
+const LAST_FULL_SYNC_KEY = 'lastFullSyncAt';
+const DEFAULT_FULL_RESYNC_MS = 7 * 24 * 60 * 60 * 1000;
 
 const ERROR_TEXT: Record<string, string> = {
   'permission-denied': 'دسترسی به داده‌های حساب رد شد (قوانین امنیتی Firestore).',
@@ -61,6 +69,9 @@ export class ProgressSyncEngine {
   private stopped = false;
   private gotFirstSnapshot = false;
   private resubscribeAttempts = 0;
+  /** True while the current subscription is a full read whose first snapshot is still pending. */
+  private fullReadPending = false;
+  private incremental = false;
 
   constructor(private readonly o: SyncEngineOptions) {
     this.status = {
@@ -85,6 +96,11 @@ export class ProgressSyncEngine {
     if (this.stopped) return;
     for (const c of confirmed) if (isValidConfirmed(c)) this.confirmed.set(c.wordId, c);
     for (const p of pending) if (isValidPending(p)) this.pending.set(p.wordId, { ...p, state: p.state === 'acked' ? 'acked' : 'queued' });
+    const lastFull = await this.o.local.getMeta<number>(this.o.uid, LAST_FULL_SYNC_KEY).catch(() => undefined);
+    const now = (this.o.now ?? Date.now)();
+    this.incremental = this.confirmed.size > 0 && typeof lastFull === 'number'
+      && now - lastFull < (this.o.fullResyncIntervalMs ?? DEFAULT_FULL_RESYNC_MS);
+    if (this.stopped) return;
     this.subscribeRemote();
     // Local data is usable immediately when offline; otherwise wait (bounded) for the server.
     if (!this.status.online) this.status.phase = 'ready';
@@ -239,13 +255,22 @@ export class ProgressSyncEngine {
     this.emit();
   }
 
+  /** Newest server time in the local confirmed copy (cursor for incremental reads). */
+  private newestConfirmed(): number | undefined {
+    let max: number | undefined;
+    for (const c of this.confirmed.values()) if (max === undefined || c.serverUpdatedAt > max) max = c.serverUpdatedAt;
+    return max;
+  }
+
   private subscribeRemote() {
     this.unsubscribe?.();
     this.status = { ...this.status, remote: 'connecting' };
+    const since = this.incremental ? this.newestConfirmed() : undefined;
+    this.fullReadPending = since === undefined;
     this.unsubscribe = this.o.remote.subscribe(this.o.uid, {
       onDocs: (docs) => { void this.serial(() => this.onDocs(docs)); },
       onError: (e) => { void this.serial(() => this.onRemoteError(e)); },
-    });
+    }, since === undefined ? {} : { since });
   }
 
   private async onDocs(docs: RemoteProgressDoc[]) {
@@ -270,6 +295,12 @@ export class ProgressSyncEngine {
     }
     this.gotFirstSnapshot = true;
     this.resubscribeAttempts = 0;
+    if (this.fullReadPending) {
+      // A complete server copy is now local: later (re)subscriptions can be incremental.
+      this.fullReadPending = false;
+      this.incremental = true;
+      await this.o.local.setMeta(this.o.uid, LAST_FULL_SYNC_KEY, (this.o.now ?? Date.now)()).catch(() => {});
+    }
     this.status = { ...this.status, remote: 'live', lastError: this.status.lastError === 'unavailable' ? null : this.status.lastError };
     this.markReady(false);
     try {

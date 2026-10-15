@@ -57,6 +57,7 @@ service cloud.firestore {
           && d.learned is bool
           && d.updatedAt == request.time
           && d.clientUpdatedAt is int
+          && d.clientUpdatedAt >= 0 && d.clientUpdatedAt < 10000000000000 // informational device clock (ms), bounded
           && boundedString(d.opId, 64)
           && boundedString(d.deviceId, 64)
           && d.origin in ['toggle', 'migration'];
