@@ -18,3 +18,9 @@ firebase-adminsdk*.json
 *.log
 .DS_Store
 Thumbs.db
+
+# v2 build variants and Firebase emulator artefacts
+dist-*/
+firebase-debug*.log
+firestore-debug*.log
+ui-debug*.log
