@@ -1,0 +1,674 @@
+{
+  "der U-Wert": {
+    "formula": {
+      "lbl": "فرمول",
+      "val": "U = λ / d"
+    },
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "U",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "W/(m²·K)",
+        "cls": ""
+      },
+      {
+        "key": "قانون",
+        "val": "هرچه کمتر باشد عایق بهتر است",
+        "cls": "fa"
+      }
+    ]
+  },
+  "der R-Wert": {
+    "formula": {
+      "lbl": "فرمول",
+      "val": "R = d / λ"
+    },
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "R",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "m²·K/W",
+        "cls": ""
+      },
+      {
+        "key": "رابطه",
+        "val": "R = 1/U",
+        "cls": ""
+      }
+    ]
+  },
+  "die Wärmeleitfähigkeit": {
+    "formula": null,
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "λ (lambda)",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "W/(m·K)",
+        "cls": ""
+      },
+      {
+        "key": "بتن",
+        "val": "≈ 2.0",
+        "cls": ""
+      },
+      {
+        "key": "هوا",
+        "val": "≈ 0.025",
+        "cls": ""
+      }
+    ]
+  },
+  "die Wärmedämmung": {
+    "formula": null,
+    "kv": [
+      {
+        "key": "معیار",
+        "val": "λ < 0.060 W/(m·K)",
+        "cls": ""
+      },
+      {
+        "key": "هدف",
+        "val": "کاهش U-Wert",
+        "cls": "fa"
+      }
+    ]
+  },
+  "die Wärmebrücke": {
+    "formula": null,
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "Ψ (psi)",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "W/(m·K)",
+        "cls": ""
+      },
+      {
+        "key": "خطر",
+        "val": "میعان، کپک، خوردگی",
+        "cls": "fa"
+      }
+    ]
+  },
+  "der Wärmeverlust": {
+    "formula": {
+      "lbl": "فرمول",
+      "val": "Q = U · A · ΔT"
+    },
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "Q",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "Watt (W)",
+        "cls": ""
+      },
+      {
+        "key": "متغیرها",
+        "val": "U · A · ΔT",
+        "cls": ""
+      }
+    ]
+  },
+  "der Jahresheizwärmebedarf": {
+    "formula": null,
+    "kv": [
+      {
+        "key": "واحد",
+        "val": "kWh/(m²·a)",
+        "cls": ""
+      },
+      {
+        "key": "Passivhaus",
+        "val": "< 15 kWh/(m²·a)",
+        "cls": ""
+      },
+      {
+        "key": "نماد",
+        "val": "QH",
+        "cls": "sym"
+      }
+    ]
+  },
+  "das Passivhaus": {
+    "formula": null,
+    "kv": [
+      {
+        "key": "انرژی",
+        "val": "< 15 kWh/(m²·a)",
+        "cls": ""
+      },
+      {
+        "key": "گرمایش",
+        "val": "< 10 W/m²",
+        "cls": ""
+      }
+    ]
+  },
+  "der Taupunkt": {
+    "formula": {
+      "lbl": "فرمول",
+      "val": "Td ≈ T − (100−RH)/5"
+    },
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "Td",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "°C",
+        "cls": ""
+      },
+      {
+        "key": "خطر",
+        "val": "زیر Td → میعان و کپک",
+        "cls": "fa"
+      }
+    ]
+  },
+  "der sd-Wert": {
+    "formula": {
+      "lbl": "فرمول",
+      "val": "sd = μ · d"
+    },
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "sd",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "متر (m)",
+        "cls": "fa"
+      },
+      {
+        "key": "تعریف",
+        "val": "ضخامت معادل لایه هوا",
+        "cls": "fa"
+      }
+    ]
+  },
+  "das Schalldämmmaß (Rw)": {
+    "formula": null,
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "Rw",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "dB",
+        "cls": ""
+      },
+      {
+        "key": "حداقل",
+        "val": "Rw ≥ 53 dB",
+        "cls": ""
+      }
+    ]
+  },
+  "der Dezibel (dB)": {
+    "formula": {
+      "lbl": "فرمول",
+      "val": "L = 20 · log(p / p₀)"
+    },
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "dB",
+        "cls": "sym"
+      },
+      {
+        "key": "مقیاس",
+        "val": "لگاریتمی",
+        "cls": "fa"
+      },
+      {
+        "key": "انسان",
+        "val": "0 – 130 dB",
+        "cls": ""
+      }
+    ]
+  },
+  "die Kraft": {
+    "formula": {
+      "lbl": "فرمول",
+      "val": "F = m · a"
+    },
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "F",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "Newton (N)",
+        "cls": ""
+      }
+    ]
+  },
+  "das Moment": {
+    "formula": {
+      "lbl": "فرمول",
+      "val": "M = F · l"
+    },
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "M",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "kN·m",
+        "cls": ""
+      }
+    ]
+  },
+  "das Biegemoment": {
+    "formula": {
+      "lbl": "فرمول",
+      "val": "M = F × l"
+    },
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "M",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "kN·m",
+        "cls": ""
+      },
+      {
+        "key": "اثر",
+        "val": "بالا: فشار — پایین: کشش",
+        "cls": "fa"
+      }
+    ]
+  },
+  "die Querkraft": {
+    "formula": null,
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "V یا Q",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "kN",
+        "cls": ""
+      },
+      {
+        "key": "جهت",
+        "val": "عمود بر محور",
+        "cls": "fa"
+      }
+    ]
+  },
+  "die Normalkraft": {
+    "formula": null,
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "N",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "kN",
+        "cls": ""
+      },
+      {
+        "key": "انواع",
+        "val": "کشش (+) · فشار (−)",
+        "cls": "fa"
+      }
+    ]
+  },
+  "die Spannung": {
+    "formula": {
+      "lbl": "فرمول",
+      "val": "σ = F / A"
+    },
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "σ (sigma)",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "N/mm² (MPa)",
+        "cls": ""
+      },
+      {
+        "key": "انواع",
+        "val": "فشاری · کششی · برشی",
+        "cls": "fa"
+      }
+    ]
+  },
+  "die Druckspannung": {
+    "formula": {
+      "lbl": "فرمول",
+      "val": "σd = F / A"
+    },
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "σd",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "N/mm²",
+        "cls": ""
+      },
+      {
+        "key": "بتن",
+        "val": "30–100 N/mm²",
+        "cls": ""
+      }
+    ]
+  },
+  "die Zugspannung": {
+    "formula": {
+      "lbl": "فرمول",
+      "val": "σt = F / A"
+    },
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "σt",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "N/mm²",
+        "cls": ""
+      },
+      {
+        "key": "بتن",
+        "val": "ضعیف: ~3 N/mm²",
+        "cls": "fa"
+      }
+    ]
+  },
+  "die Dehnung": {
+    "formula": {
+      "lbl": "فرمول",
+      "val": "ε = ΔL / L₀"
+    },
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "ε (epsilon)",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "بدون واحد",
+        "cls": "fa"
+      },
+      {
+        "key": "قانون هوک",
+        "val": "σ = E · ε",
+        "cls": ""
+      }
+    ]
+  },
+  "der Elastizitätsmodul (E-Modul)": {
+    "formula": {
+      "lbl": "فرمول",
+      "val": "E = σ / ε"
+    },
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "E",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "N/mm²",
+        "cls": ""
+      },
+      {
+        "key": "فولاد",
+        "val": "210,000 N/mm²",
+        "cls": ""
+      },
+      {
+        "key": "بتن",
+        "val": "≈ 30,000 N/mm²",
+        "cls": ""
+      }
+    ]
+  },
+  "die Durchbiegung": {
+    "formula": {
+      "lbl": "فرمول",
+      "val": "f = 5·q·L⁴/(384·E·I)"
+    },
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "f",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "mm",
+        "cls": ""
+      },
+      {
+        "key": "محدودیت",
+        "val": "f ≤ L/300",
+        "cls": ""
+      }
+    ]
+  },
+  "das Trägheitsmoment": {
+    "formula": {
+      "lbl": "فرمول",
+      "val": "I = b · h³ / 12"
+    },
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "I",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "cm⁴",
+        "cls": ""
+      },
+      {
+        "key": "اثر",
+        "val": "بیشتر → خیز کمتر",
+        "cls": "fa"
+      }
+    ]
+  },
+  "die Steifigkeit": {
+    "formula": {
+      "lbl": "فرمول",
+      "val": "EI = E · I"
+    },
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "EI",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "N·mm²",
+        "cls": ""
+      },
+      {
+        "key": "تعریف",
+        "val": "مقاومت در برابر تغییرشکل",
+        "cls": "fa"
+      }
+    ]
+  },
+  "die Knicklast": {
+    "formula": {
+      "lbl": "فرمول",
+      "val": "Fk = π²·E·I / L²"
+    },
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "Fk",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "kN",
+        "cls": ""
+      },
+      {
+        "key": "قانون",
+        "val": "اویلر — ستون لاغر",
+        "cls": "fa"
+      }
+    ]
+  },
+  "der Wasserzementwert (w/z)": {
+    "formula": {
+      "lbl": "فرمول",
+      "val": "w/z = m_w / m_z"
+    },
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "w/z",
+        "cls": "sym"
+      },
+      {
+        "key": "محدوده",
+        "val": "0.35 – 0.60",
+        "cls": ""
+      },
+      {
+        "key": "قانون",
+        "val": "کمتر → مقاومت بیشتر",
+        "cls": "fa"
+      }
+    ]
+  },
+  "die Druckfestigkeit": {
+    "formula": null,
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "fck",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "N/mm²",
+        "cls": ""
+      },
+      {
+        "key": "کلاس‌ها",
+        "val": "C20/25 · C30/37",
+        "cls": ""
+      }
+    ]
+  },
+  "die Streckgrenze": {
+    "formula": null,
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "fy",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "N/mm²",
+        "cls": ""
+      },
+      {
+        "key": "S235",
+        "val": "235 N/mm²",
+        "cls": ""
+      },
+      {
+        "key": "S355",
+        "val": "355 N/mm²",
+        "cls": ""
+      }
+    ]
+  },
+  "die Zugfestigkeit": {
+    "formula": null,
+    "kv": [
+      {
+        "key": "نماد",
+        "val": "fu",
+        "cls": "sym"
+      },
+      {
+        "key": "واحد",
+        "val": "N/mm²",
+        "cls": ""
+      },
+      {
+        "key": "S235",
+        "val": "fu = 360 N/mm²",
+        "cls": ""
+      }
+    ]
+  },
+  "das Gefälle": {
+    "formula": null,
+    "kv": [
+      {
+        "key": "بام مسطح",
+        "val": "≥ 2%",
+        "cls": ""
+      },
+      {
+        "key": "بام شیبدار",
+        "val": "≥ 5%",
+        "cls": ""
+      },
+      {
+        "key": "محاسبه",
+        "val": "h / L × 100",
+        "cls": ""
+      }
+    ]
+  }
+}

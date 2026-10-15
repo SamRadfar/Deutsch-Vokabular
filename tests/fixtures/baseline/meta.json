@@ -1,0 +1,10 @@
+{
+  "description": "Read-only baseline of the legacy single-file app. Do not edit by hand.",
+  "source": "index.html",
+  "sourceCommit": "676300397518d5e005cd8eb3edcfb417ca892f09",
+  "generator": "scripts/extract-baseline.mjs",
+  "sha256": {
+    "vocabulary": "bc288c18c0255a3924ee561d90a3c8a57e65fa20caa7923d6efc1c7d14b191c5",
+    "bautechnikInfo": "a21a2173e62592913dddb23fab0bed2c35ffe37c1c2dd8d9d4df6d40068a0731"
+  }
+}

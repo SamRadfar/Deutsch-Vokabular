@@ -1,0 +1,599 @@
+{
+  "totals": {
+    "categories": 7,
+    "subtabs": 33,
+    "emptySubtabs": [
+      "bauphysik/bo1",
+      "bauphysik/bo2",
+      "bauphysik/bo3",
+      "bauphysik/bo4"
+    ],
+    "groups": 115,
+    "words": 999,
+    "uniqueProgressKeys": 994
+  },
+  "typeCounts": {
+    "n": 817,
+    "au": 19,
+    "v": 111,
+    "a": 42,
+    "x": 10
+  },
+  "typesOutsideLegacyTypeMap": [
+    "x"
+  ],
+  "categories": [
+    {
+      "mainKey": "arch",
+      "label": "🏛 Architecture",
+      "theme": "arch",
+      "tabs": [
+        {
+          "id": "bau",
+          "label": "Bau & Konstruktion",
+          "groups": 14,
+          "words": 156
+        },
+        {
+          "id": "zng",
+          "label": "Zeichnung & Planung",
+          "groups": 4,
+          "words": 29
+        },
+        {
+          "id": "tga",
+          "label": "TGA & Haustechnik",
+          "groups": 4,
+          "words": 21
+        },
+        {
+          "id": "fas",
+          "label": "Fassade & Hülle",
+          "groups": 3,
+          "words": 17
+        },
+        {
+          "id": "plng",
+          "label": "Planung & Prozess",
+          "groups": 3,
+          "words": 26
+        }
+      ],
+      "words": 249
+    },
+    {
+      "mainKey": "acad",
+      "label": "🎓 Architekturstudium",
+      "theme": "acad",
+      "tabs": [
+        {
+          "id": "studio",
+          "label": "Studio & Entwurf",
+          "groups": 3,
+          "words": 24
+        },
+        {
+          "id": "jury",
+          "label": "Jury & Kritik",
+          "groups": 2,
+          "words": 14
+        },
+        {
+          "id": "theorie",
+          "label": "Theorie & Forschung",
+          "groups": 3,
+          "words": 25
+        },
+        {
+          "id": "modell",
+          "label": "Modellbau & Darstellung",
+          "groups": 3,
+          "words": 20
+        },
+        {
+          "id": "software",
+          "label": "Software & Workflow",
+          "groups": 3,
+          "words": 18
+        },
+        {
+          "id": "uni",
+          "label": "Uni & Alltag",
+          "groups": 4,
+          "words": 35
+        }
+      ],
+      "words": 136
+    },
+    {
+      "mainKey": "bautechnik",
+      "label": "🏗 Bautechnik",
+      "theme": "bautechnik",
+      "tabs": [
+        {
+          "id": "tragwerk",
+          "label": "Tragwerkslehre",
+          "groups": 5,
+          "words": 35
+        },
+        {
+          "id": "baustoff",
+          "label": "Baustoffkunde",
+          "groups": 5,
+          "words": 38
+        },
+        {
+          "id": "baukonstruktion",
+          "label": "Baukonstruktion",
+          "groups": 4,
+          "words": 36
+        },
+        {
+          "id": "ausbau",
+          "label": "Ausbau",
+          "groups": 3,
+          "words": 32
+        },
+        {
+          "id": "tga2",
+          "label": "Gebäudetechnik (TGA)",
+          "groups": 4,
+          "words": 32
+        },
+        {
+          "id": "bauausfuehrung",
+          "label": "Bauausführung",
+          "groups": 4,
+          "words": 30
+        }
+      ],
+      "words": 203
+    },
+    {
+      "mainKey": "bauphysik",
+      "label": "🌡 Bauphysik",
+      "theme": "bauphysik",
+      "tabs": [
+        {
+          "id": "bo1",
+          "label": "BÖ1",
+          "groups": 1,
+          "words": 0
+        },
+        {
+          "id": "bo2",
+          "label": "BÖ2",
+          "groups": 1,
+          "words": 0
+        },
+        {
+          "id": "bo3",
+          "label": "BÖ3",
+          "groups": 1,
+          "words": 0
+        },
+        {
+          "id": "bo4",
+          "label": "BÖ4",
+          "groups": 1,
+          "words": 0
+        },
+        {
+          "id": "bo5",
+          "label": "BÖ5",
+          "groups": 1,
+          "words": 117
+        }
+      ],
+      "words": 117
+    },
+    {
+      "mainKey": "fitness",
+      "label": "🏋️ Fitness",
+      "theme": "fitness",
+      "tabs": [
+        {
+          "id": "training",
+          "label": "Training & Ausrüstung",
+          "groups": 10,
+          "words": 66
+        },
+        {
+          "id": "ernaehrung",
+          "label": "Erholung & Verletzungen",
+          "groups": 4,
+          "words": 41
+        }
+      ],
+      "words": 107
+    },
+    {
+      "mainKey": "anatomie",
+      "label": "🫀 Anatomie",
+      "theme": "anatomie",
+      "tabs": [
+        {
+          "id": "oberkoerper",
+          "label": "Muskeln & Oberkörper",
+          "groups": 3,
+          "words": 21
+        },
+        {
+          "id": "unterkoerper",
+          "label": "Unterkörper & Gelenke",
+          "groups": 3,
+          "words": 21
+        },
+        {
+          "id": "skelett",
+          "label": "Skelett & System",
+          "groups": 7,
+          "words": 40
+        }
+      ],
+      "words": 82
+    },
+    {
+      "mainKey": "dreame",
+      "label": "🤖 Dreame",
+      "theme": "dreame",
+      "tabs": [
+        {
+          "id": "saugroboter",
+          "label": "Saugroboter",
+          "groups": 3,
+          "words": 29
+        },
+        {
+          "id": "staubsauger",
+          "label": "Kabelloser Staubsauger",
+          "groups": 2,
+          "words": 16
+        },
+        {
+          "id": "nass",
+          "label": "Nass- & Trockensauger",
+          "groups": 1,
+          "words": 11
+        },
+        {
+          "id": "mahroboter",
+          "label": "Mähroboter",
+          "groups": 1,
+          "words": 10
+        },
+        {
+          "id": "haartrockner",
+          "label": "Haarpflege",
+          "groups": 2,
+          "words": 11
+        },
+        {
+          "id": "allgemein",
+          "label": "Allgemein & Verkauf",
+          "groups": 3,
+          "words": 28
+        }
+      ],
+      "words": 105
+    }
+  ],
+  "progressKeyCollisions": [
+    {
+      "key": "acad::belegen",
+      "locations": [
+        "theorie#2.3",
+        "uni#2.0"
+      ]
+    },
+    {
+      "key": "acad::modellieren",
+      "locations": [
+        "modell#2.0",
+        "software#2.0"
+      ]
+    },
+    {
+      "key": "acad::rendern",
+      "locations": [
+        "modell#2.3",
+        "software#2.3"
+      ]
+    },
+    {
+      "key": "bautechnik::die Dreifachverglasung",
+      "locations": [
+        "baustoff#3.2",
+        "baukonstruktion#3.7"
+      ]
+    },
+    {
+      "key": "bauphysik::der Hebelarm",
+      "locations": [
+        "bo5#0.14",
+        "bo5#0.53"
+      ]
+    }
+  ],
+  "crossCategoryWords": [
+    {
+      "word": "die Trennwand",
+      "mainKeys": [
+        "arch",
+        "bauphysik"
+      ]
+    },
+    {
+      "word": "der Sturz",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "das Auflager",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "monolithisch",
+      "mainKeys": [
+        "arch",
+        "bauphysik"
+      ]
+    },
+    {
+      "word": "der Massivbau",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "der Holzbau",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "die Schalung",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "die Bewehrung",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "der Putz",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "der Estrich",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "der Wandaufbau",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "das Tragwerk",
+      "mainKeys": [
+        "arch",
+        "bauphysik"
+      ]
+    },
+    {
+      "word": "der Mangel",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "das Gerüst",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "der Trockenbau",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "der Stahlbeton",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "die Schallschutzwand",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "die Statik",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "der Maßstab",
+      "mainKeys": [
+        "arch",
+        "acad"
+      ]
+    },
+    {
+      "word": "abstimmen",
+      "mainKeys": [
+        "arch",
+        "acad"
+      ]
+    },
+    {
+      "word": "überarbeiten",
+      "mainKeys": [
+        "arch",
+        "acad"
+      ]
+    },
+    {
+      "word": "maßstäblich",
+      "mainKeys": [
+        "arch",
+        "acad"
+      ]
+    },
+    {
+      "word": "die Wärmepumpe",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "die Fußbodenheizung",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "der Heizkörper",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "die Wärmerückgewinnung",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "die Photovoltaikanlage",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "der Bodenaufbau",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "der Randdämmstreifen",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "der Bodenbelag",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "das WDVS",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "der Sonnenschutz",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "einreichen",
+      "mainKeys": [
+        "arch",
+        "acad"
+      ]
+    },
+    {
+      "word": "die Abnahme",
+      "mainKeys": [
+        "arch",
+        "bautechnik"
+      ]
+    },
+    {
+      "word": "das Brettsperrholz (CLT)",
+      "mainKeys": [
+        "bautechnik",
+        "bauphysik"
+      ]
+    },
+    {
+      "word": "die Betondeckung",
+      "mainKeys": [
+        "bautechnik",
+        "bauphysik"
+      ]
+    },
+    {
+      "word": "der schwimmende Estrich",
+      "mainKeys": [
+        "bautechnik",
+        "bauphysik"
+      ]
+    }
+  ],
+  "bautechnikInfo": {
+    "entries": 31,
+    "displayed": 17,
+    "neverDisplayed": [
+      "der U-Wert",
+      "der R-Wert",
+      "die Wärmeleitfähigkeit",
+      "die Wärmedämmung",
+      "die Wärmebrücke",
+      "der Wärmeverlust",
+      "der Jahresheizwärmebedarf",
+      "das Passivhaus",
+      "der Taupunkt",
+      "der sd-Wert",
+      "das Schalldämmmaß (Rw)",
+      "der Dezibel (dB)",
+      "das Moment",
+      "das Trägheitsmoment"
+    ]
+  }
+}

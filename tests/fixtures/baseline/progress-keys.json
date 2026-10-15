@@ -1,0 +1,7994 @@
+[
+  {
+    "domIndex": 0,
+    "progressKey": "arch::die Außenwand",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 1,
+    "progressKey": "arch::die Innenwand",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 2,
+    "progressKey": "arch::die Tragwand",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 3,
+    "progressKey": "arch::nichttragende Wand",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 4,
+    "progressKey": "arch::die Trennwand",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 5,
+    "progressKey": "arch::die Scherwand",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 6,
+    "progressKey": "arch::die Stütze",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 7,
+    "progressKey": "arch::der Balken",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 8,
+    "progressKey": "arch::der Unterzug",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 9,
+    "progressKey": "arch::der Träger",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 10,
+    "progressKey": "arch::das Fundament",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 11,
+    "progressKey": "arch::die Bodenplatte",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 12,
+    "progressKey": "arch::die Decke",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 13,
+    "progressKey": "arch::der Sturz",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 1,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 14,
+    "progressKey": "arch::die Brüstung",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 1,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 15,
+    "progressKey": "arch::die Spannweite",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 1,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 16,
+    "progressKey": "arch::das Auflager",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 1,
+    "rowIndex": 10
+  },
+  {
+    "domIndex": 17,
+    "progressKey": "arch::abtragen",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 18,
+    "progressKey": "arch::ausführen",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 19,
+    "progressKey": "arch::belasten",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 20,
+    "progressKey": "arch::bewehren",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 21,
+    "progressKey": "arch::gründen",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 22,
+    "progressKey": "arch::verankern",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 2,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 23,
+    "progressKey": "arch::tragend",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 2,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 24,
+    "progressKey": "arch::standsicher",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 2,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 25,
+    "progressKey": "arch::monolithisch",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 2,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 26,
+    "progressKey": "arch::der Skelettbau",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 3,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 27,
+    "progressKey": "arch::der Massivbau",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 3,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 28,
+    "progressKey": "arch::das Mauerwerk",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 3,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 29,
+    "progressKey": "arch::der Holzbau",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 3,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 30,
+    "progressKey": "arch::die Fertigteilbauweise",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 3,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 31,
+    "progressKey": "arch::die Dämmung",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 4,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 32,
+    "progressKey": "arch::die Dampfsperre",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 4,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 33,
+    "progressKey": "arch::die Schalung",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 4,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 34,
+    "progressKey": "arch::die Bewehrung",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 4,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 35,
+    "progressKey": "arch::der Putz",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 4,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 36,
+    "progressKey": "arch::der Mörtel",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 4,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 37,
+    "progressKey": "arch::der Estrich",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 4,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 38,
+    "progressKey": "arch::der Wandaufbau",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 4,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 39,
+    "progressKey": "arch::die Dehnfuge",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 5,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 40,
+    "progressKey": "arch::die Wärmebrücke",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 5,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 41,
+    "progressKey": "arch::das Anschlussdetail",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 5,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 42,
+    "progressKey": "arch::der Brandschutz",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 5,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 43,
+    "progressKey": "arch::der Schallschutz",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 5,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 44,
+    "progressKey": "arch::das Tragwerk",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 5,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 45,
+    "progressKey": "arch::die Lastabtragung",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 5,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 46,
+    "progressKey": "arch::der First",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 6,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 47,
+    "progressKey": "arch::die Attika",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 6,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 48,
+    "progressKey": "arch::das Flachdach",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 6,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 49,
+    "progressKey": "arch::die Dachrinne",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 6,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 50,
+    "progressKey": "arch::der Architekt",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 7,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 51,
+    "progressKey": "arch::der Bauvertrag",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 7,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 52,
+    "progressKey": "arch::die HOAI",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 7,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 53,
+    "progressKey": "arch::die Vergabe",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 7,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 54,
+    "progressKey": "arch::der Mangel",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 7,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 55,
+    "progressKey": "arch::die Gewährleistung",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 7,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 56,
+    "progressKey": "arch::das Gutachten",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 7,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 57,
+    "progressKey": "arch::die Statikberechnung",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 7,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 58,
+    "progressKey": "arch::die Bauabnahme",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 7,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 59,
+    "progressKey": "arch::die Baustelle",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 8,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 60,
+    "progressKey": "arch::der Bauplan",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 8,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 61,
+    "progressKey": "arch::der Bausatz",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 8,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 62,
+    "progressKey": "arch::der Fertigbau",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 8,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 63,
+    "progressKey": "arch::die Montage",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 8,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 64,
+    "progressKey": "arch::das Gerüst",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 8,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 65,
+    "progressKey": "arch::der Schutt",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 8,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 66,
+    "progressKey": "arch::das Aufmaß",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 8,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 67,
+    "progressKey": "arch::die Erschließung",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 8,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 68,
+    "progressKey": "arch::der Versorgungsanschluss",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 8,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 69,
+    "progressKey": "arch::die Erweiterung",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 8,
+    "rowIndex": 10
+  },
+  {
+    "domIndex": 70,
+    "progressKey": "arch::die Restrukturierung",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 8,
+    "rowIndex": 11
+  },
+  {
+    "domIndex": 71,
+    "progressKey": "arch::der Aufriss",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 72,
+    "progressKey": "arch::die Säule",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 73,
+    "progressKey": "arch::der Giebel",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 74,
+    "progressKey": "arch::der Erker",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 75,
+    "progressKey": "arch::die Rinne",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 76,
+    "progressKey": "arch::der Klinker",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 77,
+    "progressKey": "arch::die Auskragung",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 78,
+    "progressKey": "arch::der Trockenbau",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 79,
+    "progressKey": "arch::die Sperrholzplatte",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 80,
+    "progressKey": "arch::der Putzträger",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 81,
+    "progressKey": "arch::das Satteldach",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 10
+  },
+  {
+    "domIndex": 82,
+    "progressKey": "arch::die Holzkonstruktion",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 11
+  },
+  {
+    "domIndex": 83,
+    "progressKey": "arch::die Armierung",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 12
+  },
+  {
+    "domIndex": 84,
+    "progressKey": "arch::der Stahlbeton",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 13
+  },
+  {
+    "domIndex": 85,
+    "progressKey": "arch::der Ziegel",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 14
+  },
+  {
+    "domIndex": 86,
+    "progressKey": "arch::die Installation",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 15
+  },
+  {
+    "domIndex": 87,
+    "progressKey": "arch::der Aufzug",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 16
+  },
+  {
+    "domIndex": 88,
+    "progressKey": "arch::die Schallschutzwand",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 17
+  },
+  {
+    "domIndex": 89,
+    "progressKey": "arch::der Höhenunterschied",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 18
+  },
+  {
+    "domIndex": 90,
+    "progressKey": "arch::die Pufferzone",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 9,
+    "rowIndex": 19
+  },
+  {
+    "domIndex": 91,
+    "progressKey": "arch::die Statik",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 10,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 92,
+    "progressKey": "arch::die Bauphysik",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 10,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 93,
+    "progressKey": "arch::die Akustik",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 10,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 94,
+    "progressKey": "arch::die Ästhetik",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 10,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 95,
+    "progressKey": "arch::die Belüftung",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 10,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 96,
+    "progressKey": "arch::die Beleuchtung",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 10,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 97,
+    "progressKey": "arch::der Energiebedarf",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 10,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 98,
+    "progressKey": "arch::die Abdichtung",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 10,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 99,
+    "progressKey": "arch::die Klimahülle",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 10,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 100,
+    "progressKey": "arch::die Solarenergie",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 10,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 101,
+    "progressKey": "arch::die Baukonstruktion",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 10,
+    "rowIndex": 10
+  },
+  {
+    "domIndex": 102,
+    "progressKey": "arch::die Bausubstanz",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 10,
+    "rowIndex": 11
+  },
+  {
+    "domIndex": 103,
+    "progressKey": "arch::der Denkmalschutz",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 11,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 104,
+    "progressKey": "arch::die Denkmalpflege",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 11,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 105,
+    "progressKey": "arch::die Baukultur",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 11,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 106,
+    "progressKey": "arch::die Nachhaltigkeit",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 11,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 107,
+    "progressKey": "arch::nachhaltiges Bauen",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 11,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 108,
+    "progressKey": "arch::die Baunutzungsverordnung",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 11,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 109,
+    "progressKey": "arch::reversibel",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 11,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 110,
+    "progressKey": "arch::der Übergang Alt-Neu",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 11,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 111,
+    "progressKey": "arch::das Haus-im-Haus",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 11,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 112,
+    "progressKey": "arch::die Integrationsaufgabe",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 11,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 113,
+    "progressKey": "arch::die Werkssiedlung",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 11,
+    "rowIndex": 10
+  },
+  {
+    "domIndex": 114,
+    "progressKey": "arch::das Industriemuseum",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 11,
+    "rowIndex": 11
+  },
+  {
+    "domIndex": 115,
+    "progressKey": "arch::der Wolkenkratzer",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 12,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 116,
+    "progressKey": "arch::die Burg",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 12,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 117,
+    "progressKey": "arch::der Mauerturm",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 12,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 118,
+    "progressKey": "arch::der Burggraben",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 12,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 119,
+    "progressKey": "arch::der Staudamm",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 12,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 120,
+    "progressKey": "arch::die Kirche",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 12,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 121,
+    "progressKey": "arch::die Moschee",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 12,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 122,
+    "progressKey": "arch::die Kuppel",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 12,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 123,
+    "progressKey": "arch::die Brücke",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 12,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 124,
+    "progressKey": "arch::der Tempel",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 12,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 125,
+    "progressKey": "arch::die Synagoge",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 12,
+    "rowIndex": 10
+  },
+  {
+    "domIndex": 126,
+    "progressKey": "arch::das Gewölbe",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 12,
+    "rowIndex": 11
+  },
+  {
+    "domIndex": 127,
+    "progressKey": "arch::die Kathedrale",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 12,
+    "rowIndex": 12
+  },
+  {
+    "domIndex": 128,
+    "progressKey": "arch::das Gesims",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 12,
+    "rowIndex": 13
+  },
+  {
+    "domIndex": 129,
+    "progressKey": "arch::die Kreuzblume",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 12,
+    "rowIndex": 14
+  },
+  {
+    "domIndex": 130,
+    "progressKey": "arch::die Turmspitze",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 12,
+    "rowIndex": 15
+  },
+  {
+    "domIndex": 131,
+    "progressKey": "arch::der Fries",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 12,
+    "rowIndex": 16
+  },
+  {
+    "domIndex": 132,
+    "progressKey": "arch::der Strebepfeiler",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 12,
+    "rowIndex": 17
+  },
+  {
+    "domIndex": 133,
+    "progressKey": "arch::bauen",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 134,
+    "progressKey": "arch::errichten",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 135,
+    "progressKey": "arch::montieren",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 136,
+    "progressKey": "arch::isolieren",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 137,
+    "progressKey": "arch::sanieren",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 138,
+    "progressKey": "arch::renovieren",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 139,
+    "progressKey": "arch::überwachen",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 140,
+    "progressKey": "arch::prüfen",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 141,
+    "progressKey": "arch::verlegen",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 142,
+    "progressKey": "arch::verputzen",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 143,
+    "progressKey": "arch::betonieren",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 10
+  },
+  {
+    "domIndex": 144,
+    "progressKey": "arch::mauern",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 11
+  },
+  {
+    "domIndex": 145,
+    "progressKey": "arch::kalkulieren",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 12
+  },
+  {
+    "domIndex": 146,
+    "progressKey": "arch::demontieren",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 13
+  },
+  {
+    "domIndex": 147,
+    "progressKey": "arch::abreißen",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 14
+  },
+  {
+    "domIndex": 148,
+    "progressKey": "arch::restaurieren",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 15
+  },
+  {
+    "domIndex": 149,
+    "progressKey": "arch::gestalten",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 16
+  },
+  {
+    "domIndex": 150,
+    "progressKey": "arch::transformieren",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 17
+  },
+  {
+    "domIndex": 151,
+    "progressKey": "arch::konservieren",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 18
+  },
+  {
+    "domIndex": 152,
+    "progressKey": "arch::rekonstruieren",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 19
+  },
+  {
+    "domIndex": 153,
+    "progressKey": "arch::freilegen",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 20
+  },
+  {
+    "domIndex": 154,
+    "progressKey": "arch::bewahren",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 21
+  },
+  {
+    "domIndex": 155,
+    "progressKey": "arch::einmessen",
+    "mainKey": "arch",
+    "tabId": "bau",
+    "groupIndex": 13,
+    "rowIndex": 22
+  },
+  {
+    "domIndex": 156,
+    "progressKey": "arch::der Grundriss",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 157,
+    "progressKey": "arch::der Schnitt",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 158,
+    "progressKey": "arch::die Ansicht",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 159,
+    "progressKey": "arch::der Lageplan",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 160,
+    "progressKey": "arch::das Detail",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 161,
+    "progressKey": "arch::der Bebauungsplan",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 162,
+    "progressKey": "arch::der Maßstab",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 163,
+    "progressKey": "arch::das Raster",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 164,
+    "progressKey": "arch::die Höhenkote",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 165,
+    "progressKey": "arch::die Bemaßung",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 166,
+    "progressKey": "arch::die Schraffur",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 167,
+    "progressKey": "arch::der Plankopf",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 168,
+    "progressKey": "arch::der Planungsstand",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 169,
+    "progressKey": "arch::darstellen",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 170,
+    "progressKey": "arch::bemaßen",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 171,
+    "progressKey": "arch::koordinieren",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 172,
+    "progressKey": "arch::abstimmen",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 173,
+    "progressKey": "arch::überarbeiten",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 174,
+    "progressKey": "arch::maßstäblich",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 2,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 175,
+    "progressKey": "arch::genehmigungsfähig",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 2,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 176,
+    "progressKey": "arch::die Raumhöhe",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 3,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 177,
+    "progressKey": "arch::die Zarge",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 3,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 178,
+    "progressKey": "arch::die Laibung",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 3,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 179,
+    "progressKey": "arch::der Treppenlauf",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 3,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 180,
+    "progressKey": "arch::das Geländer",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 3,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 181,
+    "progressKey": "arch::der Balkon",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 3,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 182,
+    "progressKey": "arch::die Loggia",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 3,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 183,
+    "progressKey": "arch::der Schacht",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 3,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 184,
+    "progressKey": "arch::barrierefreies Bauen",
+    "mainKey": "arch",
+    "tabId": "zng",
+    "groupIndex": 3,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 185,
+    "progressKey": "arch::die Heizung",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 186,
+    "progressKey": "arch::die Wärmepumpe",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 187,
+    "progressKey": "arch::die Fußbodenheizung",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 188,
+    "progressKey": "arch::der Heizkörper",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 189,
+    "progressKey": "arch::die Lüftung",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 190,
+    "progressKey": "arch::die Wärmerückgewinnung",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 191,
+    "progressKey": "arch::der Lüftungsschacht",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 192,
+    "progressKey": "arch::die Klimaanlage",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 0,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 193,
+    "progressKey": "arch::beheizen",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 194,
+    "progressKey": "arch::belüften",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 195,
+    "progressKey": "arch::anschließen",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 196,
+    "progressKey": "arch::energieeffizient",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 197,
+    "progressKey": "arch::die Sanitärinstallation",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 198,
+    "progressKey": "arch::die Entwässerung",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 199,
+    "progressKey": "arch::die Kanalisation",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 200,
+    "progressKey": "arch::die Elektroinstallation",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 201,
+    "progressKey": "arch::die Leitungsführung",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 202,
+    "progressKey": "arch::die Photovoltaikanlage",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 2,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 203,
+    "progressKey": "arch::der Bodenaufbau",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 3,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 204,
+    "progressKey": "arch::der Randdämmstreifen",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 3,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 205,
+    "progressKey": "arch::der Bodenbelag",
+    "mainKey": "arch",
+    "tabId": "tga",
+    "groupIndex": 3,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 206,
+    "progressKey": "arch::die Fassade",
+    "mainKey": "arch",
+    "tabId": "fas",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 207,
+    "progressKey": "arch::die Vorhangfassade",
+    "mainKey": "arch",
+    "tabId": "fas",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 208,
+    "progressKey": "arch::vorgehängte Fassade (VHF)",
+    "mainKey": "arch",
+    "tabId": "fas",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 209,
+    "progressKey": "arch::das WDVS",
+    "mainKey": "arch",
+    "tabId": "fas",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 210,
+    "progressKey": "arch::die Pfosten-Riegel-Konstruktion",
+    "mainKey": "arch",
+    "tabId": "fas",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 211,
+    "progressKey": "arch::verkleiden",
+    "mainKey": "arch",
+    "tabId": "fas",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 212,
+    "progressKey": "arch::abdichten",
+    "mainKey": "arch",
+    "tabId": "fas",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 213,
+    "progressKey": "arch::dämmen",
+    "mainKey": "arch",
+    "tabId": "fas",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 214,
+    "progressKey": "arch::hinterlüftet",
+    "mainKey": "arch",
+    "tabId": "fas",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 215,
+    "progressKey": "arch::wärmegedämmt",
+    "mainKey": "arch",
+    "tabId": "fas",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 216,
+    "progressKey": "arch::die Verglasung",
+    "mainKey": "arch",
+    "tabId": "fas",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 217,
+    "progressKey": "arch::der Sonnenschutz",
+    "mainKey": "arch",
+    "tabId": "fas",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 218,
+    "progressKey": "arch::der g-Wert",
+    "mainKey": "arch",
+    "tabId": "fas",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 219,
+    "progressKey": "arch::das Fensterband",
+    "mainKey": "arch",
+    "tabId": "fas",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 220,
+    "progressKey": "arch::die Verkleidung",
+    "mainKey": "arch",
+    "tabId": "fas",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 221,
+    "progressKey": "arch::der U-Wert",
+    "mainKey": "arch",
+    "tabId": "fas",
+    "groupIndex": 2,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 222,
+    "progressKey": "arch::die Hinterlüftung",
+    "mainKey": "arch",
+    "tabId": "fas",
+    "groupIndex": 2,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 223,
+    "progressKey": "arch::die Grundlagenermittlung",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 224,
+    "progressKey": "arch::der Vorentwurf",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 225,
+    "progressKey": "arch::der Entwurf",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 226,
+    "progressKey": "arch::die Genehmigungsplanung",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 227,
+    "progressKey": "arch::die Ausführungsplanung",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 228,
+    "progressKey": "arch::die Bauleitung",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 229,
+    "progressKey": "arch::planen",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 230,
+    "progressKey": "arch::beantragen",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 231,
+    "progressKey": "arch::einreichen",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 232,
+    "progressKey": "arch::freigeben",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 233,
+    "progressKey": "arch::ausschreiben",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 234,
+    "progressKey": "arch::genehmigt",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 235,
+    "progressKey": "arch::baureif",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 236,
+    "progressKey": "arch::der Bauherr",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 237,
+    "progressKey": "arch::der Generalunternehmer",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 238,
+    "progressKey": "arch::der Statiker",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 239,
+    "progressKey": "arch::der Fachplaner",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 240,
+    "progressKey": "arch::die Baugenehmigung",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 241,
+    "progressKey": "arch::die GRZ",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 2,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 242,
+    "progressKey": "arch::die GFZ",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 2,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 243,
+    "progressKey": "arch::der Grenzabstand",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 2,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 244,
+    "progressKey": "arch::die Kostenschätzung",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 2,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 245,
+    "progressKey": "arch::das Leistungsverzeichnis",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 2,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 246,
+    "progressKey": "arch::die Abnahme",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 2,
+    "rowIndex": 10
+  },
+  {
+    "domIndex": 247,
+    "progressKey": "arch::der Rohbau",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 2,
+    "rowIndex": 11
+  },
+  {
+    "domIndex": 248,
+    "progressKey": "arch::der Innenausbau",
+    "mainKey": "arch",
+    "tabId": "plng",
+    "groupIndex": 2,
+    "rowIndex": 12
+  },
+  {
+    "domIndex": 249,
+    "progressKey": "acad::das Entwurfsstudio",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 250,
+    "progressKey": "acad::die Pinwand",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 251,
+    "progressKey": "acad::die Abgabe",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 252,
+    "progressKey": "acad::der Abgabetermin",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 253,
+    "progressKey": "acad::das Arbeitsmodell",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 254,
+    "progressKey": "acad::der Entwurfsprozess",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 255,
+    "progressKey": "acad::die Iteration",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 256,
+    "progressKey": "acad::der Entwurfsansatz",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 0,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 257,
+    "progressKey": "acad::die Nachtschicht",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 0,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 258,
+    "progressKey": "acad::das Konzept",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 0,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 259,
+    "progressKey": "acad::skizzieren",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 260,
+    "progressKey": "acad::entwerfen",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 261,
+    "progressKey": "acad::überarbeiten",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 262,
+    "progressKey": "acad::verfeinern",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 263,
+    "progressKey": "acad::entwickeln",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 264,
+    "progressKey": "acad::präsentieren",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 265,
+    "progressKey": "acad::abstimmen",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 266,
+    "progressKey": "acad::fertigstellen",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 1,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 267,
+    "progressKey": "acad::durcharbeiten",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 1,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 268,
+    "progressKey": "acad::konzeptionell",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 269,
+    "progressKey": "acad::räumlich",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 270,
+    "progressKey": "acad::maßstäblich",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 271,
+    "progressKey": "acad::überzeugend",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 272,
+    "progressKey": "acad::kohärent",
+    "mainKey": "acad",
+    "tabId": "studio",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 273,
+    "progressKey": "acad::die Jurysitzung",
+    "mainKey": "acad",
+    "tabId": "jury",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 274,
+    "progressKey": "acad::die Kritik",
+    "mainKey": "acad",
+    "tabId": "jury",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 275,
+    "progressKey": "acad::das Feedback",
+    "mainKey": "acad",
+    "tabId": "jury",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 276,
+    "progressKey": "acad::die Stellungnahme",
+    "mainKey": "acad",
+    "tabId": "jury",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 277,
+    "progressKey": "acad::der Juror / die Jurorin",
+    "mainKey": "acad",
+    "tabId": "jury",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 278,
+    "progressKey": "acad::das Kolloquium",
+    "mainKey": "acad",
+    "tabId": "jury",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 279,
+    "progressKey": "acad::die Pinup-Runde",
+    "mainKey": "acad",
+    "tabId": "jury",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 280,
+    "progressKey": "acad::verteidigen",
+    "mainKey": "acad",
+    "tabId": "jury",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 281,
+    "progressKey": "acad::kommentieren",
+    "mainKey": "acad",
+    "tabId": "jury",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 282,
+    "progressKey": "acad::bewerten",
+    "mainKey": "acad",
+    "tabId": "jury",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 283,
+    "progressKey": "acad::kritisieren",
+    "mainKey": "acad",
+    "tabId": "jury",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 284,
+    "progressKey": "acad::argumentieren",
+    "mainKey": "acad",
+    "tabId": "jury",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 285,
+    "progressKey": "acad::konstruktiv",
+    "mainKey": "acad",
+    "tabId": "jury",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 286,
+    "progressKey": "acad::nachvollziehbar",
+    "mainKey": "acad",
+    "tabId": "jury",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 287,
+    "progressKey": "acad::die Tektonik",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 288,
+    "progressKey": "acad::die Atmosphäre",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 289,
+    "progressKey": "acad::die Phänomenologie",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 290,
+    "progressKey": "acad::der Typus",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 291,
+    "progressKey": "acad::der Kontext",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 292,
+    "progressKey": "acad::die Proportion",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 293,
+    "progressKey": "acad::der Maßstab",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 294,
+    "progressKey": "acad::die Materialität",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 0,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 295,
+    "progressKey": "acad::das Raumkonzept",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 0,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 296,
+    "progressKey": "acad::die Morphologie",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 0,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 297,
+    "progressKey": "acad::die Recherche",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 298,
+    "progressKey": "acad::die Analyse",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 299,
+    "progressKey": "acad::die Literaturrecherche",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 300,
+    "progressKey": "acad::die These",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 301,
+    "progressKey": "acad::die Hypothese",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 302,
+    "progressKey": "acad::die Fallstudie",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 303,
+    "progressKey": "acad::das Präzedenzprojekt",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 304,
+    "progressKey": "acad::die Seminararbeit",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 1,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 305,
+    "progressKey": "acad::die Hausarbeit",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 1,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 306,
+    "progressKey": "acad::analysieren",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 307,
+    "progressKey": "acad::recherchieren",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 308,
+    "progressKey": "acad::zitieren",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 309,
+    "progressKey": "acad::belegen",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 310,
+    "progressKey": "acad::auswerten",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 311,
+    "progressKey": "acad::vergleichen",
+    "mainKey": "acad",
+    "tabId": "theorie",
+    "groupIndex": 2,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 312,
+    "progressKey": "acad::der Modellbau",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 313,
+    "progressKey": "acad::das Maßstabsmodell",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 314,
+    "progressKey": "acad::das Volumenmodell",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 315,
+    "progressKey": "acad::das Schnittmodell",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 316,
+    "progressKey": "acad::das Balsaholz",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 317,
+    "progressKey": "acad::der Schneideplotter",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 318,
+    "progressKey": "acad::die Pappschachtel",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 319,
+    "progressKey": "acad::das Rendering",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 320,
+    "progressKey": "acad::das Diagramm",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 321,
+    "progressKey": "acad::die Collage",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 322,
+    "progressKey": "acad::das Axonometrie",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 323,
+    "progressKey": "acad::die Draufsicht",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 324,
+    "progressKey": "acad::die Schwarzplan",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 325,
+    "progressKey": "acad::die Mappe",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 326,
+    "progressKey": "acad::modellieren",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 327,
+    "progressKey": "acad::zuschneiden",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 328,
+    "progressKey": "acad::kleben",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 329,
+    "progressKey": "acad::rendern",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 330,
+    "progressKey": "acad::plotten",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 331,
+    "progressKey": "acad::lasern",
+    "mainKey": "acad",
+    "tabId": "modell",
+    "groupIndex": 2,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 332,
+    "progressKey": "acad::AutoCAD",
+    "mainKey": "acad",
+    "tabId": "software",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 333,
+    "progressKey": "acad::Rhino (Rhinoceros)",
+    "mainKey": "acad",
+    "tabId": "software",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 334,
+    "progressKey": "acad::Revit",
+    "mainKey": "acad",
+    "tabId": "software",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 335,
+    "progressKey": "acad::Grasshopper",
+    "mainKey": "acad",
+    "tabId": "software",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 336,
+    "progressKey": "acad::ArchiCAD",
+    "mainKey": "acad",
+    "tabId": "software",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 337,
+    "progressKey": "acad::V-Ray",
+    "mainKey": "acad",
+    "tabId": "software",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 338,
+    "progressKey": "acad::Lumion",
+    "mainKey": "acad",
+    "tabId": "software",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 339,
+    "progressKey": "acad::Photoshop",
+    "mainKey": "acad",
+    "tabId": "software",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 340,
+    "progressKey": "acad::InDesign",
+    "mainKey": "acad",
+    "tabId": "software",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 341,
+    "progressKey": "acad::Illustrator",
+    "mainKey": "acad",
+    "tabId": "software",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 342,
+    "progressKey": "acad::SketchUp",
+    "mainKey": "acad",
+    "tabId": "software",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 343,
+    "progressKey": "acad::modellieren",
+    "mainKey": "acad",
+    "tabId": "software",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 344,
+    "progressKey": "acad::exportieren",
+    "mainKey": "acad",
+    "tabId": "software",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 345,
+    "progressKey": "acad::importieren",
+    "mainKey": "acad",
+    "tabId": "software",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 346,
+    "progressKey": "acad::rendern",
+    "mainKey": "acad",
+    "tabId": "software",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 347,
+    "progressKey": "acad::parametrisch arbeiten",
+    "mainKey": "acad",
+    "tabId": "software",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 348,
+    "progressKey": "acad::layouten",
+    "mainKey": "acad",
+    "tabId": "software",
+    "groupIndex": 2,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 349,
+    "progressKey": "acad::drucken / plotten",
+    "mainKey": "acad",
+    "tabId": "software",
+    "groupIndex": 2,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 350,
+    "progressKey": "acad::die Vorlesung",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 351,
+    "progressKey": "acad::das Seminar",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 352,
+    "progressKey": "acad::die Übung",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 353,
+    "progressKey": "acad::der Kurs",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 354,
+    "progressKey": "acad::die Pflichtveranstaltung",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 355,
+    "progressKey": "acad::die Wahlveranstaltung",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 356,
+    "progressKey": "acad::die Kreditpunkte / ECTS",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 357,
+    "progressKey": "acad::das Modul",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 0,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 358,
+    "progressKey": "acad::das Semester",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 0,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 359,
+    "progressKey": "acad::die Immatrikulation",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 0,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 360,
+    "progressKey": "acad::die Exmatrikulation",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 0,
+    "rowIndex": 10
+  },
+  {
+    "domIndex": 361,
+    "progressKey": "acad::die Sprechstunde",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 0,
+    "rowIndex": 11
+  },
+  {
+    "domIndex": 362,
+    "progressKey": "acad::der Betreuer / die Betreuerin",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 363,
+    "progressKey": "acad::der Professor / die Professorin",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 364,
+    "progressKey": "acad::der Assistent / die Assistentin",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 365,
+    "progressKey": "acad::das Korrekturgespräch",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 366,
+    "progressKey": "acad::die Betreuung",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 367,
+    "progressKey": "acad::nachfragen",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 368,
+    "progressKey": "acad::Rücksprache halten",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 369,
+    "progressKey": "acad::belegen",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 370,
+    "progressKey": "acad::anmelden",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 371,
+    "progressKey": "acad::abmelden",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 372,
+    "progressKey": "acad::bestehen",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 373,
+    "progressKey": "acad::durchfallen",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 374,
+    "progressKey": "acad::einreichen",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 2,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 375,
+    "progressKey": "acad::abgeben",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 2,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 376,
+    "progressKey": "acad::sich vorbereiten",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 2,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 377,
+    "progressKey": "acad::unter Druck stehen",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 3,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 378,
+    "progressKey": "acad::die Deadline",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 3,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 379,
+    "progressKey": "acad::auf den letzten Drücker",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 3,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 380,
+    "progressKey": "acad::ins Detail gehen",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 3,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 381,
+    "progressKey": "acad::auf dem richtigen Weg sein",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 3,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 382,
+    "progressKey": "acad::der rote Faden",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 3,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 383,
+    "progressKey": "acad::das macht Sinn",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 3,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 384,
+    "progressKey": "acad::die Nachtschicht schieben",
+    "mainKey": "acad",
+    "tabId": "uni",
+    "groupIndex": 3,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 385,
+    "progressKey": "bautechnik::die Statik",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 386,
+    "progressKey": "bautechnik::die Kraft",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 387,
+    "progressKey": "bautechnik::die Last",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 388,
+    "progressKey": "bautechnik::die Eigenlast",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 389,
+    "progressKey": "bautechnik::die Nutzlast",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 390,
+    "progressKey": "bautechnik::die Windlast",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 391,
+    "progressKey": "bautechnik::die Schneelast",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 392,
+    "progressKey": "bautechnik::das Auflager",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 0,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 393,
+    "progressKey": "bautechnik::die Querkraft",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 0,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 394,
+    "progressKey": "bautechnik::die Normalkraft",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 0,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 395,
+    "progressKey": "bautechnik::das Biegemoment",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 0,
+    "rowIndex": 10
+  },
+  {
+    "domIndex": 396,
+    "progressKey": "bautechnik::statisch bestimmt",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 0,
+    "rowIndex": 11
+  },
+  {
+    "domIndex": 397,
+    "progressKey": "bautechnik::die Spannung",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 398,
+    "progressKey": "bautechnik::die Druckspannung",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 399,
+    "progressKey": "bautechnik::die Zugspannung",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 400,
+    "progressKey": "bautechnik::die Dehnung",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 401,
+    "progressKey": "bautechnik::der Elastizitätsmodul (E-Modul)",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 402,
+    "progressKey": "bautechnik::die Durchbiegung",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 403,
+    "progressKey": "bautechnik::die Steifigkeit",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 404,
+    "progressKey": "bautechnik::die Knicklast",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 1,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 405,
+    "progressKey": "bautechnik::der Stahlbau",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 406,
+    "progressKey": "bautechnik::der Fachwerkträger",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 407,
+    "progressKey": "bautechnik::das Schweißen",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 408,
+    "progressKey": "bautechnik::die Schraubenverbindung",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 409,
+    "progressKey": "bautechnik::der Korrosionsschutz",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 410,
+    "progressKey": "bautechnik::der Holzbau",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 3,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 411,
+    "progressKey": "bautechnik::das Brettschichtholz (BSH)",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 3,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 412,
+    "progressKey": "bautechnik::das Brettsperrholz (CLT)",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 3,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 413,
+    "progressKey": "bautechnik::die Holzverbindung",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 3,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 414,
+    "progressKey": "bautechnik::der Massivbau",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 4,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 415,
+    "progressKey": "bautechnik::der Stahlbeton",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 4,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 416,
+    "progressKey": "bautechnik::die Bewehrung",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 4,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 417,
+    "progressKey": "bautechnik::die Betondeckung",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 4,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 418,
+    "progressKey": "bautechnik::die Schalung",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 4,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 419,
+    "progressKey": "bautechnik::die Ortbetonbauweise",
+    "mainKey": "bautechnik",
+    "tabId": "tragwerk",
+    "groupIndex": 4,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 420,
+    "progressKey": "bautechnik::der Beton",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 421,
+    "progressKey": "bautechnik::der Zement",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 422,
+    "progressKey": "bautechnik::der Zuschlagstoff",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 423,
+    "progressKey": "bautechnik::der Wasserzementwert (w/z)",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 424,
+    "progressKey": "bautechnik::die Druckfestigkeit",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 425,
+    "progressKey": "bautechnik::das Carbonatisieren",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 426,
+    "progressKey": "bautechnik::die Betonrezeptur",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 427,
+    "progressKey": "bautechnik::die Hydratation",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 0,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 428,
+    "progressKey": "bautechnik::der Betonzusatz",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 0,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 429,
+    "progressKey": "bautechnik::der Fertigbeton",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 0,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 430,
+    "progressKey": "bautechnik::der Stahl",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 431,
+    "progressKey": "bautechnik::die Streckgrenze",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 432,
+    "progressKey": "bautechnik::die Zugfestigkeit",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 433,
+    "progressKey": "bautechnik::der Betonstahl",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 434,
+    "progressKey": "bautechnik::die Korrosion",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 435,
+    "progressKey": "bautechnik::nichtrostender Stahl",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 436,
+    "progressKey": "bautechnik::die Schweißbarkeit",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 437,
+    "progressKey": "bautechnik::der Legierungsstahl",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 1,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 438,
+    "progressKey": "bautechnik::die Wärmebehandlung",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 1,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 439,
+    "progressKey": "bautechnik::das Holz",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 440,
+    "progressKey": "bautechnik::das Nadelholz",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 441,
+    "progressKey": "bautechnik::das Laubholz",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 442,
+    "progressKey": "bautechnik::die Holzfeuchte",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 443,
+    "progressKey": "bautechnik::der Holzschutz",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 444,
+    "progressKey": "bautechnik::die Holzklasse",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 2,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 445,
+    "progressKey": "bautechnik::der Holzwerkstoff",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 2,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 446,
+    "progressKey": "bautechnik::das Einscheibensicherheitsglas (ESG)",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 3,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 447,
+    "progressKey": "bautechnik::das Verbundsicherheitsglas (VSG)",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 3,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 448,
+    "progressKey": "bautechnik::die Dreifachverglasung",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 3,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 449,
+    "progressKey": "bautechnik::der g-Wert (Glas)",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 3,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 450,
+    "progressKey": "bautechnik::die Glasdicke",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 3,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 451,
+    "progressKey": "bautechnik::das Strukturglas",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 3,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 452,
+    "progressKey": "bautechnik::der Kunststoff",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 4,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 453,
+    "progressKey": "bautechnik::das PVC",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 4,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 454,
+    "progressKey": "bautechnik::die Bitumenbahn",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 4,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 455,
+    "progressKey": "bautechnik::das Epoxidharz",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 4,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 456,
+    "progressKey": "bautechnik::die Geomembran",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 4,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 457,
+    "progressKey": "bautechnik::der Dübel",
+    "mainKey": "bautechnik",
+    "tabId": "baustoff",
+    "groupIndex": 4,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 458,
+    "progressKey": "bautechnik::der Wandaufbau",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 459,
+    "progressKey": "bautechnik::das WDVS",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 460,
+    "progressKey": "bautechnik::die zweischalige Wand",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 461,
+    "progressKey": "bautechnik::die Innendämmung",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 462,
+    "progressKey": "bautechnik::die Außendämmung",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 463,
+    "progressKey": "bautechnik::der Putz",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 464,
+    "progressKey": "bautechnik::die Fuge",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 465,
+    "progressKey": "bautechnik::die Dehnungsfuge",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 0,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 466,
+    "progressKey": "bautechnik::der Sockelbereich",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 0,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 467,
+    "progressKey": "bautechnik::der Dachaufbau",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 468,
+    "progressKey": "bautechnik::das Warmdach",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 469,
+    "progressKey": "bautechnik::das Kaltdach",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 470,
+    "progressKey": "bautechnik::das Umkehrdach",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 471,
+    "progressKey": "bautechnik::das Gründach",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 472,
+    "progressKey": "bautechnik::das Gefälle",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 473,
+    "progressKey": "bautechnik::der Dachrand",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 474,
+    "progressKey": "bautechnik::die Dachlattung",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 1,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 475,
+    "progressKey": "bautechnik::der Dachstuhl",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 1,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 476,
+    "progressKey": "bautechnik::die Dachwasserableitung",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 1,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 477,
+    "progressKey": "bautechnik::die vorgehängte hinterlüftete Fassade",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 478,
+    "progressKey": "bautechnik::die Pfosten-Riegel-Fassade",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 479,
+    "progressKey": "bautechnik::die Elementfassade",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 480,
+    "progressKey": "bautechnik::die Fugenabdichtung",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 481,
+    "progressKey": "bautechnik::die Natursteinfassade",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 482,
+    "progressKey": "bautechnik::die Ziegelfassade",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 2,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 483,
+    "progressKey": "bautechnik::der Sonnenschutz",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 2,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 484,
+    "progressKey": "bautechnik::der Fassadenanker",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 2,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 485,
+    "progressKey": "bautechnik::der Fensterrahmen",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 3,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 486,
+    "progressKey": "bautechnik::die Fensterlaibung",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 3,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 487,
+    "progressKey": "bautechnik::der Fensteranschluss",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 3,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 488,
+    "progressKey": "bautechnik::der Sturz",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 3,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 489,
+    "progressKey": "bautechnik::die Fensterbank",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 3,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 490,
+    "progressKey": "bautechnik::der Blendrahmen",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 3,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 491,
+    "progressKey": "bautechnik::der Flügelrahmen",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 3,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 492,
+    "progressKey": "bautechnik::die Dreifachverglasung",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 3,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 493,
+    "progressKey": "bautechnik::die Sonnenschutzverglasung",
+    "mainKey": "bautechnik",
+    "tabId": "baukonstruktion",
+    "groupIndex": 3,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 494,
+    "progressKey": "bautechnik::der Trockenbau",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 495,
+    "progressKey": "bautechnik::die Gipskartonplatte",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 496,
+    "progressKey": "bautechnik::die Vorsatzschale",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 497,
+    "progressKey": "bautechnik::die Systemtrennwand",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 498,
+    "progressKey": "bautechnik::die Ständerwand",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 499,
+    "progressKey": "bautechnik::die Brandschutzplatte",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 500,
+    "progressKey": "bautechnik::der Abhänger",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 501,
+    "progressKey": "bautechnik::die Spachtelmasse",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 0,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 502,
+    "progressKey": "bautechnik::der Akustikputz",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 0,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 503,
+    "progressKey": "bautechnik::die Schallschutzwand",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 0,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 504,
+    "progressKey": "bautechnik::der Bodenaufbau",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 505,
+    "progressKey": "bautechnik::der Estrich",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 506,
+    "progressKey": "bautechnik::der schwimmende Estrich",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 507,
+    "progressKey": "bautechnik::der Bodenbelag",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 508,
+    "progressKey": "bautechnik::die Fußbodenheizung",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 509,
+    "progressKey": "bautechnik::der Randdämmstreifen",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 510,
+    "progressKey": "bautechnik::der Zementestrich",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 511,
+    "progressKey": "bautechnik::der Anhydritestrich",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 1,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 512,
+    "progressKey": "bautechnik::die Dampfsperre (Boden)",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 1,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 513,
+    "progressKey": "bautechnik::die Trittschalldämmung",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 1,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 514,
+    "progressKey": "bautechnik::der Fliesenbelag",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 1,
+    "rowIndex": 10
+  },
+  {
+    "domIndex": 515,
+    "progressKey": "bautechnik::das Parkett",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 1,
+    "rowIndex": 11
+  },
+  {
+    "domIndex": 516,
+    "progressKey": "bautechnik::die Bodendämmung",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 1,
+    "rowIndex": 12
+  },
+  {
+    "domIndex": 517,
+    "progressKey": "bautechnik::die abgehängte Decke",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 518,
+    "progressKey": "bautechnik::die Wandbekleidung",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 519,
+    "progressKey": "bautechnik::der Innenputz",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 520,
+    "progressKey": "bautechnik::die Akustikdecke",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 521,
+    "progressKey": "bautechnik::die Systemdecke",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 522,
+    "progressKey": "bautechnik::der Sichtbeton",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 2,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 523,
+    "progressKey": "bautechnik::die Wandfarbe",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 2,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 524,
+    "progressKey": "bautechnik::die Tapete",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 2,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 525,
+    "progressKey": "bautechnik::der Anstrich",
+    "mainKey": "bautechnik",
+    "tabId": "ausbau",
+    "groupIndex": 2,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 526,
+    "progressKey": "bautechnik::die Heizungsanlage",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 527,
+    "progressKey": "bautechnik::die Wärmepumpe",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 528,
+    "progressKey": "bautechnik::die Vorlauftemperatur",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 529,
+    "progressKey": "bautechnik::der Heizkörper",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 530,
+    "progressKey": "bautechnik::die Fernwärme",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 531,
+    "progressKey": "bautechnik::der Pufferspeicher",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 532,
+    "progressKey": "bautechnik::der Heizkessel",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 533,
+    "progressKey": "bautechnik::das Thermostatventil",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 0,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 534,
+    "progressKey": "bautechnik::der Heizkreisverteiler",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 0,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 535,
+    "progressKey": "bautechnik::die Lüftungsanlage",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 536,
+    "progressKey": "bautechnik::die Wärmerückgewinnung",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 537,
+    "progressKey": "bautechnik::der Wärmetauscher",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 538,
+    "progressKey": "bautechnik::der Luftkanal",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 539,
+    "progressKey": "bautechnik::die Luftwechselrate",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 540,
+    "progressKey": "bautechnik::der Fortluftkanal",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 541,
+    "progressKey": "bautechnik::der Zuluftkanal",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 542,
+    "progressKey": "bautechnik::die Brandschutzklappen",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 1,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 543,
+    "progressKey": "bautechnik::der Lüftungsfilter",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 1,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 544,
+    "progressKey": "bautechnik::die Sanitärtechnik",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 545,
+    "progressKey": "bautechnik::die Trinkwasseranlage",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 546,
+    "progressKey": "bautechnik::die Abwasseranlage",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 547,
+    "progressKey": "bautechnik::der Siphon",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 548,
+    "progressKey": "bautechnik::das Mindestgefälle",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 549,
+    "progressKey": "bautechnik::der Schmutzwasserkanal",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 2,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 550,
+    "progressKey": "bautechnik::die Regenwassernutzung",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 2,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 551,
+    "progressKey": "bautechnik::die Elektrotechnik",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 3,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 552,
+    "progressKey": "bautechnik::die Photovoltaikanlage",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 3,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 553,
+    "progressKey": "bautechnik::die Gebäudeautomation",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 3,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 554,
+    "progressKey": "bautechnik::der Potenzialausgleich",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 3,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 555,
+    "progressKey": "bautechnik::der Sicherungskasten",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 3,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 556,
+    "progressKey": "bautechnik::die Kabelführung",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 3,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 557,
+    "progressKey": "bautechnik::die Notstromversorgung",
+    "mainKey": "bautechnik",
+    "tabId": "tga2",
+    "groupIndex": 3,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 558,
+    "progressKey": "bautechnik::der Bauablaufplan",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 559,
+    "progressKey": "bautechnik::der Balkenplan (Gantt)",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 560,
+    "progressKey": "bautechnik::der kritische Pfad",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 561,
+    "progressKey": "bautechnik::die Baukoordination",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 562,
+    "progressKey": "bautechnik::der Bauzeitenplan",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 563,
+    "progressKey": "bautechnik::die Schnittstellenkoordination",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 564,
+    "progressKey": "bautechnik::die Behinderungsanzeige",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 565,
+    "progressKey": "bautechnik::das Gerüst",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 566,
+    "progressKey": "bautechnik::der Kran",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 567,
+    "progressKey": "bautechnik::die Baustelleneinrichtung",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 568,
+    "progressKey": "bautechnik::das Bautagebuch",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 569,
+    "progressKey": "bautechnik::die Einrüstung",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 570,
+    "progressKey": "bautechnik::der Verbau",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 571,
+    "progressKey": "bautechnik::der Bodenaushub",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 572,
+    "progressKey": "bautechnik::der Baukran",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 1,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 573,
+    "progressKey": "bautechnik::die Qualitätssicherung",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 574,
+    "progressKey": "bautechnik::die Abnahme",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 575,
+    "progressKey": "bautechnik::das Abnahmeprotokoll",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 576,
+    "progressKey": "bautechnik::der Mangel",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 577,
+    "progressKey": "bautechnik::die Mängelrüge",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 578,
+    "progressKey": "bautechnik::die Begehung",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 2,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 579,
+    "progressKey": "bautechnik::das Prüfzeugnis",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 2,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 580,
+    "progressKey": "bautechnik::die Druckprobe",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 2,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 581,
+    "progressKey": "bautechnik::die Arbeitssicherheit",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 3,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 582,
+    "progressKey": "bautechnik::die persönliche Schutzausrüstung",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 3,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 583,
+    "progressKey": "bautechnik::die Absturzsicherung",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 3,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 584,
+    "progressKey": "bautechnik::der SiGe-Plan",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 3,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 585,
+    "progressKey": "bautechnik::die Gefährdungsbeurteilung",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 3,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 586,
+    "progressKey": "bautechnik::die Schutzkleidung",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 3,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 587,
+    "progressKey": "bautechnik::der Sicherheitsgurt",
+    "mainKey": "bautechnik",
+    "tabId": "bauausfuehrung",
+    "groupIndex": 3,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 588,
+    "progressKey": "bauphysik::das Tragwerk",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 589,
+    "progressKey": "bauphysik::das Tragverhalten / die Tragwirkung",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 590,
+    "progressKey": "bauphysik::die Decke / die Deckenplatte",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 591,
+    "progressKey": "bauphysik::der Geschossbau",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 592,
+    "progressKey": "bauphysik::die Last / der Lastfall",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 593,
+    "progressKey": "bauphysik::das Eigengewicht",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 594,
+    "progressKey": "bauphysik::die ständige Last / die Auflast",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 595,
+    "progressKey": "bauphysik::die Nutzlast / die Verkehrslast",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 596,
+    "progressKey": "bauphysik::die Schnittgrößen",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 597,
+    "progressKey": "bauphysik::die Normalkraft (N)",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 598,
+    "progressKey": "bauphysik::die Querkraft (V)",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 10
+  },
+  {
+    "domIndex": 599,
+    "progressKey": "bauphysik::das Biegemoment (M)",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 11
+  },
+  {
+    "domIndex": 600,
+    "progressKey": "bauphysik::der Zug / der Druck",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 12
+  },
+  {
+    "domIndex": 601,
+    "progressKey": "bauphysik::die Spannung / der Querschnitt",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 13
+  },
+  {
+    "domIndex": 602,
+    "progressKey": "bauphysik::der Hebelarm",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 14
+  },
+  {
+    "domIndex": 603,
+    "progressKey": "bauphysik::die Durchbiegung / die Biegelinie",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 15
+  },
+  {
+    "domIndex": 604,
+    "progressKey": "bauphysik::der Wendepunkt",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 16
+  },
+  {
+    "domIndex": 605,
+    "progressKey": "bauphysik::das Auflager / die Stütze",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 17
+  },
+  {
+    "domIndex": 606,
+    "progressKey": "bauphysik::das Einfeldsystem / das Durchlaufsystem",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 18
+  },
+  {
+    "domIndex": 607,
+    "progressKey": "bauphysik::das Gelenk / der Gerberträger",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 19
+  },
+  {
+    "domIndex": 608,
+    "progressKey": "bauphysik::statisch bestimmt / unbestimmt",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 20
+  },
+  {
+    "domIndex": 609,
+    "progressKey": "bauphysik::das Feldmoment / das Stützmoment",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 21
+  },
+  {
+    "domIndex": 610,
+    "progressKey": "bauphysik::die Momenten-Hüllkurve",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 22
+  },
+  {
+    "domIndex": 611,
+    "progressKey": "bauphysik::die Spannweite (L)",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 23
+  },
+  {
+    "domIndex": 612,
+    "progressKey": "bauphysik::die ideelle Länge (li)",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 24
+  },
+  {
+    "domIndex": 613,
+    "progressKey": "bauphysik::die statische Höhe / Nutzhöhe (d)",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 25
+  },
+  {
+    "domIndex": 614,
+    "progressKey": "bauphysik::die Bauteildicke / Plattendicke (h)",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 26
+  },
+  {
+    "domIndex": 615,
+    "progressKey": "bauphysik::die Schlankheit",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 27
+  },
+  {
+    "domIndex": 616,
+    "progressKey": "bauphysik::das Innenfeld / Endfeld",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 28
+  },
+  {
+    "domIndex": 617,
+    "progressKey": "bauphysik::die Auskragung / der Kragarm",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 29
+  },
+  {
+    "domIndex": 618,
+    "progressKey": "bauphysik::die Bewehrung / Zugbewehrung",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 30
+  },
+  {
+    "domIndex": 619,
+    "progressKey": "bauphysik::die Betondeckung",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 31
+  },
+  {
+    "domIndex": 620,
+    "progressKey": "bauphysik::das Fertigteil / der Ortbeton",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 32
+  },
+  {
+    "domIndex": 621,
+    "progressKey": "bauphysik::der Unterzug / die Rippe",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 33
+  },
+  {
+    "domIndex": 622,
+    "progressKey": "bauphysik::monolithisch",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 34
+  },
+  {
+    "domIndex": 623,
+    "progressKey": "bauphysik::die Voute",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 35
+  },
+  {
+    "domIndex": 624,
+    "progressKey": "bauphysik::die Vorbemessung / der Nachweis",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 36
+  },
+  {
+    "domIndex": 625,
+    "progressKey": "bauphysik::maßgebend",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 37
+  },
+  {
+    "domIndex": 626,
+    "progressKey": "bauphysik::die Trennwand",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 38
+  },
+  {
+    "domIndex": 627,
+    "progressKey": "bauphysik::das Brettsperrholz (CLT)",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 39
+  },
+  {
+    "domIndex": 628,
+    "progressKey": "bauphysik::die Schwingung / der Schallschutz",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 40
+  },
+  {
+    "domIndex": 629,
+    "progressKey": "bauphysik::der schwimmende Estrich",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 41
+  },
+  {
+    "domIndex": 630,
+    "progressKey": "bauphysik::der Abbrand / Restquerschnitt",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 42
+  },
+  {
+    "domIndex": 631,
+    "progressKey": "bauphysik::die Vorspannung / Spannlitze",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 43
+  },
+  {
+    "domIndex": 632,
+    "progressKey": "bauphysik::die Hohldiele / die Fuge",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 44
+  },
+  {
+    "domIndex": 633,
+    "progressKey": "bauphysik::OK / UK",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 45
+  },
+  {
+    "domIndex": 634,
+    "progressKey": "bauphysik::EG / OG / UG",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 46
+  },
+  {
+    "domIndex": 635,
+    "progressKey": "bauphysik::die Biegung / die Biegebeanspruchung",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 47
+  },
+  {
+    "domIndex": 636,
+    "progressKey": "bauphysik::der Stahlbeton / Spannbeton",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 48
+  },
+  {
+    "domIndex": 637,
+    "progressKey": "bauphysik::der Druck / der Zug",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 49
+  },
+  {
+    "domIndex": 638,
+    "progressKey": "bauphysik::die Druckzone / Zugzone",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 50
+  },
+  {
+    "domIndex": 639,
+    "progressKey": "bauphysik::das Kräftepaar",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 51
+  },
+  {
+    "domIndex": 640,
+    "progressKey": "bauphysik::die Resultierende",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 52
+  },
+  {
+    "domIndex": 641,
+    "progressKey": "bauphysik::der Hebelarm",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 53
+  },
+  {
+    "domIndex": 642,
+    "progressKey": "bauphysik::das Moment / die Querkraft",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 54
+  },
+  {
+    "domIndex": 643,
+    "progressKey": "bauphysik::die Normalspannung / Schubspannung",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 55
+  },
+  {
+    "domIndex": 644,
+    "progressKey": "bauphysik::die Hauptspannung",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 56
+  },
+  {
+    "domIndex": 645,
+    "progressKey": "bauphysik::die Spannungstrajektorie",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 57
+  },
+  {
+    "domIndex": 646,
+    "progressKey": "bauphysik::die Dehnung / Stauchung",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 58
+  },
+  {
+    "domIndex": 647,
+    "progressKey": "bauphysik::die Arbeitslinie",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 59
+  },
+  {
+    "domIndex": 648,
+    "progressKey": "bauphysik::der Elastizitätsmodul",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 60
+  },
+  {
+    "domIndex": 649,
+    "progressKey": "bauphysik::die Steifigkeit / Festigkeit",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 61
+  },
+  {
+    "domIndex": 650,
+    "progressKey": "bauphysik::die Streckgrenze / das Fließen",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 62
+  },
+  {
+    "domIndex": 651,
+    "progressKey": "bauphysik::der Riss / gerissener Querschnitt",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 63
+  },
+  {
+    "domIndex": 652,
+    "progressKey": "bauphysik::der Verbund / die Verankerung",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 64
+  },
+  {
+    "domIndex": 653,
+    "progressKey": "bauphysik::homogen / inhomogen",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 65
+  },
+  {
+    "domIndex": 654,
+    "progressKey": "bauphysik::isotrop / anisotrop",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 66
+  },
+  {
+    "domIndex": 655,
+    "progressKey": "bauphysik::die Bemessung / Vorbemessung",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 67
+  },
+  {
+    "domIndex": 656,
+    "progressKey": "bauphysik::das Gewölbe / der Bogen",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 68
+  },
+  {
+    "domIndex": 657,
+    "progressKey": "bauphysik::die Stützlinie",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 69
+  },
+  {
+    "domIndex": 658,
+    "progressKey": "bauphysik::die Pfeilhöhe / der Stich",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 70
+  },
+  {
+    "domIndex": 659,
+    "progressKey": "bauphysik::der Bogenschub",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 71
+  },
+  {
+    "domIndex": 660,
+    "progressKey": "bauphysik::das Widerlager",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 72
+  },
+  {
+    "domIndex": 661,
+    "progressKey": "bauphysik::die Kappendecke",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 73
+  },
+  {
+    "domIndex": 662,
+    "progressKey": "bauphysik::scheitrecht",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 74
+  },
+  {
+    "domIndex": 663,
+    "progressKey": "bauphysik::das Zugband",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 75
+  },
+  {
+    "domIndex": 664,
+    "progressKey": "bauphysik::der Hohlziegel / Hohlkörper",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 76
+  },
+  {
+    "domIndex": 665,
+    "progressKey": "bauphysik::die Rippe / Rippendecke",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 77
+  },
+  {
+    "domIndex": 666,
+    "progressKey": "bauphysik::die Querrippe",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 78
+  },
+  {
+    "domIndex": 667,
+    "progressKey": "bauphysik::der Unterzug / Überzug",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 79
+  },
+  {
+    "domIndex": 668,
+    "progressKey": "bauphysik::die Schalung / Abstützung",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 80
+  },
+  {
+    "domIndex": 669,
+    "progressKey": "bauphysik::der Ortbeton / das Fertigteil",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 81
+  },
+  {
+    "domIndex": 670,
+    "progressKey": "bauphysik::das Halbfertigteil / der Aufbeton",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 82
+  },
+  {
+    "domIndex": 671,
+    "progressKey": "bauphysik::der Gitterträger",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 83
+  },
+  {
+    "domIndex": 672,
+    "progressKey": "bauphysik::der Bügel / Montagebewehrung",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 84
+  },
+  {
+    "domIndex": 673,
+    "progressKey": "bauphysik::der Rechteckquerschnitt",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 85
+  },
+  {
+    "domIndex": 674,
+    "progressKey": "bauphysik::der Plattenbalken / Steg",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 86
+  },
+  {
+    "domIndex": 675,
+    "progressKey": "bauphysik::die mitwirkende Plattenbreite",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 87
+  },
+  {
+    "domIndex": 676,
+    "progressKey": "bauphysik::die statische Höhe / Gesamthöhe",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 88
+  },
+  {
+    "domIndex": 677,
+    "progressKey": "bauphysik::der Bewehrungsquerschnitt",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 89
+  },
+  {
+    "domIndex": 678,
+    "progressKey": "bauphysik::der Verlegeplan / Montagezustand",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 90
+  },
+  {
+    "domIndex": 679,
+    "progressKey": "bauphysik::das Faltwerk",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 91
+  },
+  {
+    "domIndex": 680,
+    "progressKey": "bauphysik::die Querscheibe",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 92
+  },
+  {
+    "domIndex": 681,
+    "progressKey": "bauphysik::das Beulen",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 93
+  },
+  {
+    "domIndex": 682,
+    "progressKey": "bauphysik::die Halbfertigteilbauweise",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 94
+  },
+  {
+    "domIndex": 683,
+    "progressKey": "bauphysik::der Endzustand",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 95
+  },
+  {
+    "domIndex": 684,
+    "progressKey": "bauphysik::die Verbundbauweise",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 96
+  },
+  {
+    "domIndex": 685,
+    "progressKey": "bauphysik::der Kopfbolzendübel",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 97
+  },
+  {
+    "domIndex": 686,
+    "progressKey": "bauphysik::die Längsschubkraft",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 98
+  },
+  {
+    "domIndex": 687,
+    "progressKey": "bauphysik::der Teilverbund",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 99
+  },
+  {
+    "domIndex": 688,
+    "progressKey": "bauphysik::der Schlupf",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 100
+  },
+  {
+    "domIndex": 689,
+    "progressKey": "bauphysik::der Kammerbeton",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 101
+  },
+  {
+    "domIndex": 690,
+    "progressKey": "bauphysik::die Knagge",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 102
+  },
+  {
+    "domIndex": 691,
+    "progressKey": "bauphysik::die Ertüchtigung",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 103
+  },
+  {
+    "domIndex": 692,
+    "progressKey": "bauphysik::der Einschub",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 104
+  },
+  {
+    "domIndex": 693,
+    "progressKey": "bauphysik::die Trennfolie",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 105
+  },
+  {
+    "domIndex": 694,
+    "progressKey": "bauphysik::der Trittschallschutz",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 106
+  },
+  {
+    "domIndex": 695,
+    "progressKey": "bauphysik::das Kriechen / Schwinden",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 107
+  },
+  {
+    "domIndex": 696,
+    "progressKey": "bauphysik::der Flansch / Gurt",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 108
+  },
+  {
+    "domIndex": 697,
+    "progressKey": "bauphysik::die Lasteinzugsbreite",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 109
+  },
+  {
+    "domIndex": 698,
+    "progressKey": "bauphysik::die Druckzonenhöhe",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 110
+  },
+  {
+    "domIndex": 699,
+    "progressKey": "bauphysik::der innere Hebelarm",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 111
+  },
+  {
+    "domIndex": 700,
+    "progressKey": "bauphysik::die Nulllinie",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 112
+  },
+  {
+    "domIndex": 701,
+    "progressKey": "bauphysik::der Momentennullpunkt",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 113
+  },
+  {
+    "domIndex": 702,
+    "progressKey": "bauphysik::die Momentenumlagerung",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 114
+  },
+  {
+    "domIndex": 703,
+    "progressKey": "bauphysik::die Rotationsfähigkeit",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 115
+  },
+  {
+    "domIndex": 704,
+    "progressKey": "bauphysik::der lichte Abstand",
+    "mainKey": "bauphysik",
+    "tabId": "bo5",
+    "groupIndex": 0,
+    "rowIndex": 116
+  },
+  {
+    "domIndex": 705,
+    "progressKey": "fitness::das Fitnessstudio",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 706,
+    "progressKey": "fitness::die Mitgliedschaft",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 707,
+    "progressKey": "fitness::der Trainer",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 708,
+    "progressKey": "fitness::die Umkleide",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 709,
+    "progressKey": "fitness::der Trainingsplan",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 710,
+    "progressKey": "fitness::die Trainingseinheit",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 711,
+    "progressKey": "fitness::die Hantel",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 712,
+    "progressKey": "fitness::die Langhantel",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 713,
+    "progressKey": "fitness::die Hantelscheibe",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 714,
+    "progressKey": "fitness::das Laufband",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 715,
+    "progressKey": "fitness::der Kraftraum",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 716,
+    "progressKey": "fitness::die Klimmzugstange",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 717,
+    "progressKey": "fitness::die Gewichtsweste",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 718,
+    "progressKey": "fitness::das Widerstandsband",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 1,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 719,
+    "progressKey": "fitness::die Yogamatte",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 1,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 720,
+    "progressKey": "fitness::das Sportgetränk",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 1,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 721,
+    "progressKey": "fitness::trainieren",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 722,
+    "progressKey": "fitness::sich aufwärmen",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 723,
+    "progressKey": "fitness::sich dehnen",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 724,
+    "progressKey": "fitness::heben",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 725,
+    "progressKey": "fitness::drücken",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 726,
+    "progressKey": "fitness::ziehen",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 2,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 727,
+    "progressKey": "fitness::einen Satz machen",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 2,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 728,
+    "progressKey": "fitness::die Wiederholung",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 2,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 729,
+    "progressKey": "fitness::die Pause",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 2,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 730,
+    "progressKey": "fitness::die Wiederholungszahl",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 2,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 731,
+    "progressKey": "fitness::maximales Gewicht",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 2,
+    "rowIndex": 10
+  },
+  {
+    "domIndex": 732,
+    "progressKey": "fitness::die Muskelmasse aufbauen",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 2,
+    "rowIndex": 11
+  },
+  {
+    "domIndex": 733,
+    "progressKey": "fitness::Fett verbrennen",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 2,
+    "rowIndex": 12
+  },
+  {
+    "domIndex": 734,
+    "progressKey": "fitness::die Ausdauer",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 2,
+    "rowIndex": 13
+  },
+  {
+    "domIndex": 735,
+    "progressKey": "fitness::die Muskelkraft",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 2,
+    "rowIndex": 14
+  },
+  {
+    "domIndex": 736,
+    "progressKey": "fitness::das Cardio-Training",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 3,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 737,
+    "progressKey": "fitness::das Ausdauertraining",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 3,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 738,
+    "progressKey": "fitness::das Intervalltraining",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 3,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 739,
+    "progressKey": "fitness::die Kondition",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 3,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 740,
+    "progressKey": "fitness::die Leistungsfähigkeit",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 3,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 741,
+    "progressKey": "fitness::abnehmen",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 4,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 742,
+    "progressKey": "fitness::zunehmen",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 4,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 743,
+    "progressKey": "fitness::das Körpergewicht",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 4,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 744,
+    "progressKey": "fitness::der Körperfettanteil",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 4,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 745,
+    "progressKey": "fitness::die Körpergröße",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 4,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 746,
+    "progressKey": "fitness::strecken",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 5,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 747,
+    "progressKey": "fitness::beugen",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 5,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 748,
+    "progressKey": "fitness::springen",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 5,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 749,
+    "progressKey": "fitness::joggen",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 5,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 750,
+    "progressKey": "fitness::schwitzen",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 5,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 751,
+    "progressKey": "fitness::sich überanstrengen",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 5,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 752,
+    "progressKey": "fitness::übertrainieren",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 5,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 753,
+    "progressKey": "fitness::die Kettlebell",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 6,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 754,
+    "progressKey": "fitness::das Springseil",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 6,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 755,
+    "progressKey": "fitness::der Boxsack",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 6,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 756,
+    "progressKey": "fitness::der Trainingspartner",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 7,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 757,
+    "progressKey": "fitness::das Trainingsziel",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 7,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 758,
+    "progressKey": "fitness::die Trainingsintensität",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 7,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 759,
+    "progressKey": "fitness::die Trainingsroutine",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 7,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 760,
+    "progressKey": "fitness::der Trainingsfortschritt",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 7,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 761,
+    "progressKey": "fitness::der Ruhetag",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 7,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 762,
+    "progressKey": "fitness::das Plateau",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 7,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 763,
+    "progressKey": "fitness::die Koordination",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 8,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 764,
+    "progressKey": "fitness::die Flexibilität",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 8,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 765,
+    "progressKey": "fitness::die Beweglichkeit",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 8,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 766,
+    "progressKey": "fitness::das Gleichgewicht",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 8,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 767,
+    "progressKey": "fitness::die Körperspannung",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 8,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 768,
+    "progressKey": "fitness::das Aufwärmen",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 9,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 769,
+    "progressKey": "fitness::das Cool-down",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 9,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 770,
+    "progressKey": "fitness::das Aufwärmprogramm",
+    "mainKey": "fitness",
+    "tabId": "training",
+    "groupIndex": 9,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 771,
+    "progressKey": "fitness::das Protein",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 772,
+    "progressKey": "fitness::die Kalorien",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 773,
+    "progressKey": "fitness::das Nahrungsergänzungsmittel",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 774,
+    "progressKey": "fitness::der Muskelaufbau",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 775,
+    "progressKey": "fitness::die Diät",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 776,
+    "progressKey": "fitness::die Erholung",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 777,
+    "progressKey": "fitness::sich erholen",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 778,
+    "progressKey": "fitness::der Muskelkater",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 779,
+    "progressKey": "fitness::müde",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 780,
+    "progressKey": "fitness::erschöpft",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 781,
+    "progressKey": "fitness::die Massage",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 782,
+    "progressKey": "fitness::die Regenerationszeit",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 783,
+    "progressKey": "fitness::ausgeruht",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 1,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 784,
+    "progressKey": "fitness::die Verletzung",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 785,
+    "progressKey": "fitness::sich verletzen",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 786,
+    "progressKey": "fitness::sich umknicken",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 787,
+    "progressKey": "fitness::die Zerrung",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 788,
+    "progressKey": "fitness::der Riss",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 789,
+    "progressKey": "fitness::die Entzündung",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 2,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 790,
+    "progressKey": "fitness::die Physiotherapie",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 2,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 791,
+    "progressKey": "fitness::kühlen",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 2,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 792,
+    "progressKey": "fitness::schonen",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 2,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 793,
+    "progressKey": "fitness::die Bandage",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 2,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 794,
+    "progressKey": "fitness::die Vorbeugung",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 2,
+    "rowIndex": 10
+  },
+  {
+    "domIndex": 795,
+    "progressKey": "fitness::schmerzhaft",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 2,
+    "rowIndex": 11
+  },
+  {
+    "domIndex": 796,
+    "progressKey": "fitness::der Krankengymnast",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 2,
+    "rowIndex": 12
+  },
+  {
+    "domIndex": 797,
+    "progressKey": "fitness::der Ernährungsplan",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 3,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 798,
+    "progressKey": "fitness::der Kalorienverbrauch",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 3,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 799,
+    "progressKey": "fitness::ausgewogen",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 3,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 800,
+    "progressKey": "fitness::die Portion",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 3,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 801,
+    "progressKey": "fitness::motiviert",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 3,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 802,
+    "progressKey": "fitness::die Sportart",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 3,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 803,
+    "progressKey": "fitness::sich fit halten",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 3,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 804,
+    "progressKey": "fitness::fit werden",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 3,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 805,
+    "progressKey": "fitness::gesund bleiben",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 3,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 806,
+    "progressKey": "fitness::die Belastung",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 3,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 807,
+    "progressKey": "fitness::die Muskelspannung",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 3,
+    "rowIndex": 10
+  },
+  {
+    "domIndex": 808,
+    "progressKey": "fitness::die Muskeldefinition",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 3,
+    "rowIndex": 11
+  },
+  {
+    "domIndex": 809,
+    "progressKey": "fitness::das Übertraining",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 3,
+    "rowIndex": 12
+  },
+  {
+    "domIndex": 810,
+    "progressKey": "fitness::die Bewegungsfreiheit",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 3,
+    "rowIndex": 13
+  },
+  {
+    "domIndex": 811,
+    "progressKey": "fitness::regelmäßig trainieren",
+    "mainKey": "fitness",
+    "tabId": "ernaehrung",
+    "groupIndex": 3,
+    "rowIndex": 14
+  },
+  {
+    "domIndex": 812,
+    "progressKey": "anatomie::die Brustmuskulatur",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 813,
+    "progressKey": "anatomie::die Bauchmuskeln",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 814,
+    "progressKey": "anatomie::die seitliche Bauchmuskulatur",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 815,
+    "progressKey": "anatomie::der Rumpf",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 816,
+    "progressKey": "anatomie::der Rücken",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 817,
+    "progressKey": "anatomie::der untere Rücken",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 818,
+    "progressKey": "anatomie::der Bauchnabel",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 819,
+    "progressKey": "anatomie::der Bizeps",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 820,
+    "progressKey": "anatomie::der Trizeps",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 821,
+    "progressKey": "anatomie::die Schulter",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 822,
+    "progressKey": "anatomie::der Unterarm",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 823,
+    "progressKey": "anatomie::der Oberarm",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 824,
+    "progressKey": "anatomie::das Handgelenk",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 825,
+    "progressKey": "anatomie::der Ellbogen",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 826,
+    "progressKey": "anatomie::der Finger",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 1,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 827,
+    "progressKey": "anatomie::die Hand",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 1,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 828,
+    "progressKey": "anatomie::der Trapezmuskel",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 829,
+    "progressKey": "anatomie::der Nacken",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 830,
+    "progressKey": "anatomie::das Schulterblatt",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 831,
+    "progressKey": "anatomie::die Wirbelsäule",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 832,
+    "progressKey": "anatomie::die Nackenmuskulatur",
+    "mainKey": "anatomie",
+    "tabId": "oberkoerper",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 833,
+    "progressKey": "anatomie::der Oberschenkel",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 834,
+    "progressKey": "anatomie::der Quadrizeps",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 835,
+    "progressKey": "anatomie::die Beinbeuger",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 836,
+    "progressKey": "anatomie::die Wade",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 837,
+    "progressKey": "anatomie::der Unterschenkel",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 838,
+    "progressKey": "anatomie::die Ferse",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 839,
+    "progressKey": "anatomie::der Fuß",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 840,
+    "progressKey": "anatomie::die Zehe",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 0,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 841,
+    "progressKey": "anatomie::die Wadenmuskulatur",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 0,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 842,
+    "progressKey": "anatomie::das Gesäß",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 843,
+    "progressKey": "anatomie::die Hüfte",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 844,
+    "progressKey": "anatomie::die Hüftbeuger",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 845,
+    "progressKey": "anatomie::die Hüftmuskulatur",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 846,
+    "progressKey": "anatomie::der Gesäßmuskel",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 847,
+    "progressKey": "anatomie::das Gelenk",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 848,
+    "progressKey": "anatomie::das Knie",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 849,
+    "progressKey": "anatomie::das Sprunggelenk",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 850,
+    "progressKey": "anatomie::die Hüftgelenk",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 851,
+    "progressKey": "anatomie::der Knorpel",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 852,
+    "progressKey": "anatomie::die Sehne",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 2,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 853,
+    "progressKey": "anatomie::das Band (Bänder)",
+    "mainKey": "anatomie",
+    "tabId": "unterkoerper",
+    "groupIndex": 2,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 854,
+    "progressKey": "anatomie::der Muskel",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 855,
+    "progressKey": "anatomie::die Muskulatur",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 856,
+    "progressKey": "anatomie::die Muskelfaser",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 857,
+    "progressKey": "anatomie::die Muskelkontraktion",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 858,
+    "progressKey": "anatomie::der Körperbau",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 859,
+    "progressKey": "anatomie::der Knochen",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 860,
+    "progressKey": "anatomie::das Skelett",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 861,
+    "progressKey": "anatomie::der Schädel",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 862,
+    "progressKey": "anatomie::das Becken",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 863,
+    "progressKey": "anatomie::der Brustkorb",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 864,
+    "progressKey": "anatomie::die Rippe",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 865,
+    "progressKey": "anatomie::das Schlüsselbein",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 866,
+    "progressKey": "anatomie::das Fersenbein",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 1,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 867,
+    "progressKey": "anatomie::das Steißbein",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 1,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 868,
+    "progressKey": "anatomie::der Wirbel",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 869,
+    "progressKey": "anatomie::die Bandscheibe",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 870,
+    "progressKey": "anatomie::das Rückenmark",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 871,
+    "progressKey": "anatomie::die Achillessehne",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 3,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 872,
+    "progressKey": "anatomie::der Meniskus",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 3,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 873,
+    "progressKey": "anatomie::das Kreuzband",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 3,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 874,
+    "progressKey": "anatomie::die Rotatorenmanschette",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 3,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 875,
+    "progressKey": "anatomie::das Fußgelenk",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 3,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 876,
+    "progressKey": "anatomie::das Zwerchfell",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 4,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 877,
+    "progressKey": "anatomie::die Atemmuskulatur",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 4,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 878,
+    "progressKey": "anatomie::der Nerv",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 4,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 879,
+    "progressKey": "anatomie::das Nervensystem",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 4,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 880,
+    "progressKey": "anatomie::die Motorik",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 4,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 881,
+    "progressKey": "anatomie::die Feinmotorik",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 4,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 882,
+    "progressKey": "anatomie::die Grobmotorik",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 4,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 883,
+    "progressKey": "anatomie::die Haltung",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 5,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 884,
+    "progressKey": "anatomie::die Körperhaltung",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 5,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 885,
+    "progressKey": "anatomie::symmetrisch",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 5,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 886,
+    "progressKey": "anatomie::asymmetrisch",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 5,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 887,
+    "progressKey": "anatomie::muskulös",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 5,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 888,
+    "progressKey": "anatomie::schlank",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 5,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 889,
+    "progressKey": "anatomie::drahtig",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 5,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 890,
+    "progressKey": "anatomie::der Bewegungsapparat",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 6,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 891,
+    "progressKey": "anatomie::das Gewebe",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 6,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 892,
+    "progressKey": "anatomie::das Blut",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 6,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 893,
+    "progressKey": "anatomie::die Haut",
+    "mainKey": "anatomie",
+    "tabId": "skelett",
+    "groupIndex": 6,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 894,
+    "progressKey": "dreame::die Saugkraft",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 895,
+    "progressKey": "dreame::die Saugleistung",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 896,
+    "progressKey": "dreame::die Wischfunktion",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 897,
+    "progressKey": "dreame::die Wischintensität",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 898,
+    "progressKey": "dreame::die Kantenreinigung",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 899,
+    "progressKey": "dreame::die Teppicherkennung",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 900,
+    "progressKey": "dreame::die Tiefenreinigung",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 901,
+    "progressKey": "dreame::der Schmutzwassertank",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 0,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 902,
+    "progressKey": "dreame::der Frischwassertank",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 0,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 903,
+    "progressKey": "dreame::das Wischpad",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 0,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 904,
+    "progressKey": "dreame::die Seitenbürste",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 0,
+    "rowIndex": 10
+  },
+  {
+    "domIndex": 905,
+    "progressKey": "dreame::die Walzenbürste",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 0,
+    "rowIndex": 11
+  },
+  {
+    "domIndex": 906,
+    "progressKey": "dreame::die Selbstreinigung",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 0,
+    "rowIndex": 12
+  },
+  {
+    "domIndex": 907,
+    "progressKey": "dreame::die Heißlufttrocknung",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 0,
+    "rowIndex": 13
+  },
+  {
+    "domIndex": 908,
+    "progressKey": "dreame::die Basisstation",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 0,
+    "rowIndex": 14
+  },
+  {
+    "domIndex": 909,
+    "progressKey": "dreame::der Staubbeutel",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 0,
+    "rowIndex": 15
+  },
+  {
+    "domIndex": 910,
+    "progressKey": "dreame::die automatische Leerung",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 0,
+    "rowIndex": 16
+  },
+  {
+    "domIndex": 911,
+    "progressKey": "dreame::die LiDAR-Navigation",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 912,
+    "progressKey": "dreame::die Hinderniserkennung",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 913,
+    "progressKey": "dreame::die Raumkartierung",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 914,
+    "progressKey": "dreame::die Reinigungszone",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 915,
+    "progressKey": "dreame::die Sperrzone",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 916,
+    "progressKey": "dreame::die Schwellenüberwindung",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 917,
+    "progressKey": "dreame::der Reinigungsmodus",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 918,
+    "progressKey": "dreame::die Echtzeit-Karte",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 1,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 919,
+    "progressKey": "dreame::die Mehrfachetagen-Kartierung",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 1,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 920,
+    "progressKey": "dreame::die App-Steuerung",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 921,
+    "progressKey": "dreame::die Sprachsteuerung",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 922,
+    "progressKey": "dreame::der Reinigungsplan",
+    "mainKey": "dreame",
+    "tabId": "saugroboter",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 923,
+    "progressKey": "dreame::die Akkulaufzeit",
+    "mainKey": "dreame",
+    "tabId": "staubsauger",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 924,
+    "progressKey": "dreame::die Ladezeit",
+    "mainKey": "dreame",
+    "tabId": "staubsauger",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 925,
+    "progressKey": "dreame::der Akkustand",
+    "mainKey": "dreame",
+    "tabId": "staubsauger",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 926,
+    "progressKey": "dreame::der Hochgeschwindigkeitsmotor",
+    "mainKey": "dreame",
+    "tabId": "staubsauger",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 927,
+    "progressKey": "dreame::der Saugmodus",
+    "mainKey": "dreame",
+    "tabId": "staubsauger",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 928,
+    "progressKey": "dreame::der Eco-Modus",
+    "mainKey": "dreame",
+    "tabId": "staubsauger",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 929,
+    "progressKey": "dreame::die Motorleistung",
+    "mainKey": "dreame",
+    "tabId": "staubsauger",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 930,
+    "progressKey": "dreame::der Bürstenkopf",
+    "mainKey": "dreame",
+    "tabId": "staubsauger",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 931,
+    "progressKey": "dreame::die Fugendüse",
+    "mainKey": "dreame",
+    "tabId": "staubsauger",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 932,
+    "progressKey": "dreame::die Polsterdüse",
+    "mainKey": "dreame",
+    "tabId": "staubsauger",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 933,
+    "progressKey": "dreame::das Staubbehälter",
+    "mainKey": "dreame",
+    "tabId": "staubsauger",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 934,
+    "progressKey": "dreame::das HEPA-Filter",
+    "mainKey": "dreame",
+    "tabId": "staubsauger",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 935,
+    "progressKey": "dreame::die Wandhalterung",
+    "mainKey": "dreame",
+    "tabId": "staubsauger",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 936,
+    "progressKey": "dreame::die Entwirr-Technologie",
+    "mainKey": "dreame",
+    "tabId": "staubsauger",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 937,
+    "progressKey": "dreame::das Gewicht",
+    "mainKey": "dreame",
+    "tabId": "staubsauger",
+    "groupIndex": 1,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 938,
+    "progressKey": "dreame::die LED-Beleuchtung",
+    "mainKey": "dreame",
+    "tabId": "staubsauger",
+    "groupIndex": 1,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 939,
+    "progressKey": "dreame::die Nassreinigung",
+    "mainKey": "dreame",
+    "tabId": "nass",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 940,
+    "progressKey": "dreame::die Walzenreinigung",
+    "mainKey": "dreame",
+    "tabId": "nass",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 941,
+    "progressKey": "dreame::die Schaumreinigung",
+    "mainKey": "dreame",
+    "tabId": "nass",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 942,
+    "progressKey": "dreame::die Selbstreinigungsfunktion",
+    "mainKey": "dreame",
+    "tabId": "nass",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 943,
+    "progressKey": "dreame::die ThermoTub-Technologie",
+    "mainKey": "dreame",
+    "tabId": "nass",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 944,
+    "progressKey": "dreame::die GapFree-Technologie",
+    "mainKey": "dreame",
+    "tabId": "nass",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 945,
+    "progressKey": "dreame::die TangleCut-Funktion",
+    "mainKey": "dreame",
+    "tabId": "nass",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 946,
+    "progressKey": "dreame::streifenfrei",
+    "mainKey": "dreame",
+    "tabId": "nass",
+    "groupIndex": 0,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 947,
+    "progressKey": "dreame::der Hartboden",
+    "mainKey": "dreame",
+    "tabId": "nass",
+    "groupIndex": 0,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 948,
+    "progressKey": "dreame::hartnäckige Verschmutzungen",
+    "mainKey": "dreame",
+    "tabId": "nass",
+    "groupIndex": 0,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 949,
+    "progressKey": "dreame::flüssige Verschmutzungen",
+    "mainKey": "dreame",
+    "tabId": "nass",
+    "groupIndex": 0,
+    "rowIndex": 10
+  },
+  {
+    "domIndex": 950,
+    "progressKey": "dreame::der Mähroboter",
+    "mainKey": "dreame",
+    "tabId": "mahroboter",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 951,
+    "progressKey": "dreame::die Mähfläche",
+    "mainKey": "dreame",
+    "tabId": "mahroboter",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 952,
+    "progressKey": "dreame::die Schnitthöhe",
+    "mainKey": "dreame",
+    "tabId": "mahroboter",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 953,
+    "progressKey": "dreame::die Schnittbreite",
+    "mainKey": "dreame",
+    "tabId": "mahroboter",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 954,
+    "progressKey": "dreame::die Geländesteigung",
+    "mainKey": "dreame",
+    "tabId": "mahroboter",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 955,
+    "progressKey": "dreame::die drahtlose Begrenzung",
+    "mainKey": "dreame",
+    "tabId": "mahroboter",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 956,
+    "progressKey": "dreame::die RTK-Navigation",
+    "mainKey": "dreame",
+    "tabId": "mahroboter",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 957,
+    "progressKey": "dreame::der Regensensor",
+    "mainKey": "dreame",
+    "tabId": "mahroboter",
+    "groupIndex": 0,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 958,
+    "progressKey": "dreame::die Mulchfunktion",
+    "mainKey": "dreame",
+    "tabId": "mahroboter",
+    "groupIndex": 0,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 959,
+    "progressKey": "dreame::der Allradantrieb",
+    "mainKey": "dreame",
+    "tabId": "mahroboter",
+    "groupIndex": 0,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 960,
+    "progressKey": "dreame::die Windgeschwindigkeit",
+    "mainKey": "dreame",
+    "tabId": "haartrockner",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 961,
+    "progressKey": "dreame::die Temperaturstufen",
+    "mainKey": "dreame",
+    "tabId": "haartrockner",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 962,
+    "progressKey": "dreame::die Kältestufe",
+    "mainKey": "dreame",
+    "tabId": "haartrockner",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 963,
+    "progressKey": "dreame::der Negativ-Ionen-Generator",
+    "mainKey": "dreame",
+    "tabId": "haartrockner",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 964,
+    "progressKey": "dreame::der Überhitzungsschutz",
+    "mainKey": "dreame",
+    "tabId": "haartrockner",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 965,
+    "progressKey": "dreame::die Wattzahl",
+    "mainKey": "dreame",
+    "tabId": "haartrockner",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 966,
+    "progressKey": "dreame::die Temperaturregelung",
+    "mainKey": "dreame",
+    "tabId": "haartrockner",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 967,
+    "progressKey": "dreame::der Airstyler",
+    "mainKey": "dreame",
+    "tabId": "haartrockner",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 968,
+    "progressKey": "dreame::der Lockenkopf",
+    "mainKey": "dreame",
+    "tabId": "haartrockner",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 969,
+    "progressKey": "dreame::der Glättungsaufsatz",
+    "mainKey": "dreame",
+    "tabId": "haartrockner",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 970,
+    "progressKey": "dreame::die Hitzeschutzfunktion",
+    "mainKey": "dreame",
+    "tabId": "haartrockner",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 971,
+    "progressKey": "dreame::die Garantie",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 0,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 972,
+    "progressKey": "dreame::die Garantieverlängerung",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 0,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 973,
+    "progressKey": "dreame::das Zubehör",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 0,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 974,
+    "progressKey": "dreame::der Lieferumfang",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 0,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 975,
+    "progressKey": "dreame::das Preis-Leistungs-Verhältnis",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 0,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 976,
+    "progressKey": "dreame::das Flaggschiff-Modell",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 0,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 977,
+    "progressKey": "dreame::die Produktserie",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 0,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 978,
+    "progressKey": "dreame::der Energieverbrauch",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 0,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 979,
+    "progressKey": "dreame::die Testnote",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 0,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 980,
+    "progressKey": "dreame::die Auszeichnung",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 0,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 981,
+    "progressKey": "dreame::der Kundennutzen",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 1,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 982,
+    "progressKey": "dreame::die Alleinstellungsmerkmale",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 1,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 983,
+    "progressKey": "dreame::die Zielgruppe",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 1,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 984,
+    "progressKey": "dreame::das Anwendungsgebiet",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 1,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 985,
+    "progressKey": "dreame::die Vorführung",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 1,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 986,
+    "progressKey": "dreame::der Vergleich",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 1,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 987,
+    "progressKey": "dreame::die Kompatibilität",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 1,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 988,
+    "progressKey": "dreame::geräuscharm",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 2,
+    "rowIndex": 0
+  },
+  {
+    "domIndex": 989,
+    "progressKey": "dreame::energiesparend",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 2,
+    "rowIndex": 1
+  },
+  {
+    "domIndex": 990,
+    "progressKey": "dreame::wartungsarm",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 2,
+    "rowIndex": 2
+  },
+  {
+    "domIndex": 991,
+    "progressKey": "dreame::leistungsstark",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 2,
+    "rowIndex": 3
+  },
+  {
+    "domIndex": 992,
+    "progressKey": "dreame::benutzerfreundlich",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 2,
+    "rowIndex": 4
+  },
+  {
+    "domIndex": 993,
+    "progressKey": "dreame::vollautomatisch",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 2,
+    "rowIndex": 5
+  },
+  {
+    "domIndex": 994,
+    "progressKey": "dreame::einstellen",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 2,
+    "rowIndex": 6
+  },
+  {
+    "domIndex": 995,
+    "progressKey": "dreame::reinigen",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 2,
+    "rowIndex": 7
+  },
+  {
+    "domIndex": 996,
+    "progressKey": "dreame::navigieren",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 2,
+    "rowIndex": 8
+  },
+  {
+    "domIndex": 997,
+    "progressKey": "dreame::aufladen",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 2,
+    "rowIndex": 9
+  },
+  {
+    "domIndex": 998,
+    "progressKey": "dreame::kartieren",
+    "mainKey": "dreame",
+    "tabId": "allgemein",
+    "groupIndex": 2,
+    "rowIndex": 10
+  }
+]
