@@ -1,0 +1,15 @@
+.empty-state {
+  padding: 40px 16px;
+  text-align: center;
+  font-family: var(--fp);
+  color: var(--tm);
+}
+.empty-state__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ts);
+}
+.empty-state__desc {
+  font-size: 12px;
+  margin-top: 6px;
+}

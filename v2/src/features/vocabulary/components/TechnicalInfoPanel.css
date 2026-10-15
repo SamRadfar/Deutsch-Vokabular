@@ -1,0 +1,107 @@
+/* Ported from legacy "BAUTECHNIK INFO — GLASSMORPHISM DRAWER" */
+.info-trigger {
+  display: inline-flex;
+  align-items: center;
+  font-size: 9px;
+  font-weight: 600;
+  color: #b8922f;
+  background: rgba(201, 168, 76, 0.08);
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  border-radius: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.12s;
+  white-space: nowrap;
+  font-family: var(--fp);
+  vertical-align: middle;
+  margin-inline-start: 4px;
+}
+.info-trigger:hover,
+.info-trigger.is-open { background: rgba(201, 168, 76, 0.15); }
+.info-trigger:active { transform: scale(0.92); }
+
+.info-drawer {
+  background: rgba(20, 25, 32, 0.92);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.07) inset;
+  position: relative;
+  margin: 8px 10px 10px;
+  animation: info-in 0.3s ease;
+}
+.info-drawer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50px;
+  height: 50px;
+  background: radial-gradient(circle at 0 0, rgba(201, 168, 76, 0.15), transparent 70%);
+  pointer-events: none;
+}
+.info-drawer__formula {
+  padding: 0 16px;
+  min-height: 46px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.info-drawer__formula-lbl,
+.info-drawer__key {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  color: rgba(255, 255, 255, 0.88);
+  font-family: var(--fp);
+}
+.info-drawer__formula-val {
+  font-size: 17px;
+  font-weight: 700;
+  color: #c9a84c;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
+}
+.info-drawer__kv { padding: 4px 0; }
+.info-drawer__row {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  min-height: 40px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 12px;
+}
+.info-drawer__row:last-child { border-bottom: none; }
+.info-drawer__key { flex: 0 0 56px; }
+.info-drawer__val {
+  flex: 1;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(240, 244, 255, 0.9);
+  font-family: var(--fn);
+}
+.info-drawer__val--persian { font-family: var(--fp); }
+.info-drawer__val--symbol {
+  font-size: 22px;
+  font-weight: 700;
+  color: #c9a84c;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
+}
+
+@keyframes info-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .info-drawer { animation: none; }
+}
+@media (max-width: 640px) {
+  .info-drawer { margin: -4px 0 10px; }
+  .info-trigger { font-size: 10px; padding: 4px 8px; }
+}

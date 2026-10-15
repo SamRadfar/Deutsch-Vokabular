@@ -1,0 +1,126 @@
+/* Vocabulary table (desktop) and cards (mobile) — ported from legacy table + "MOBILE CARD LAYOUT ≤ 640px" */
+
+/* ── Table ── */
+.tscr { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.vtable { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.vtable .c-word { width: 15%; }
+.vtable .c-type { width: 10%; }
+.vtable .c-fa { width: 12%; }
+.vtable .c-ex { width: 24%; }
+.vtable .c-tr { width: 19%; }
+.vtable .c-pr { width: 16%; }
+.vtable .c-spk { width: 46px; }
+.vtable thead { background: var(--thead-bg); }
+.vtable thead th {
+  padding: 10px 12px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.75);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+.vtable thead th:last-child { border-right: none; text-align: center; }
+.vtable thead th.rh {
+  text-align: right;
+  font-family: var(--fp);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 11px;
+  font-weight: 600;
+}
+.vtable tbody tr { border-bottom: 1px solid var(--br); transition: background 0.12s; }
+.vtable tbody tr.vrow:nth-child(odd) { background: var(--row-odd); }
+.vtable tbody tr.vrow:nth-child(even) { background: var(--row-even); }
+.vtable tbody tr.vrow:hover { background: var(--row-hov); }
+.vtable td,
+.vtable tbody th[scope='row'] {
+  padding: 10px 12px;
+  vertical-align: middle;
+  border-right: 1px solid var(--br);
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.vtable td:last-child { border-right: none; text-align: center; padding: 6px 4px; }
+.vtable .td-fa,
+.vtable .td-tr,
+.vtable .td-pr { text-align: right; }
+
+/* Group header row */
+.vtable tr.grp th {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  text-align: left;
+  background: var(--grp);
+  color: var(--ac);
+  border-left: 3px solid var(--ac);
+}
+.vtable tr.info-row,
+.vtable tr.info-row:hover { background: transparent; }
+.vtable tr.info-row > td { padding: 0; border: none; text-align: left; }
+
+/* ── Field typography (shared by table and cards) ── */
+.v-word { font-weight: 600; font-size: 13.5px; color: var(--tp); letter-spacing: -0.1px; }
+.v-fa { font-weight: 600; font-size: 13px; color: var(--tp); }
+.v-ex { font-size: 12px; color: var(--ts); line-height: 1.6; font-style: italic; }
+.v-tr { font-size: 12px; color: var(--ts); line-height: 1.6; }
+.v-pr { font-size: 12px; color: var(--ac); }
+.v-fa, .v-tr, .v-pr { display: block; text-align: right; }
+
+/* ── Cards (mobile) ── */
+.vcards { padding: 10px 8px 4px; }
+.vcards__group + .vcards__group { margin-top: 6px; }
+.grp-heading {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  background: var(--grp);
+  color: var(--ac);
+  border-left: 3px solid var(--ac);
+}
+.vcard {
+  display: grid;
+  grid-template-areas:
+    'word type'
+    'fa   fa'
+    'ex   ex'
+    'tr   tr'
+    'pr   spk';
+  grid-template-columns: minmax(0, 1fr) auto;
+  background: var(--sf);
+  border: 1px solid var(--br);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+.vcard__word { grid-area: word; padding: 12px 6px 4px 12px; }
+.vcard__word .v-word { font-weight: 700; font-size: 14px; }
+.vcard__type {
+  grid-area: type;
+  padding: 12px 10px 4px 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+}
+.vcard__fa { grid-area: fa; padding: 0 10px 8px 12px; border-bottom: 1px solid var(--br); }
+.vcard__fa .v-fa { font-size: 14px; }
+.vcard__ex { grid-area: ex; padding: 8px 10px 4px 12px; }
+.vcard__tr { grid-area: tr; padding: 0 10px 8px 12px; }
+.vcard__pr { grid-area: pr; padding: 0 10px 12px 12px; align-self: end; }
+.vcard__pr .v-pr { font-size: 11.5px; }
+.vcard__spk { grid-area: spk; padding: 0 8px 8px 0; display: flex; align-items: flex-end; justify-content: flex-end; }
+.vcard .v-word, .vcard .v-ex { overflow-wrap: anywhere; }

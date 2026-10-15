@@ -1,0 +1,43 @@
+/* Design tokens — values copied from the legacy app (index.html :root and dark theme). */
+:root {
+  --bg: #f0f4fb; --sf: #ffffff; --sfalt: #f7f9fd;
+  --br: #e2e8f4; --brs: #c4cfdf;
+  --tp: #0d1b2e; --ts: #3a4a68; --tm: #7889a8;
+  --row-odd: #ffffff; --row-even: #f7f9fd; --row-hov: #edf1fc;
+  --hdr-bg: rgba(255, 255, 255, 0.94);
+  --thead-bg: #0d1b2e;
+  --fn: 'Inter', system-ui, sans-serif;
+  --fp: 'Vazir', 'Tahoma', sans-serif;
+
+  /* Category accents */
+  --ac-arch: #3a56d4; --acl-arch: rgba(58, 86, 212, 0.10); --acg-arch: linear-gradient(135deg, #3a56d4, #6d28d9); --grp-arch: rgba(58, 86, 212, 0.06);
+  --ac-acad: #b45309; --acl-acad: rgba(180, 83, 9, 0.10); --acg-acad: linear-gradient(135deg, #d97706, #ef4444); --grp-acad: rgba(180, 83, 9, 0.06);
+  --ac-dreame: #047857; --acl-dreame: rgba(4, 120, 87, 0.10); --acg-dreame: linear-gradient(135deg, #059669, #0d9488); --grp-dreame: rgba(4, 120, 87, 0.06);
+  --ac-bautechnik: #0f766e; --acl-bautechnik: rgba(15, 118, 110, 0.10); --acg-bautechnik: linear-gradient(135deg, #0f766e, #0891b2); --grp-bautechnik: rgba(15, 118, 110, 0.06);
+  --ac-fitness: #c2410c; --acl-fitness: rgba(194, 65, 12, 0.10); --acg-fitness: linear-gradient(135deg, #ea580c, #dc2626); --grp-fitness: rgba(194, 65, 12, 0.06);
+  --ac-anatomie: #9f1239; --acl-anatomie: rgba(159, 18, 57, 0.10); --acg-anatomie: linear-gradient(135deg, #be123c, #e11d48); --grp-anatomie: rgba(159, 18, 57, 0.06);
+  --ac-bauphysik: #2563eb; --acl-bauphysik: rgba(37, 99, 235, 0.10); --acg-bauphysik: linear-gradient(135deg, #2563eb, #06b6d4); --grp-bauphysik: rgba(37, 99, 235, 0.06);
+
+  /* Active accent (overridden per category scope below) */
+  --ac: var(--ac-arch); --acl: var(--acl-arch); --acg: var(--acg-arch); --grp: var(--grp-arch);
+}
+
+/* Dark theme — tonal, individually tuned (legacy values) */
+html[data-theme='dark'] {
+  --bg: #12141c; --sf: #1b1e29; --sfalt: #181a24;
+  --br: rgba(255, 255, 255, 0.09); --brs: rgba(255, 255, 255, 0.16);
+  --tp: #eef0f6; --ts: #aab0c4; --tm: #767c92;
+  --row-odd: #1b1e29; --row-even: #181a24; --row-hov: #222533;
+  --hdr-bg: rgba(27, 30, 41, 0.88);
+  --thead-bg: #0b0d13;
+  color-scheme: dark;
+}
+
+/* One rule per category instead of repeating every component selector (legacy). */
+[data-category='arch'] { --ac: var(--ac-arch); --acl: var(--acl-arch); --acg: var(--acg-arch); --grp: var(--grp-arch); }
+[data-category='acad'] { --ac: var(--ac-acad); --acl: var(--acl-acad); --acg: var(--acg-acad); --grp: var(--grp-acad); }
+[data-category='bautechnik'] { --ac: var(--ac-bautechnik); --acl: var(--acl-bautechnik); --acg: var(--acg-bautechnik); --grp: var(--grp-bautechnik); }
+[data-category='bauphysik'] { --ac: var(--ac-bauphysik); --acl: var(--acl-bauphysik); --acg: var(--acg-bauphysik); --grp: var(--grp-bauphysik); }
+[data-category='fitness'] { --ac: var(--ac-fitness); --acl: var(--acl-fitness); --acg: var(--acg-fitness); --grp: var(--grp-fitness); }
+[data-category='anatomie'] { --ac: var(--ac-anatomie); --acl: var(--acl-anatomie); --acg: var(--acg-anatomie); --grp: var(--grp-anatomie); }
+[data-category='dreame'] { --ac: var(--ac-dreame); --acl: var(--acl-dreame); --acg: var(--acg-dreame); --grp: var(--grp-dreame); }

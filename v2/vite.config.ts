@@ -12,6 +12,20 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    rolldownOptions: {
+      output: {
+        // Content and framework change at different rates than app code: separate chunks
+        // keep browser caches valid across app-only or content-only releases.
+        codeSplitting: {
+          groups: [
+            { name: 'vocabulary-content', test: /[\\/]src[\\/]data[\\/]vocabulary[\\/]/ },
+            { name: 'react', test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/ },
+          ],
+        },
+      },
+    },
+    // The content chunk is ~315 kB minified (≈ 90 kB gzip) by nature; warn only above that.
+    chunkSizeWarningLimit: 450,
   },
   test: {
     environment: 'jsdom',
