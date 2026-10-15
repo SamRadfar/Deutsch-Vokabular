@@ -91,8 +91,11 @@ menu, sync status), `v2/src/features/progress/` (IndexedDB store, sync engine, F
 migration workflow), `v2/firestore.rules`, `v2/firebase.json` and emulator tests
 (`v2/tests/emulator/`, `v2/tests/e2e-emulator/`). See ADR 0004 and `docs/SYNC_DESIGN.md`.
 
-Still planned (Phase 4+): production deployment, the server-side AI endpoint, the review and
-pronunciation engines, and a PWA service worker.
+Phase 4A adds `v2/src/features/review/` (flashcards: pure deck/session/outcome logic, a
+device-local review log in IndexedDB v2, and the «🔄 مرور» tab). See `docs/REVIEW_DESIGN.md`.
+
+Still planned: production deployment, the server-side AI endpoint, the pronunciation/shadowing
+engine, cloud-synced review state (proposal in `REVIEW_DESIGN.md` §6) and a PWA service worker.
 
 ## v2 architecture (Phase 2)
 
