@@ -21,6 +21,25 @@ Run the legacy app locally with any static server from the repository root, for
 example `python -m http.server 8000`, then open `http://localhost:8000/`. Firebase
 sync and AI generation call live services. **Do not use them in tests.**
 
+## v2 application (Phase 2+)
+
+The React preview lives in `v2/` with its own `package.json` and lockfile. See
+[`v2/README.md`](../v2/README.md) for all commands. In short:
+
+```bash
+cd v2
+npm ci                              # exact locked dependencies
+npx playwright install chromium     # once, for browser tests
+npm run dev                         # http://localhost:5173/
+npm run typecheck && npm test       # strict TypeScript + Vitest
+npm run test:e2e                    # Playwright against the production build
+npm run build && npm run preview    # http://localhost:4173/
+```
+
+Content in `v2/src/data/vocabulary/` was generated once by `v2/scripts/generate-content.mjs`.
+Do not re-run it for normal work: content is now edited in the JSON (ids stay), and every
+change must keep the data-integrity tests green or be an approved, documented content change.
+
 ## Branching and commits
 
 - `main` = production (GitHub Pages deploys it). Never commit to it directly.

@@ -1,6 +1,6 @@
 # ADR 0001: Target architecture for Deutsch Vokabular 2.0
 
-- Status: **Proposed.** Awaiting the product owner's decision on the open points in §5.
+- Status: **Proposed.** Awaiting the product owner's decision on the open points in §5. **§3.1 (optional sign-in) is superseded by [ADR 0003](0003-product-requirements-auth-and-data.md)**: Google sign-in is required for cloud accounts and sync; guest mode is not approved.
 - Date: 2026-10-15
 - Scope: the direction for Phase 2+. Phase 1 only adds documentation and baseline tests.
 
@@ -26,7 +26,7 @@
 | React | **Accept** | Stateful multi-screen UI (tables, overlays, sessions, auth state) benefits from components. It is widely known, which matters for AI-assisted development. Cost: bundle size. Mitigate with code-splitting per mode. Preact or Svelte were considered and rejected because of a smaller ecosystem and no decisive gain at this scale. |
 | TypeScript | **Accept** | The data contracts (`DATA_CONTRACTS.md`) become types. It catches the class of bugs found in the legacy app (undefined handlers, wrong ids). |
 | Vite | **Accept** | It is the simplest maintained build for a static SPA. PWA support via `vite-plugin-pwa` (Workbox) replaces the hand-written `sw.js`. |
-| Firebase Authentication (Google) | **Accept, with a local mode** | Firebase is already in use, and Google sign-in is native there. **Sign-in must be optional:** a fully functional local (anonymous) mode is required because Google may be unreachable. |
+| Firebase Authentication (Google) | **Accept, with a local mode** | Firebase is already in use, and Google sign-in is native there. **Sign-in must be optional:** a fully functional local (anonymous) mode is required because Google may be unreachable. *(Superseded by ADR 0003: sign-in is required for cloud features; guest mode is not approved.)* |
 | Cloud Firestore | **Accept** | Firestore is already in use. Per-user documents with Security Rules (`request.auth.uid == uid`) replace code-addressed blobs. Progress is stored **per word** to allow per-word merging and SRS fields later. |
 | Secure server-side AI API | **Accept, hosting open (§5)** | The Anthropic key moves to the server. The endpoint verifies the Firebase ID token, rate-limits per user, validates input and validates the model output against a schema. The browser never sees the key. |
 | Vitest + React Testing Library | **Accept** | Unit and component tests. The Phase 1 baseline suite (Node test runner, ADR 0002) stays and can be ported. |
@@ -35,7 +35,7 @@
 
 ## 3. Decision (proposed)
 
-1. **Local-first data layer.** An own IndexedDB store is the source of truth on each
+1. **Local-first data layer.** *(Partly superseded by ADR 0003: "signed-out" use is not an approved requirement; the local store remains for offline use and legacy migration.)* An own IndexedDB store is the source of truth on each
    device. Learning, review and pronunciation work offline and signed-out. Cloud
    sync is a layer on top: when signed in, changes replicate to Firestore and remote
    changes merge per word (last-writer-wins on `updatedAt`). Firestore's own offline

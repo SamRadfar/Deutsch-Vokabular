@@ -72,5 +72,51 @@ docs/                                             this documentation, ADRs
 .github/workflows/ci.yml                          CI (tests only, no deploy)
 ```
 
-Planned (Phase 2+): `src/`, `src/content/`, `functions/` or `server/`,
-`firestore.rules`, `e2e/`. See ADR 0001 §3.6.
+Phase 2 adds the isolated `v2/` application (not deployed):
+
+```
+v2/src/app/                      App shell
+v2/src/components/               Header, TabList (ARIA tabs), ThemeToggle, EmptyState
+v2/src/features/vocabulary/      navigation state, table/cards, badges, technical info
+v2/src/features/pronunciation/   Web Speech service + provider + button
+v2/src/features/progress/migration/  read-only legacy migration plan/preview (pure logic)
+v2/src/data/vocabulary/          vocabulary.v1.json, technical-info.v1.json, id-registry.v1.json
+v2/src/data/legacy/              dvok5-index-maps.v1.json
+v2/src/models/, services/, hooks/, styles/
+v2/tests/unit/, v2/tests/e2e/
+```
+
+Still planned (Phase 3+): Firebase Auth (Google, required for cloud features, see ADR 0003),
+`users/{uid}` Firestore data and `firestore.rules`, the server-side AI endpoint, the review and
+pronunciation engines, and a PWA service worker.
+
+## v2 architecture (Phase 2)
+
+```mermaid
+flowchart TB
+  subgraph Content["Versioned content (read-only)"]
+    VJ["vocabulary.v1.json<br/>999 entries, stable ids"]
+    TJ["technical-info.v1.json<br/>linked by entry id"]
+    RJ["id-registry.v1.json<br/>id ↔ legacy mainKey::word"]
+  end
+  REPO["services/content<br/>validate · repository"]
+  UI["React UI<br/>App → MainNavigation → CategoryView → SubtabPanel<br/>→ VocabularyTable | VocabularyCards"]
+  TTS["features/pronunciation<br/>speechService (Web Speech API)"]
+  PREF[("localStorage<br/>dv2.pref.theme.v1 only")]
+  MIG["features/progress/migration<br/>planMigration · previewMigration<br/>(pure, not wired to UI)"]
+  LEG[("legacy localStorage keys<br/>read-only interface")]
+
+  VJ & TJ --> REPO --> UI
+  UI --> TTS
+  UI <--> PREF
+  RJ --> MIG
+  LEG -. "readLegacySnapshot (not called yet)" .-> MIG
+```
+
+Key rules:
+
+- The UI holds navigation state in React. It never reads the DOM to learn about vocabulary.
+- All text is rendered as React text nodes. Raw HTML APIs are banned, and a test enforces it.
+- Content is validated at startup (`ContentValidationError`). Ids come from the content and are
+  never computed at runtime.
+- v2 writes exactly one browser key (`dv2.pref.theme.v1`). Legacy keys are never written.

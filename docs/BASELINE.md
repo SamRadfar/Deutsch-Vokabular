@@ -51,7 +51,7 @@ Words per subtab:
 
 | ID | Defect | Test |
 |---|---|---|
-| V1 | `icon.png` is missing. `sw.js` `cache.addAll` fails, so the app has no offline support. The manifest and apple-touch icons are broken. | `known-defects.test.mjs` |
+| V1 | `icon.png` is missing. `sw.js` `cache.addAll` fails, so the app has no offline support. The manifest and apple-touch icons are broken. In addition, `icon-512.png` is a **blank light-blue square** (found in Phase 2), so the installed PWA icon is blank; the real logo exists only as the inline JPEG in the header. | `known-defects.test.mjs` |
 | V2 | The flashcard ✗/✓ and 🔊 buttons call the undefined `fcAnswer` and `fcSpeak`. Only tap and swipe work. | idem |
 | V3 | "مرور دوباره" leaves the card scene hidden. | Playwright, Phase 2 |
 | V4 | Reset does not sync, does not clear custom-word ticks and does not clear exposure. | Phase 2 |

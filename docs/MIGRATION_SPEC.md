@@ -1,7 +1,7 @@
 # Data Migration Specification (legacy → v2)
 
-Status: **specification only (Phase 1).** Nothing in this document has been
-implemented. No user data has been read, copied or modified.
+Status: **specification (Phase 1); pure migration logic implemented and tested in Phase 2 (see §7).** Nothing has been
+executed against real data. No user data has been read, copied or modified.
 
 Inputs are described in [`DATA_CONTRACTS.md`](DATA_CONTRACTS.md). The target
 architecture is in [`adr/0001-target-architecture.md`](adr/0001-target-architecture.md).
@@ -121,3 +121,80 @@ All fixtures are **synthetic**. They never contain real user data or keys.
 - Idempotency: running twice gives an identical store. Changed input gives a union.
 - A property test: for any synthetic legacy state, the set of learned built-in rows
   in the legacy app equals the set of learned ids in v2, including collision coupling.
+
+## 7. Implementation status (Phase 2)
+
+Migration is implemented as **pure, tested transformation logic only**. Nothing reads real
+user data automatically, and nothing writes to `localStorage` or Firestore.
+
+### 7.1 Stable word ids (done)
+
+| Item | Implementation |
+|---|---|
+| Id format | `dv_` + 10 lowercase hex characters, e.g. `dv_522b07848b` (`v2/src/models/vocabulary.ts`, `WORD_ID_PATTERN`) |
+| Minting rule (applied **once**) | `'dv_' + sha256('deutsch-vokabular/word/v1|' + baselineIndex + '|' + legacyKey).slice(0, 10)` over the Phase 1 baseline order |
+| Where ids live | Stored **in the content** (`v2/src/data/vocabulary/vocabulary.v1.json`, field `id`). They are never derived at runtime, so changing order or spelling later keeps every id. |
+| Registry | `v2/src/data/vocabulary/id-registry.v1.json`: `{ id, legacyKey, legacyWord, baselineIndex, baselineLocation }` for all 999 entries, plus `mintedFrom` (commit `6763003`, Phase 1 SHA-256). It is immutable history. |
+| Generator | `v2/scripts/generate-content.mjs`: aborts unless the legacy data equals the Phase 1 SHA-256, never overwrites without `--force`, and **reuses the registry** with `--force`. A forced re-run was verified to be byte-identical. |
+| New entries (future) | Get new random `dv_` ids from a minting helper (not yet needed). Existing ids are never reused or recomputed. |
+| Tests | `v2/tests/unit/data/stable-ids.test.ts`: uniqueness, format, independent re-derivation of every id, content = registry. |
+
+### 7.2 Legacy key mapping (done)
+
+- `buildLegacyKeyIndex()` (`v2/src/services/content/idRegistry.ts`) maps 994 legacy
+  `mainKey::word` keys to 999 ids.
+- **Duplicates:** the 5 colliding keys map to 2 separate entries each. Both records are kept
+  with identical text. A legacy tick on such a key is applied to **both** entries, because
+  the legacy UI displayed both rows as ticked. This reproduces observed state rather than
+  guessing intent. Every such mapping is listed in the preview as `ambiguous` for user review.
+- `buildWordTextIndex()` maps word text to ids across categories (37 words occur in several
+  categories). It is used only for relocation hints and for exposure counters.
+
+### 7.3 Migration preparation (done, not executed)
+
+`v2/src/features/progress/migration/`:
+
+| Function | Purpose |
+|---|---|
+| `readLegacySnapshot(storage)` | Reads the 8 legacy keys through a **read-only** interface. Detects `dvok5_apikey` by key **name** only; its value is never read. |
+| `planMigration(snapshot)` | Defensive per-key parsing, then a complete `MigrationPlan`: learned ids with provenance, ambiguous mappings, orphans with relocation candidates, the dvok5 decision, custom words with placement or "Unsorted", validated settings, exposure, theme, sync-code presence, and issues. |
+| `previewMigration(plan)` | Summary for the user: counts, `potentialDataLoss`, warnings, info, `safeToMigrate`. |
+| `verifyDvok5MapsUnambiguous()` | Checks that no two historical vocabularies share a checkbox count before an entry count is used to identify a version. A dvok5 blob must also have contiguous indexes `0..n-1`. |
+
+All of this is covered by `v2/tests/unit/migration/plan.test.ts`, using synthetic fixtures only.
+
+### 7.4 The 39 removed vocabulary entries
+
+Commit `6763003` removed the subtab `bautechnik/bauphysik` (39 words). Ticks for them can
+exist on devices as `dvok6` keys (until that device's next save) or as `dvok5` indexes
+490–528 of the 822-checkbox version. They are **archived as orphans** with their original key
+and reported as `ORPHANED_PROGRESS` (data-loss risk). They are never imported silently.
+
+7 of the words still exist in `arch`. They are reported as relocation candidates, and the
+decision whether to offer them to the user is open (ADR 0003, open decision 6):
+
+| Removed `bautechnik::…` word | Same text now exists as |
+|---|---|
+| `der U-Wert` | `arch::der U-Wert` (`dv_b4668e09fa`) |
+| `die Wärmebrücke` | `arch::die Wärmebrücke` (`dv_118f25ffea`) |
+| `die Dampfsperre` | `arch::die Dampfsperre` (`dv_5a47bd6b7b`) |
+| `die Abdichtung` | `arch::die Abdichtung` (`dv_1a3402ece2`) |
+| `die Hinterlüftung` | `arch::die Hinterlüftung` (`dv_fb3a4ff784`) |
+| `der Schallschutz` | `arch::der Schallschutz` (`dv_8c278a5ba3`) |
+| `der Brandschutz` | `arch::der Brandschutz` (`dv_fbc108255e`) |
+
+The other 32 words (der Wärmeschutz, der R-Wert, die Wärmeleitfähigkeit, die Wärmedämmung,
+der Wärmeverlust, die Transmissionswärmeverluste, der Jahresheizwärmebedarf, das Passivhaus,
+die Mineralwolle, das Polystyrol (EPS/XPS), der Feuchteschutz, der Taupunkt, die Kondensation,
+die Dampfbremse, der sd-Wert, die Kapillarwirkung, der Schimmel, der Luftschall,
+der Körperschall, der Trittschall, das Schalldämmmaß (Rw), der Dezibel (dB), die Schalldämmung,
+die Schallabsorption, der Nachhall, die Feuerwiderstandsklasse, der Brandabschnitt,
+die Brandwand, der Fluchtweg, nichtbrennbar, die Brandlast, die Brandmeldeanlage) have no
+counterpart in the current vocabulary. 12 of their technical-info entries are still in
+`technical-info.v1.json` with `entryIds: []` (DQ-6).
+
+### 7.5 Still to do (Phase 3+)
+
+Execute the plan against real storage (with backup and download), write the v2 store, run the
+cloud merge after Google sign-in, compute the idempotency `inputHash`, and build the review UI
+for ambiguous mappings, orphans and deferred dvok5 data.

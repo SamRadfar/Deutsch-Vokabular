@@ -10,15 +10,20 @@ Live: <https://samradfar.github.io/Deutsch-Vokabular/>
 
 ## Status
 
-The production app is the single file `index.html` on `main`.
-**Deutsch Vokabular 2.0 — Phase 1 (foundation)** adds documentation and read-only
-baseline tests on branch `refactor/pro-v2-foundation`. The legacy app is unchanged.
+The production app is the single file `index.html` on `main` (unchanged).
+
+- **Phase 1 (foundation):** documentation and read-only baseline tests.
+- **Phase 2 (architecture, branch `refactor/pro-v2-architecture`):** an isolated React +
+  TypeScript + Vite preview in [`v2/`](v2/README.md) that browses all 999 entries, with
+  stable word ids and tested, read-only migration-preparation logic. It is not deployed.
 
 ## Quick start
 
 ```bash
 npm test                 # baseline + data-contract checks (Node ≥ 22, no install needed)
 npm run baseline:check   # compare index.html vocabulary with the fixtures
+
+cd v2 && npm ci && npm run dev   # v2 preview → http://localhost:5173/
 ```
 
 ## Documentation
@@ -30,5 +35,6 @@ npm run baseline:check   # compare index.html vocabulary with the fixtures
 | [docs/DATA_QUALITY.md](docs/DATA_QUALITY.md) | Known content issues (recorded, not corrected) |
 | [docs/MIGRATION_SPEC.md](docs/MIGRATION_SPEC.md) | Loss-free migration to v2 and Google sign-in, and rollback |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Current and target architecture |
-| [docs/adr/](docs/adr/) | Architecture Decision Records |
+| [docs/adr/](docs/adr/) | Architecture Decision Records (0003 = accepted product requirements) |
+| [v2/README.md](v2/README.md) | v2 preview: commands, structure, visible differences |
 | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Workflow, commands, rules |
