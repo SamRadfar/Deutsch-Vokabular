@@ -35,5 +35,8 @@ export default defineConfig({
     setupFiles: ['./tests/setup.ts'],
     include: ['tests/unit/**/*.test.{ts,tsx}'],
     restoreMocks: true,
+    // Several component tests render the whole app (tables of up to 156 rows plus providers) in
+    // jsdom; on Windows they take 2–4 s each, too close to the 5 s default. Assertions are unchanged.
+    testTimeout: 15_000,
   },
 });

@@ -11,6 +11,7 @@ export const EMULATOR_ENV = {
   VITE_FIREBASE_PROJECT_ID: 'demo-deutsch-vokabular',
   VITE_FIREBASE_APP_ID: 'demo-app',
   VITE_FIREBASE_USE_EMULATORS: 'true',
+  VITE_FIREBASE_EMULATOR_HOST: process.env.E2E_EMULATOR_HOST ?? '127.0.0.1',
 };
 
 export default defineConfig({
@@ -21,6 +22,10 @@ export default defineConfig({
   retries: 0,
   reporter: [['list']],
   timeout: 60_000,
+  // After sign-in the app waits up to 5 s (by design) for the first server snapshot before it
+  // shows progress from local data; on a cold emulator that wait can be used fully. Assertions
+  // therefore get more than the 5 s Playwright default.
+  expect: { timeout: 10_000 },
   use: {
     baseURL: 'http://localhost:4174/',
     trace: 'retain-on-failure',
@@ -28,6 +33,16 @@ export default defineConfig({
   projects: [
     { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile-chromium', use: { ...devices['Pixel 7'] } },
+    // Opt-in cross-browser run: E2E_BROWSERS=all npm run test:e2e:emulator
+    // (Edge uses the installed browser; WebKit on Windows/Linux approximates Safari, it is not Safari.)
+    ...(process.env.E2E_BROWSERS === 'all'
+      ? [
+          { name: 'desktop-edge', use: { ...devices['Desktop Edge'], channel: 'msedge' } },
+          { name: 'desktop-firefox', use: { ...devices['Desktop Firefox'] } },
+          { name: 'desktop-webkit', use: { ...devices['Desktop Safari'] } },
+          { name: 'mobile-webkit-iphone', use: { ...devices['iPhone 13'] } },
+        ]
+      : []),
   ],
   webServer: {
     command: 'npx vite build --outDir dist-emulator --emptyOutDir && npx vite preview --outDir dist-emulator --port 4174 --strictPort',

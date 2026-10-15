@@ -9,9 +9,17 @@ const second = vocabulary.categories[0]!.subtabs[0]!.groups[0]!.entries[1]!;
 const checkbox = (page: Page, word: string) => page.getByRole('checkbox', { name: `یادگرفتم: ${word}` });
 const uniqueEmail = (label: string) => `${label}-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example.test`;
 
+/**
+ * WebKit reports Firestore's long-lived Listen/Write channels as "… due to access control checks"
+ * when a navigation (reload / sign-out redirect) aborts them. Measured: these appear only at the
+ * moment of navigation, never during use or idle, and state is correct afterwards
+ * (docs/FIREBASE_VALIDATION.md §5). Exactly this message is tolerated; anything else fails.
+ */
+const WEBKIT_ABORTED_CHANNEL = /\/google\.firestore\.v1\.Firestore\/(Listen|Write)\/channel\?.* due to access control checks\.$/;
+
 function trackErrors(page: Page) {
   const errors: string[] = [];
-  page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
+  page.on('pageerror', (e) => { if (!WEBKIT_ABORTED_CHANNEL.test(e.message)) errors.push(`pageerror: ${e.message}`); });
   page.on('console', (m) => {
     if (m.type() !== 'error') return;
     const t = m.text();
@@ -83,8 +91,13 @@ test('sign in, mark learned, persist across reload, sign out', async ({ page }) 
 
 test('two devices with the same account see each other’s changes live', async ({ browser }) => {
   const email = uniqueEmail('twodev');
-  const laptop = await (await browser.newContext()).newPage();
-  const phone = await (await browser.newContext()).newPage();
+  // Both contexts are closed at the end: their live Firestore connections would otherwise keep
+  // occupying the emulator's HTTP/1.1 per-host connection slots for later tests (seen in WebKit).
+  const laptopCtx = await browser.newContext();
+  const phoneCtx = await browser.newContext();
+  const laptop = await laptopCtx.newPage();
+  const phone = await phoneCtx.newPage();
+  try {
   await laptop.goto('./');
   await phone.goto('./');
   await signIn(laptop, email, 'Two Devices');
@@ -98,6 +111,10 @@ test('two devices with the same account see each other’s changes live', async 
   await checkbox(phone, first.word).uncheck();
   await expect(checkbox(laptop, first.word)).not.toBeChecked({ timeout: 15_000 });
   await expect(laptop.getByTestId('header-progress')).toContainText('1/999');
+  } finally {
+    await laptopCtx.close();
+    await phoneCtx.close();
+  }
 });
 
 test('switching accounts never shows the previous account’s progress', async ({ page }) => {
