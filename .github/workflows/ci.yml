@@ -1,0 +1,26 @@
+# Tests only. This workflow does not build or deploy anything; GitHub Pages
+# keeps serving `main` exactly as before.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # legacy dvok5 maps are rebuilt from history
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm test
+      - run: npm run baseline:check
