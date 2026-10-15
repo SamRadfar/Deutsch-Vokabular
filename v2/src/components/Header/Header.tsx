@@ -5,13 +5,18 @@ import './Header.css';
 
 interface Props {
   totalEntries: number;
+  /** Learned count of the signed-in user; null when progress is not available. */
+  learnedCount: number | null;
   theme: ThemePreference;
   onToggleTheme(): void;
+  /** Sync status + account control. */
+  account: ReactNode;
   /** Main navigation, rendered inside the sticky header like the legacy app. */
   navigation: ReactNode;
 }
 
-export function Header({ totalEntries, theme, onToggleTheme, navigation }: Props) {
+export function Header({ totalEntries, learnedCount, theme, onToggleTheme, account, navigation }: Props) {
+  const pct = learnedCount !== null && totalEntries ? Math.round((learnedCount / totalEntries) * 100) : 0;
   return (
     <header className="hdr">
       <div className="hdr__top">
@@ -23,9 +28,19 @@ export function Header({ totalEntries, theme, onToggleTheme, navigation }: Props
           </div>
         </div>
         <div className="hdr__actions">
-          <span className="pill" lang="fa" dir="rtl" aria-label={`${totalEntries} واژه`}>{totalEntries} واژه</span>
+          {learnedCount !== null ? (
+            <span className="pill pill--progress" lang="fa" dir="rtl" data-testid="header-progress"
+              role="progressbar" aria-valuemin={0} aria-valuemax={totalEntries} aria-valuenow={learnedCount}
+              aria-label={`${learnedCount} از ${totalEntries} واژه یادگرفته`}>
+              <span>{learnedCount}/{totalEntries} واژه</span>
+              <span className="pill__bar" aria-hidden="true"><span style={{ width: `${pct}%` }} /></span>
+            </span>
+          ) : (
+            <span className="pill" lang="fa" dir="rtl" aria-label={`${totalEntries} واژه`}>{totalEntries} واژه</span>
+          )}
           <span className="preview-badge" title="Development preview — not the production app">v2 preview</span>
           <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+          {account}
         </div>
       </div>
       {navigation}

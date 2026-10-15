@@ -1,6 +1,10 @@
 import '@testing-library/jest-dom/vitest';
 import { afterEach } from 'vitest';
-import { cleanup } from '@testing-library/react';
+import { cleanup, configure } from '@testing-library/react';
+
+// The full suite runs many jsdom files in parallel (slow on Windows); give async UI
+// assertions (session restore, progress loading) more headroom than the 1 s default.
+configure({ asyncUtilTimeout: 5000 });
 
 afterEach(() => {
   cleanup();

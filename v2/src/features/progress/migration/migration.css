@@ -1,0 +1,14 @@
+.mig__box { background: var(--sfalt); border: 1px solid var(--br); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+.mig__note { font-size: 12px; color: var(--tm); }
+.mig__warn { background: #fffbeb; color: #92400e; border: 1px solid #fcd34d; border-radius: 8px; padding: 8px 10px; font-size: 12px; }
+html[data-theme='dark'] .mig__warn { background: #3a2c12; color: #f0c674; border-color: #5c4720; }
+.mig__error { color: #b42318; font-size: 13px; }
+.mig__file { display: flex; flex-direction: column; gap: 6px; font-size: 13px; margin: 8px 0; }
+.mig__file input { font-family: var(--fn); font-size: 12px; min-height: 40px; }
+.mig__stats { display: grid; gap: 4px; margin: 8px 0 12px; }
+.mig__stats > div { display: flex; justify-content: space-between; gap: 12px; padding: 6px 8px; border-radius: 6px; background: var(--sfalt); font-size: 12px; }
+.mig__stats dd { font-weight: 700; font-family: var(--fn); }
+.mig__h { font-size: 12px; font-weight: 700; margin: 10px 0 4px; }
+.mig__list { font-family: var(--fn); font-size: 12px; color: var(--ts); padding-left: 18px; list-style: disc; max-height: 160px; overflow-y: auto; }
+.mig__confirm { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; margin-top: 12px; }
+.mig__confirm input { width: 20px; height: 20px; flex-shrink: 0; margin-top: 2px; }

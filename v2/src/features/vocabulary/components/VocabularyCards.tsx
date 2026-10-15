@@ -1,13 +1,14 @@
 import type { TechnicalInfo, VocabularyEntry } from '../../../models/vocabulary';
 import { WordTypeBadge } from './WordTypeBadge';
 import { TechnicalInfoPanel, TechnicalInfoToggle } from './TechnicalInfoPanel';
+import { LearnedCheckbox, type EntryProgress } from './LearnedCheckbox';
 import {
   ExampleTranslation, GermanExample, GermanWord, PersianMeaning, PersianPronunciation, WordSpeech,
 } from './EntryFields';
 import type { EntryListProps } from './VocabularyTable';
 
 /** Mobile layout (≤ 640px): grouped cards, same fields as the table (legacy card grid). */
-export function VocabularyCards({ groups, getTechnicalInfo, openInfoId, onToggleInfo, caption }: EntryListProps) {
+export function VocabularyCards({ groups, getTechnicalInfo, openInfoId, onToggleInfo, caption, progress }: EntryListProps) {
   return (
     <div className="vcards" data-caption={caption}>
       {groups.map((group, gi) => (
@@ -21,6 +22,7 @@ export function VocabularyCards({ groups, getTechnicalInfo, openInfoId, onToggle
                   info={getTechnicalInfo(entry.id)}
                   infoOpen={openInfoId === entry.id}
                   onToggleInfo={() => onToggleInfo(entry.id)}
+                  progress={progress}
                 />
               </li>
             ))}
@@ -36,12 +38,15 @@ interface CardProps {
   info: TechnicalInfo | undefined;
   infoOpen: boolean;
   onToggleInfo(): void;
+  progress: EntryProgress | undefined;
 }
 
-export function VocabularyCard({ entry, info, infoOpen, onToggleInfo }: CardProps) {
+export function VocabularyCard({ entry, info, infoOpen, onToggleInfo, progress }: CardProps) {
+  const learned = progress?.isLearned(entry.id) ?? false;
   return (
     <>
-      <article className="vcard" data-entry-id={entry.id} aria-label={entry.word}>
+      <article className={`vcard${progress ? ' vcard--with-chk' : ''}${learned ? ' is-learned' : ''}`} data-entry-id={entry.id} aria-label={entry.word}>
+        {progress ? <div className="vcard__chk"><LearnedCheckbox entryId={entry.id} word={entry.word} progress={progress} /></div> : null}
         <div className="vcard__word"><GermanWord entry={entry} /></div>
         <div className="vcard__type">
           <WordTypeBadge type={entry.type} />

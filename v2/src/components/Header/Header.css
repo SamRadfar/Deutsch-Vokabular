@@ -98,3 +98,13 @@
 @media (max-width: 380px) {
   .brand__sub { display: none; }
 }
+
+/* Learned progress in the header (restores the legacy .pwrap progress) */
+.pill--progress { display: inline-flex; align-items: center; gap: 8px; }
+.pill__bar { width: 48px; height: 3px; background: var(--br); border-radius: 2px; overflow: hidden; display: inline-block; }
+.pill__bar > span { display: block; height: 100%; background: var(--acg-arch); transition: width 0.5s ease; }
+@media (max-width: 640px) {
+  .pill { padding: 5px 10px; }
+  .pill__bar { display: none; }
+  .hdr__actions { gap: 6px; }
+}

@@ -124,3 +124,67 @@
 .vcard__pr .v-pr { font-size: 11.5px; }
 .vcard__spk { grid-area: spk; padding: 0 8px 8px 0; display: flex; align-items: flex-end; justify-content: flex-end; }
 .vcard .v-word, .vcard .v-ex { overflow-wrap: anywhere; }
+
+/* ── Learned checkbox (legacy .vchk) and learned rows ── */
+.vtable .c-chk { width: 46px; }
+.vtable thead th.c-chk-h { text-align: center; }
+.vtable td.td-chk { text-align: center; padding: 9px 6px; }
+.learned { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+.vchk {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--brs);
+  border-radius: 4px;
+  background: var(--sf);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0;
+}
+.vchk:hover:not(:checked) { border-color: var(--ac); }
+.vchk:checked { background: var(--ac); border-color: var(--ac); box-shadow: 0 0 0 3px var(--acl); }
+.vchk:checked::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 6px;
+  height: 11px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(43deg);
+}
+.learned__state { position: absolute; top: -3px; right: -5px; width: 7px; height: 7px; border-radius: 50%; }
+.learned__state--pending { background: #d97706; }
+.learned__state--failed { background: #dc2626; }
+.vtable tbody tr.vrow.is-learned { background: var(--chk-bg); }
+.is-learned .v-word { text-decoration: line-through; text-decoration-color: var(--brs); opacity: 0.55; }
+.is-learned .v-fa { opacity: 0.55; }
+
+/* Cards with a checkbox column (legacy grid: chk | word | type) */
+.vcard--with-chk {
+  grid-template-areas:
+    'chk word type'
+    'chk fa   fa'
+    'ex  ex   ex'
+    'tr  tr   tr'
+    'pr  pr   spk';
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+}
+.vcard__chk { grid-area: chk; display: flex; justify-content: center; align-items: flex-start; padding-top: 14px; }
+.vcard--with-chk .vcard__word { padding-left: 2px; }
+.vcard.is-learned { background: var(--chk-bg); }
+@media (max-width: 640px) {
+  .vcard__chk .vchk { width: 22px; height: 22px; }
+  .vcard__chk .vchk:checked::after { left: 6px; top: 2px; width: 7px; height: 12px; }
+}
+
+/* Section progress (legacy .sprogw / .mpo / .mpi) */
+.sinfo__progress { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 500; color: var(--tm); white-space: nowrap; }
+.mpo { width: 48px; height: 3px; background: var(--br); border-radius: 2px; overflow: hidden; display: inline-block; }
+.mpi { display: block; height: 100%; border-radius: 2px; background: var(--acg); transition: width 0.5s ease; }

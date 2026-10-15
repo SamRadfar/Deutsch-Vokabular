@@ -18,14 +18,17 @@ export default defineConfig({
         // keep browser caches valid across app-only or content-only releases.
         codeSplitting: {
           groups: [
-            { name: 'vocabulary-content', test: /[\\/]src[\\/]data[\\/]vocabulary[\\/]/ },
+            // Only the browsable content; the id registry is loaded with the migration dialog.
+            { name: 'vocabulary-content', test: /[\\/]src[\\/]data[\\/]vocabulary[\\/](vocabulary|technical-info)\.v\d+\.json/ },
             { name: 'react', test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/ },
+            { name: 'firebase', test: /[\\/]node_modules[\\/](@firebase|firebase)[\\/]/ },
           ],
         },
       },
     },
-    // The content chunk is ~315 kB minified (≈ 90 kB gzip) by nature; warn only above that.
-    chunkSizeWarningLimit: 450,
+    // Firebase (≈ 735 kB minified, ≈ 217 kB gzip) is loaded asynchronously and never blocks
+    // vocabulary rendering; the content chunk is ≈ 315 kB. Warn only above these sizes.
+    chunkSizeWarningLimit: 760,
   },
   test: {
     environment: 'jsdom',

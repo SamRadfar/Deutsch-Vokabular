@@ -2,6 +2,7 @@ import { Fragment } from 'react';
 import type { TechnicalInfo, VocabularyEntry, VocabularyGroup } from '../../../models/vocabulary';
 import { WordTypeBadge } from './WordTypeBadge';
 import { TechnicalInfoPanel, TechnicalInfoToggle } from './TechnicalInfoPanel';
+import { LearnedCheckbox, type EntryProgress } from './LearnedCheckbox';
 import {
   ExampleTranslation, GermanExample, GermanWord, PersianMeaning, PersianPronunciation, WordSpeech,
 } from './EntryFields';
@@ -12,22 +13,25 @@ export interface EntryListProps {
   openInfoId: string | null;
   onToggleInfo(id: string): void;
   caption: string;
+  /** Present only when the user is signed in and progress is loaded; otherwise no ✓ column. */
+  progress?: EntryProgress | undefined;
 }
 
-const COLUMNS = 7;
-
 /** Desktop layout: one <tbody> per group, headed by a group row (legacy .grp). */
-export function VocabularyTable({ groups, getTechnicalInfo, openInfoId, onToggleInfo, caption }: EntryListProps) {
+export function VocabularyTable({ groups, getTechnicalInfo, openInfoId, onToggleInfo, caption, progress }: EntryListProps) {
+  const columns = progress ? 8 : 7;
   return (
     <div className="tscr">
       <table className="vtable">
         <caption className="visually-hidden">{caption}</caption>
         <colgroup>
+          {progress ? <col className="c-chk" /> : null}
           <col className="c-word" /><col className="c-type" /><col className="c-fa" /><col className="c-ex" />
           <col className="c-tr" /><col className="c-pr" /><col className="c-spk" />
         </colgroup>
         <thead>
           <tr>
+            {progress ? <th scope="col" className="c-chk-h"><span aria-hidden="true">✓</span><span className="visually-hidden">یادگرفتم</span></th> : null}
             <th scope="col">Wort</th>
             <th scope="col">Wortart</th>
             <th scope="col" className="rh" lang="fa" dir="rtl">فارسی</th>
@@ -40,7 +44,7 @@ export function VocabularyTable({ groups, getTechnicalInfo, openInfoId, onToggle
         {groups.map((group, gi) => (
           <tbody key={`${gi}-${group.label}`}>
             <tr className="grp">
-              <th scope="colgroup" colSpan={COLUMNS}>{group.label}</th>
+              <th scope="colgroup" colSpan={columns}>{group.label}</th>
             </tr>
             {group.entries.map((entry) => (
               <VocabularyRow
@@ -49,6 +53,8 @@ export function VocabularyTable({ groups, getTechnicalInfo, openInfoId, onToggle
                 info={getTechnicalInfo(entry.id)}
                 infoOpen={openInfoId === entry.id}
                 onToggleInfo={() => onToggleInfo(entry.id)}
+                progress={progress}
+                columns={columns}
               />
             ))}
           </tbody>
@@ -63,12 +69,16 @@ interface RowProps {
   info: TechnicalInfo | undefined;
   infoOpen: boolean;
   onToggleInfo(): void;
+  progress: EntryProgress | undefined;
+  columns: number;
 }
 
-export function VocabularyRow({ entry, info, infoOpen, onToggleInfo }: RowProps) {
+export function VocabularyRow({ entry, info, infoOpen, onToggleInfo, progress, columns }: RowProps) {
+  const learned = progress?.isLearned(entry.id) ?? false;
   return (
     <Fragment>
-      <tr className="vrow" data-entry-id={entry.id}>
+      <tr className={`vrow${learned ? ' is-learned' : ''}`} data-entry-id={entry.id}>
+        {progress ? <td className="td-chk"><LearnedCheckbox entryId={entry.id} word={entry.word} progress={progress} /></td> : null}
         <th scope="row" className="td-word"><GermanWord entry={entry} /></th>
         <td className="td-type">
           <WordTypeBadge type={entry.type} />
@@ -82,7 +92,7 @@ export function VocabularyRow({ entry, info, infoOpen, onToggleInfo }: RowProps)
       </tr>
       {info && infoOpen ? (
         <tr className="info-row">
-          <td colSpan={COLUMNS}><TechnicalInfoPanel entryId={entry.id} info={info} /></td>
+          <td colSpan={columns}><TechnicalInfoPanel entryId={entry.id} info={info} /></td>
         </tr>
       ) : null}
     </Fragment>

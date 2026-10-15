@@ -1,0 +1,46 @@
+/* Based on the legacy bottom-sheet modal (.aw-overlay / .aw-sheet) */
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: rgba(13, 27, 46, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.dialog {
+  width: min(560px, 100%);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  background: var(--sf);
+  color: var(--tp);
+  border: 1px solid var(--br);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  padding: 20px;
+  font-family: var(--fp);
+}
+.dialog__title { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+.dialog p { font-size: 13px; color: var(--ts); line-height: 1.8; margin-bottom: 10px; }
+.dialog__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.btn {
+  font-family: var(--fp);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 10px 14px;
+  min-height: 40px;
+  cursor: pointer;
+  border: 1px solid var(--br);
+  background: var(--sfalt);
+  color: var(--tp);
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn--primary { background: var(--ac-arch); border-color: var(--ac-arch); color: #fff; }
+.btn--danger { color: #b42318; }
+@media (max-width: 640px) {
+  .dialog-backdrop { align-items: flex-end; padding: 0; }
+  .dialog { border-radius: 16px 16px 0 0; max-height: 90vh; }
+  .dialog__actions .btn { flex: 1 1 100%; }
+}

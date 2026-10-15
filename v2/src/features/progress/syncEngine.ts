@@ -170,6 +170,10 @@ export class ProgressSyncEngine {
     });
   }
 
+  /** Device-local metadata in this uid's partition (e.g. migration markers). */
+  readMeta<T>(key: string): Promise<T | undefined> { return this.o.local.getMeta<T>(this.o.uid, key); }
+  writeMeta(key: string, value: unknown): Promise<void> { return this.o.local.setMeta(this.o.uid, key, value); }
+
   /** Server-confirmed value of a word, if any (used by the migration conflict check). */
   confirmedOf(wordId: string): ConfirmedProgress | undefined { return this.confirmed.get(wordId); }
   hasPending(wordId: string): boolean { return this.pending.has(wordId); }

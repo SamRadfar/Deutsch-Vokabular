@@ -5,6 +5,7 @@
   --tp: #0d1b2e; --ts: #3a4a68; --tm: #7889a8;
   --row-odd: #ffffff; --row-even: #f7f9fd; --row-hov: #edf1fc;
   --hdr-bg: rgba(255, 255, 255, 0.94);
+  --chk-bg: #f0fdf4;
   --thead-bg: #0d1b2e;
   --fn: 'Inter', system-ui, sans-serif;
   --fp: 'Vazir', 'Tahoma', sans-serif;
@@ -29,6 +30,7 @@ html[data-theme='dark'] {
   --tp: #eef0f6; --ts: #aab0c4; --tm: #767c92;
   --row-odd: #1b1e29; --row-even: #181a24; --row-hov: #222533;
   --hdr-bg: rgba(27, 30, 41, 0.88);
+  --chk-bg: rgba(34, 197, 94, 0.08);
   --thead-bg: #0b0d13;
   color-scheme: dark;
 }
