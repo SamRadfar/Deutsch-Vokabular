@@ -4,6 +4,7 @@ import type { AccountRemote } from './accountRemote';
 import { getDeviceId, type ProgressLocalStore } from './localStore';
 import type { ProgressRemote } from './remote';
 import { ProgressSyncEngine, type ProgressView } from './syncEngine';
+import { ReviewLog } from '../review/reviewLog';
 
 export interface ProgressServices {
   createRemote(): ProgressRemote;
@@ -15,7 +16,7 @@ export interface ProgressServices {
 export type ProgressContextValue =
   | { status: 'unavailable' }
   | { status: 'loading'; uid: string }
-  | { status: 'ready'; uid: string; view: ProgressView; engine: ProgressSyncEngine; account: AccountRemote };
+  | { status: 'ready'; uid: string; view: ProgressView; engine: ProgressSyncEngine; account: AccountRemote; reviews: ReviewLog };
 
 const ProgressContext = createContext<ProgressContextValue>({ status: 'unavailable' });
 
@@ -23,15 +24,16 @@ const noopSubscribe = () => () => {};
 const nullView = () => null;
 
 /**
- * Binds one ProgressSyncEngine to the signed-in uid. The engine is recreated on every uid
- * change and stopped on sign-out; data of the previous account is never exposed because
- * the context only reports an engine whose uid equals the current uid.
+ * Binds one ProgressSyncEngine (and the device-local ReviewLog) to the signed-in uid. Both are
+ * recreated on every uid change and dropped on sign-out; data of the previous account is never
+ * exposed because the context only reports an engine whose uid equals the current uid.
  */
 export function ProgressProvider({ services, knownIds, children }: { services: ProgressServices | null; knownIds: ReadonlySet<string>; children: ReactNode }) {
   const user = useSignedInUser();
   const uid = user?.uid ?? null;
   const [store, setStore] = useState<Promise<ProgressLocalStore> | null>(null);
   const [engine, setEngine] = useState<ProgressSyncEngine | null>(null);
+  const [reviews, setReviews] = useState<ReviewLog | null>(null);
 
   useEffect(() => {
     if (services && !store) setStore(services.createLocalStore());
@@ -39,17 +41,21 @@ export function ProgressProvider({ services, knownIds, children }: { services: P
 
   useEffect(() => {
     setEngine(null);
+    setReviews(null);
     if (!uid || !services || !store) return;
     let cancelled = false;
     let created: ProgressSyncEngine | null = null;
     void (async () => {
       const local = await store;
       const deviceId = await getDeviceId(local);
+      const log = new ReviewLog(uid, local);
+      await log.load();
       if (cancelled) return;
       created = new ProgressSyncEngine({
         uid, local, remote: services.createRemote(), deviceId, knownIds,
         online: typeof navigator === 'undefined' ? true : navigator.onLine,
       });
+      setReviews(log);
       setEngine(created);
       await created.start();
     })();
@@ -96,9 +102,9 @@ export function ProgressProvider({ services, knownIds, children }: { services: P
 
   const value = useMemo<ProgressContextValue>(() => {
     if (!uid || !services) return { status: 'unavailable' };
-    if (!engine || engine.uid !== uid || !view || view.status.phase !== 'ready') return { status: 'loading', uid };
-    return { status: 'ready', uid, view, engine, account: services.account };
-  }, [uid, services, engine, view]);
+    if (!engine || engine.uid !== uid || !reviews || reviews.uid !== uid || !view || view.status.phase !== 'ready') return { status: 'loading', uid };
+    return { status: 'ready', uid, view, engine, account: services.account, reviews };
+  }, [uid, services, engine, reviews, view]);
 
   return <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>;
 }

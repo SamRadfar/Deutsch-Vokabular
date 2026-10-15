@@ -4,6 +4,7 @@
  */
 export const PREFERENCE_KEYS = {
   theme: 'dv2.pref.theme.v1',
+  review: 'dv2.pref.review.v1',
 } as const;
 
 export type ThemePreference = 'light' | 'dark';
@@ -31,5 +32,40 @@ export function writeThemePreference(theme: ThemePreference): void {
     safeStorage()?.setItem(PREFERENCE_KEYS.theme, theme);
   } catch {
     /* ignore: the theme still applies for this session */
+  }
+}
+
+/** Flashcard setup remembered on this device (not personal progress; no account data). */
+export interface ReviewPreferences {
+  mode: 'all' | 'unlearned' | 'learned' | 'again';
+  /** `all` or a category key (validated against the content by the caller). */
+  scope: string;
+  /** Cards per session; null = all selected words. */
+  size: number | null;
+  /** Speak the German word when a card is turned (legacy behaviour). */
+  autoSpeak: boolean;
+}
+
+export function readReviewPreferences(): Partial<ReviewPreferences> {
+  try {
+    const raw = safeStorage()?.getItem(PREFERENCE_KEYS.review);
+    if (!raw) return {};
+    const v = JSON.parse(raw) as Record<string, unknown>;
+    const out: Partial<ReviewPreferences> = {};
+    if (v.mode === 'all' || v.mode === 'unlearned' || v.mode === 'learned' || v.mode === 'again') out.mode = v.mode;
+    if (typeof v.scope === 'string' && v.scope.length <= 40) out.scope = v.scope;
+    if (v.size === null || (typeof v.size === 'number' && Number.isInteger(v.size) && v.size > 0 && v.size <= 1000)) out.size = v.size;
+    if (typeof v.autoSpeak === 'boolean') out.autoSpeak = v.autoSpeak;
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+export function writeReviewPreferences(prefs: ReviewPreferences): void {
+  try {
+    safeStorage()?.setItem(PREFERENCE_KEYS.review, JSON.stringify(prefs));
+  } catch {
+    /* ignore: the choice still applies for this session */
   }
 }

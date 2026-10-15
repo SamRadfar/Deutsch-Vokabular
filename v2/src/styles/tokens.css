@@ -17,6 +17,8 @@
   --ac-bautechnik: #0f766e; --acl-bautechnik: rgba(15, 118, 110, 0.10); --acg-bautechnik: linear-gradient(135deg, #0f766e, #0891b2); --grp-bautechnik: rgba(15, 118, 110, 0.06);
   --ac-fitness: #c2410c; --acl-fitness: rgba(194, 65, 12, 0.10); --acg-fitness: linear-gradient(135deg, #ea580c, #dc2626); --grp-fitness: rgba(194, 65, 12, 0.06);
   --ac-anatomie: #9f1239; --acl-anatomie: rgba(159, 18, 57, 0.10); --acg-anatomie: linear-gradient(135deg, #be123c, #e11d48); --grp-anatomie: rgba(159, 18, 57, 0.06);
+  --ac-review: #7c3aed; --acl-review: rgba(124, 58, 237, 0.10); --acg-review: linear-gradient(135deg, #7c3aed, #3a56d4); --grp-review: rgba(124, 58, 237, 0.06);
+  --ok: #15803d; --okl: rgba(22, 163, 74, 0.10); --bad: #dc2626; --badl: rgba(220, 38, 38, 0.10);
   --ac-bauphysik: #2563eb; --acl-bauphysik: rgba(37, 99, 235, 0.10); --acg-bauphysik: linear-gradient(135deg, #2563eb, #06b6d4); --grp-bauphysik: rgba(37, 99, 235, 0.06);
 
   /* Active accent (overridden per category scope below) */
@@ -32,6 +34,7 @@ html[data-theme='dark'] {
   --hdr-bg: rgba(27, 30, 41, 0.88);
   --chk-bg: rgba(34, 197, 94, 0.08);
   --thead-bg: #0b0d13;
+  --ok: #4ade80; --okl: rgba(74, 222, 128, 0.12); --bad: #f87171; --badl: rgba(248, 113, 113, 0.12);
   color-scheme: dark;
 }
 
@@ -42,4 +45,5 @@ html[data-theme='dark'] {
 [data-category='bauphysik'] { --ac: var(--ac-bauphysik); --acl: var(--acl-bauphysik); --acg: var(--acg-bauphysik); --grp: var(--grp-bauphysik); }
 [data-category='fitness'] { --ac: var(--ac-fitness); --acl: var(--acl-fitness); --acg: var(--acg-fitness); --grp: var(--grp-fitness); }
 [data-category='anatomie'] { --ac: var(--ac-anatomie); --acl: var(--acl-anatomie); --acg: var(--acg-anatomie); --grp: var(--grp-anatomie); }
+[data-category='review'] { --ac: var(--ac-review); --acl: var(--acl-review); --acg: var(--acg-review); --grp: var(--grp-review); }
 [data-category='dreame'] { --ac: var(--ac-dreame); --acl: var(--acl-dreame); --acg: var(--acg-dreame); --grp: var(--grp-dreame); }

@@ -13,9 +13,9 @@ beforeEach(() => mockMatchMedia(() => false));
 afterEach(() => mockMatchMedia(() => false));
 
 describe('navigation', () => {
-  it('shows all 7 categories in legacy order with labels, first one selected', () => {
+  it('shows all 7 categories in legacy order with labels, then the review tab; first one selected', () => {
     render(<App speechService={fakeSpeech()} />);
-    expect(mainTabs().map((t) => t.textContent)).toEqual(repo.categories.map((c) => c.label));
+    expect(mainTabs().map((t) => t.textContent)).toEqual([...repo.categories.map((c) => c.label), '🔄 مرور']);
     expect(mainTabs()[0]).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByText('999 واژه')).toBeInTheDocument();
   });
@@ -56,7 +56,7 @@ describe('navigation', () => {
     expect(mainTabs()[1]).toHaveAttribute('aria-selected', 'true');
     expect(mainTabs()[1]).toHaveFocus();
     await user.keyboard('{End}');
-    expect(mainTabs()[6]).toHaveAttribute('aria-selected', 'true');
+    expect(mainTabs()[7]).toHaveAttribute('aria-selected', 'true'); // the review tab is last
     await user.keyboard('{ArrowRight}');
     expect(mainTabs()[0]).toHaveAttribute('aria-selected', 'true');
     expect(mainTabs().filter((t) => t.tabIndex === 0)).toHaveLength(1);

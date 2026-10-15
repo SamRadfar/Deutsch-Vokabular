@@ -3,58 +3,11 @@
 
 import { expect, test, type Page } from '@playwright/test';
 import vocabulary from '../../src/data/vocabulary/vocabulary.v1.json' with { type: 'json' };
+import { signIn, signOut, trackErrors, uniqueEmail } from './helpers';
 
 const first = vocabulary.categories[0]!.subtabs[0]!.groups[0]!.entries[0]!;
 const second = vocabulary.categories[0]!.subtabs[0]!.groups[0]!.entries[1]!;
 const checkbox = (page: Page, word: string) => page.getByRole('checkbox', { name: `یادگرفتم: ${word}` });
-const uniqueEmail = (label: string) => `${label}-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example.test`;
-
-/**
- * WebKit reports Firestore's long-lived Listen/Write channels as "… due to access control checks"
- * when a navigation (reload / sign-out redirect) aborts them. Measured: these appear only at the
- * moment of navigation, never during use or idle, and state is correct afterwards
- * (docs/FIREBASE_VALIDATION.md §5). Exactly this message is tolerated; anything else fails.
- */
-const WEBKIT_ABORTED_CHANNEL = /\/google\.firestore\.v1\.Firestore\/(Listen|Write)\/channel\?.* due to access control checks\.$/;
-
-function trackErrors(page: Page) {
-  const errors: string[] = [];
-  page.on('pageerror', (e) => { if (!WEBKIT_ABORTED_CHANNEL.test(e.message)) errors.push(`pageerror: ${e.message}`); });
-  page.on('console', (m) => {
-    if (m.type() !== 'error') return;
-    const t = m.text();
-    if (/fonts\.(googleapis|gstatic)\.com|cdn\.jsdelivr\.net|Failed to load resource|ERR_ABORTED/.test(t)) return;
-    errors.push(`console: ${t}`);
-  });
-  return errors;
-}
-
-/** Sign in through the Auth Emulator popup (creates the account on first use). */
-async function signIn(page: Page, email: string, name: string) {
-  const popupPromise = page.waitForEvent('popup');
-  await page.getByRole('button', { name: 'ورود با گوگل' }).click();
-  const popup = await popupPromise;
-  await popup.waitForLoadState();
-  const closed = popup.waitForEvent('close'); // attach before clicking: the popup may close at once
-  const existing = popup.getByText(email, { exact: false });
-  if (await existing.count()) {
-    await existing.first().click();
-  } else {
-    await popup.getByText('Add new account').click();
-    await popup.locator('#email-input').fill(email);
-    await popup.locator('#display-name-input').fill(name);
-    await popup.locator('#sign-in').click();
-  }
-  await closed;
-  await expect(page.getByTestId('account-button')).toBeVisible();
-}
-
-async function signOut(page: Page) {
-  await page.getByTestId('account-button').click();
-  await page.getByRole('menuitem', { name: 'خروج از حساب' }).click();
-  await expect(page.getByRole('button', { name: 'ورود با گوگل' })).toBeVisible();
-}
-
 test('signed out: browsing works and no progress checkboxes are offered', async ({ page }) => {
   const errors = trackErrors(page);
   await page.goto('./');

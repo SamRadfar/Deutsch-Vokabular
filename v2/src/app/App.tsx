@@ -3,7 +3,9 @@ import { Header } from '../components/Header/Header';
 import { useTheme } from '../hooks/useTheme';
 import { PronunciationProvider } from '../features/pronunciation/PronunciationProvider';
 import type { SpeechService } from '../features/pronunciation/speechService';
-import { MainNavigation, MAIN_TABS_PREFIX } from '../features/vocabulary/components/MainNavigation';
+import type { CategoryKey } from '../models/vocabulary';
+import { MainNavigation, MAIN_TABS_PREFIX, REVIEW_TAB_ID } from '../features/vocabulary/components/MainNavigation';
+import { ReviewPanel } from '../features/review/components/ReviewPanel';
 import { CategoryView } from '../features/vocabulary/components/CategoryView';
 import type { EntryProgress } from '../features/vocabulary/components/LearnedCheckbox';
 import { useVocabularyNavigation } from '../features/vocabulary/useVocabularyNavigation';
@@ -55,6 +57,20 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
   const category = nav.activeCategory;
   const progress = useProgress();
   const [migrationOpen, setMigrationOpen] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  // The review panel stays mounted once opened, so a running session survives a look at a category.
+  const [reviewMounted, setReviewMounted] = useState(false);
+  const selectMainTab = useCallback((id: string) => {
+    if (id === REVIEW_TAB_ID) {
+      setReviewOpen(true);
+      setReviewMounted(true);
+    } else {
+      setReviewOpen(false);
+      nav.selectCategory(id as CategoryKey);
+    }
+  }, [nav.selectCategory]);
+  // A session belongs to one account: switching or signing out starts the review tab afresh.
+  const reviewOwner = progress.status === 'unavailable' ? 'signed-out' : progress.uid;
 
   const ready = progress.status === 'ready' ? progress : null;
   const learned = ready?.view.learned;
@@ -85,21 +101,28 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
             <AccountControl totalEntries={repository.totalEntries} learnedCount={learnedCount} onOpenMigration={() => setMigrationOpen(true)} />
           </>
         )}
-        navigation={<MainNavigation categories={repository.categories} activeKey={category.key} onSelect={nav.selectCategory} />}
+        navigation={<MainNavigation categories={repository.categories} activeId={reviewOpen ? REVIEW_TAB_ID : category.key} onSelect={selectMainTab} />}
       />
       <AuthErrorBanner />
       <main className="mcontent">
-        <div role="tabpanel" id={panelElementId(MAIN_TABS_PREFIX, category.key)} aria-labelledby={tabElementId(MAIN_TABS_PREFIX, category.key)}>
-          <CategoryView
-            key={category.key}
-            category={category}
-            activeSubtabId={nav.activeSubtabId}
-            onSelectSubtab={nav.selectSubtab}
-            getTechnicalInfo={repository.getTechnicalInfo}
-            progress={entryProgress}
-            learned={learned}
-          />
-        </div>
+        {reviewOpen ? null : (
+          <div role="tabpanel" id={panelElementId(MAIN_TABS_PREFIX, category.key)} aria-labelledby={tabElementId(MAIN_TABS_PREFIX, category.key)}>
+            <CategoryView
+              key={category.key}
+              category={category}
+              activeSubtabId={nav.activeSubtabId}
+              onSelectSubtab={nav.selectSubtab}
+              getTechnicalInfo={repository.getTechnicalInfo}
+              progress={entryProgress}
+              learned={learned}
+            />
+          </div>
+        )}
+        {reviewMounted ? (
+          <div role="tabpanel" id={panelElementId(MAIN_TABS_PREFIX, REVIEW_TAB_ID)} aria-labelledby={tabElementId(MAIN_TABS_PREFIX, REVIEW_TAB_ID)} hidden={!reviewOpen}>
+            <ReviewPanel key={reviewOwner} categories={repository.categories} active={reviewOpen} />
+          </div>
+        ) : null}
       </main>
       {migrationOpen && ready ? (
         <Suspense fallback={<p className="visually-hidden" role="status">در حال بارگذاری…</p>}>

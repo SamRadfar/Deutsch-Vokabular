@@ -28,8 +28,8 @@ test.describe('application', () => {
     // Hermetic build: no developer .env.local may leak in (badge would show "dev: …").
     await expect(page.getByTestId('env-badge')).toHaveText('v2 preview');
     const tabs = page.getByRole('tablist', { name: 'Kategorien' }).getByRole('tab');
-    await expect(tabs).toHaveCount(7);
-    await expect(tabs).toHaveText(categories.map((c) => c.label));
+    await expect(tabs).toHaveCount(8); // 7 categories + the flashcard review tab
+    await expect(tabs).toHaveText([...categories.map((c) => c.label), '🔄 مرور']);
     // The legacy brand logo (extracted from index.html) loads under the relative base path.
     await expect.poll(() => page.locator('.brand__icon').evaluate((img: HTMLImageElement) => img.naturalWidth)).toBe(300);
     expect(errors).toEqual([]);

@@ -3,6 +3,7 @@
 // account's data (including its pending queue) can never be returned for another account.
 
 import type { ConfirmedProgress, PendingOp } from './model';
+import { mergeReview, type ReviewEvent, type ReviewRecord } from '../review/model';
 
 export interface LocalSnapshot {
   confirmed: ConfirmedProgress[];
@@ -18,11 +19,16 @@ export interface ProgressLocalStore {
   putConfirmed(uid: string, records: ConfirmedProgress[]): Promise<void>;
   getMeta<T>(uid: string, key: string): Promise<T | undefined>;
   setMeta(uid: string, key: string, value: unknown): Promise<void>;
+  /** Flashcard review records of this uid (device-local only, see features/review/model.ts). */
+  loadReviews(uid: string): Promise<ReviewRecord[]>;
+  /** Merges one answer into the stored record inside a single transaction (safe across tabs). */
+  recordReview(uid: string, event: ReviewEvent): Promise<ReviewRecord>;
 }
 
 export const DB_NAME = 'deutsch-vokabular-v2';
-const DB_VERSION = 1;
-const STORES = { confirmed: 'progress-confirmed', pending: 'progress-pending', meta: 'meta' } as const;
+// v1: progress + meta. v2 (Phase 4A): + review-state. Upgrades only ever add stores.
+const DB_VERSION = 2;
+const STORES = { confirmed: 'progress-confirmed', pending: 'progress-pending', meta: 'meta', reviews: 'review-state' } as const;
 
 const req = <T>(r: IDBRequest<T>) => new Promise<T>((resolve, reject) => {
   r.onsuccess = () => resolve(r.result);
@@ -43,8 +49,13 @@ export function openProgressDb(factory: IDBFactory = indexedDB, name = DB_NAME):
       if (!db.objectStoreNames.contains(STORES.confirmed)) db.createObjectStore(STORES.confirmed, { keyPath: ['uid', 'wordId'] });
       if (!db.objectStoreNames.contains(STORES.pending)) db.createObjectStore(STORES.pending, { keyPath: ['uid', 'wordId'] });
       if (!db.objectStoreNames.contains(STORES.meta)) db.createObjectStore(STORES.meta, { keyPath: ['uid', 'key'] });
+      if (!db.objectStoreNames.contains(STORES.reviews)) db.createObjectStore(STORES.reviews, { keyPath: ['uid', 'wordId'] });
     };
-    open.onsuccess = () => resolve(open.result);
+    open.onsuccess = () => {
+      // A newer version opened in another tab: release this connection so its upgrade is not blocked.
+      open.result.onversionchange = () => open.result.close();
+      resolve(open.result);
+    };
     open.onerror = () => reject(open.error);
     open.onblocked = () => reject(new Error('IndexedDB upgrade blocked by another tab'));
   });
@@ -103,6 +114,22 @@ export function createIndexedDbStore(dbPromise: Promise<IDBDatabase>): ProgressL
       tx.objectStore(STORES.meta).put({ uid, key, value });
       await done(tx);
     },
+    async loadReviews(uid) {
+      const db = await dbPromise;
+      const rows = (await req(db.transaction(STORES.reviews, 'readonly').objectStore(STORES.reviews).getAll(uidRange(uid)))) as
+        Stored<ReviewRecord>[];
+      return rows.filter((r) => r.uid === uid).map(strip);
+    },
+    async recordReview(uid, event) {
+      const db = await dbPromise;
+      const tx = db.transaction(STORES.reviews, 'readwrite');
+      const store = tx.objectStore(STORES.reviews);
+      const current = (await req(store.get([uid, event.wordId]))) as Stored<ReviewRecord> | undefined;
+      const next = mergeReview(current ? strip(current) : undefined, event);
+      store.put({ ...next, uid });
+      await done(tx);
+      return next;
+    },
   };
 }
 
@@ -111,6 +138,7 @@ export function createMemoryStore(): ProgressLocalStore {
   const confirmed = new Map<string, Map<string, ConfirmedProgress>>();
   const pending = new Map<string, Map<string, PendingOp>>();
   const meta = new Map<string, unknown>();
+  const reviews = new Map<string, Map<string, ReviewRecord>>();
   const part = <T>(m: Map<string, Map<string, T>>, uid: string) => {
     let p = m.get(uid);
     if (!p) { p = new Map(); m.set(uid, p); }
@@ -130,6 +158,12 @@ export function createMemoryStore(): ProgressLocalStore {
     async putConfirmed(uid, records) { for (const r of records) part(confirmed, uid).set(r.wordId, clone(r)); },
     async getMeta(uid, key) { return clone(meta.get(`${uid}\u0000${key}`)) as never; },
     async setMeta(uid, key, value) { meta.set(`${uid}\u0000${key}`, clone(value)); },
+    async loadReviews(uid) { return [...part(reviews, uid).values()].map(clone); },
+    async recordReview(uid, event) {
+      const next = mergeReview(part(reviews, uid).get(event.wordId), event);
+      part(reviews, uid).set(event.wordId, next);
+      return clone(next);
+    },
   };
 }
 

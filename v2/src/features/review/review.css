@@ -1,0 +1,285 @@
+/* Flashcard review (Phase 4A). Visual language of the legacy review tab (purple accent, large
+   rounded card, green/red answers); colours come from tokens.css, so dark mode follows. */
+
+.rv-setup,
+.fc-summary { --ac: var(--ac-review); --acl: var(--acl-review); --acg: var(--acg-review); }
+
+.rv-setup,
+.fc-session,
+.fc-summary {
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── Buttons ── */
+.fc-primary,
+.fc-secondary,
+.fc-tool {
+  font-family: var(--fp);
+  cursor: pointer;
+  border-radius: 12px;
+  transition: background-color 0.15s, border-color 0.15s, transform 0.1s, opacity 0.15s;
+}
+.fc-primary {
+  min-height: 48px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--acg);
+  border: none;
+  box-shadow: 0 4px 14px var(--acl);
+}
+.fc-primary:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+.fc-secondary {
+  min-height: 44px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ts);
+  background: var(--sfalt);
+  border: 1px solid var(--br);
+}
+.fc-secondary:hover { border-color: var(--brs); }
+.fc-tool {
+  min-height: 40px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ts);
+  background: var(--sf);
+  border: 1px solid var(--br);
+}
+.fc-tool:hover:not(:disabled) { border-color: var(--ac); color: var(--ac); }
+.fc-tool:disabled { opacity: 0.4; cursor: default; }
+.fc-primary:active:not(:disabled),
+.fc-answer:active { transform: scale(0.98); }
+
+/* ── Setup ── */
+.rv-hero { text-align: center; padding: 8px 0 2px; }
+.rv-hero__icon { font-size: 34px; line-height: 1.2; }
+.rv-hero h2 { font-size: 20px; font-weight: 800; color: var(--tp); }
+.rv-hero__sub { font-size: 12.5px; color: var(--tm); margin-top: 2px; }
+
+.rv-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.rv-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 6px;
+  background: var(--sf);
+  border: 1px solid var(--br);
+  border-radius: 12px;
+}
+.rv-stat__n { font-family: var(--fn); font-size: 22px; font-weight: 800; color: var(--ac); line-height: 1.3; }
+.rv-stat__l { font-size: 11px; color: var(--tm); }
+
+.rv-notice {
+  font-size: 12.5px;
+  line-height: 1.9;
+  color: var(--ts);
+  background: var(--acl);
+  border: 1px solid var(--br);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+.rv-modes { border: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.rv-modes legend { font-size: 12.5px; font-weight: 700; color: var(--ts); margin-bottom: 8px; }
+.rv-mode {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 8px;
+  padding: 12px;
+  background: var(--sf);
+  border: 1.5px solid var(--br);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+.rv-mode input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: inherit; }
+.rv-mode:hover:not(.is-disabled) { border-color: var(--brs); }
+.rv-mode.is-selected { border-color: var(--ac); background: var(--acl); }
+.rv-mode:has(input:focus-visible) { outline: 2px solid var(--ac); outline-offset: 2px; }
+.rv-mode.is-disabled { opacity: 0.55; cursor: not-allowed; }
+.rv-mode__title { font-size: 13.5px; font-weight: 700; color: var(--tp); }
+.rv-mode__count { font-family: var(--fn); font-size: 13px; font-weight: 700; color: var(--ac); }
+.rv-mode__desc { grid-column: 1 / -1; font-size: 11px; color: var(--tm); line-height: 1.6; }
+
+.rv-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.rv-field { display: flex; flex-direction: column; gap: 4px; }
+.rv-field label { font-size: 12px; font-weight: 600; color: var(--ts); }
+.rv-field select {
+  min-height: 42px;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--tp);
+  background: var(--sf);
+  border: 1px solid var(--br);
+  border-radius: 10px;
+}
+.rv-check { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ts); cursor: pointer; min-height: 32px; }
+.rv-check input { width: 18px; height: 18px; accent-color: var(--ac); }
+.rv-empty { text-align: center; font-size: 13px; color: var(--tm); }
+
+/* ── Session ── */
+.fc-session { scroll-margin-top: 130px; }
+.fc-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.fc-count { font-family: var(--fn); font-size: 14px; font-weight: 700; color: var(--ts); }
+.fc-progress { height: 6px; background: var(--br); border-radius: 3px; overflow: hidden; }
+.fc-progress > span { display: block; height: 100%; background: var(--acg); transition: width 0.3s ease; }
+.fc-tally { display: flex; justify-content: center; gap: 16px; font-family: var(--fn); font-size: 12.5px; font-weight: 700; margin-top: -6px; }
+.fc-tally__know { color: var(--ok); }
+.fc-tally__again { color: var(--bad); }
+
+.fc-scene { position: relative; perspective: 1400px; }
+.fc-swipe-hint {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  font-size: 40px;
+  font-weight: 800;
+  pointer-events: none;
+  transition: opacity 0.1s;
+}
+.fc-swipe-hint--again { left: 6px; color: var(--bad); }
+.fc-swipe-hint--know { right: 6px; color: var(--ok); }
+.fc-drag { touch-action: pan-y; transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+.fc-drag.is-dragging { transition: none; }
+
+.fc-card {
+  display: grid;
+  min-height: 300px;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.fc-card.is-flipped { transform: rotateY(180deg); }
+.fc-face {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 28px 22px;
+  text-align: center;
+  background: var(--sf);
+  border: 1px solid var(--br);
+  border-top: 4px solid var(--ac);
+  border-radius: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05), 0 12px 32px rgba(0, 0, 0, 0.08);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.fc-face--back { transform: rotateY(180deg); background: linear-gradient(180deg, var(--acl), var(--sf) 55%); }
+.fc-meta { font-size: 11px; font-weight: 600; color: var(--tm); letter-spacing: 0.2px; }
+.fc-word { font-size: 30px; font-weight: 800; line-height: 1.3; color: var(--tp); overflow-wrap: anywhere; }
+.fc-word--small { font-size: 15px; font-weight: 700; color: var(--ac); }
+.fc-row { display: flex; align-items: center; gap: 10px; }
+.fc-example { font-size: 14px; line-height: 1.7; color: var(--ts); max-width: 46ch; }
+.fc-tap { font-size: 11px; color: var(--tm); margin-top: 4px; }
+.fc-fa { font-size: 26px; font-weight: 800; line-height: 1.5; color: var(--tp); }
+.fc-pr { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ts); }
+.fc-exfa { font-size: 13.5px; line-height: 1.9; color: var(--ts); max-width: 46ch; }
+/* The shared field renderers (EntryFields) carry table sizes; on the card they take the card's. */
+.fc-face .v-word,
+.fc-face .v-fa,
+.fc-face .v-ex,
+.fc-face .v-tr,
+.fc-face .v-pr { font-size: inherit; font-weight: inherit; color: inherit; line-height: inherit; text-align: center; }
+.fc-face .v-pr { display: inline; }
+.fc-face .v-ex { font-style: italic; }
+.fc-previous { text-align: center; font-size: 12px; font-weight: 600; margin-top: 8px; }
+.fc-previous--know { color: var(--ok); }
+.fc-previous--again { color: var(--bad); }
+
+.fc-flip {
+  align-self: center;
+  min-height: 40px;
+  padding: 6px 18px;
+  font-family: var(--fp);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ac);
+  background: var(--acl);
+  border: 1px solid transparent;
+  border-radius: 20px;
+  cursor: pointer;
+}
+.fc-flip:hover { border-color: var(--ac); }
+
+.fc-answers { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fc-answer {
+  display: grid;
+  justify-items: center;
+  min-height: 64px;
+  padding: 8px 10px;
+  font-family: var(--fp);
+  font-size: 16px;
+  font-weight: 800;
+  border-radius: 14px;
+  border: 1.5px solid;
+  cursor: pointer;
+  transition: background-color 0.15s, transform 0.1s;
+}
+.fc-answer small { font-size: 11px; font-weight: 600; opacity: 0.85; }
+.fc-answer--again { color: var(--bad); background: var(--badl); border-color: var(--bad); }
+.fc-answer--know { color: var(--ok); background: var(--okl); border-color: var(--ok); }
+.fc-answer--again:hover { background: rgba(220, 38, 38, 0.18); }
+.fc-answer--know:hover { background: rgba(22, 163, 74, 0.18); }
+
+.fc-nav { display: flex; justify-content: space-between; gap: 10px; }
+/* Flex keeps arrow and label in LTR order whatever the bidi context of the Persian label. */
+.fc-nav .fc-tool { display: inline-flex; align-items: center; gap: 6px; }
+.fc-keys { text-align: center; font-size: 11px; line-height: 2.1; color: var(--tm); }
+.fc-keys kbd {
+  font-family: var(--fn);
+  font-size: 10.5px;
+  padding: 1px 6px;
+  border: 1px solid var(--br);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--sf);
+  color: var(--ts);
+}
+@media (hover: none), (pointer: coarse) {
+  .fc-keys { display: none; }
+}
+
+/* ── Summary ── */
+.fc-summary { text-align: center; padding-top: 8px; }
+.fc-summary__emoji { font-size: 44px; line-height: 1.2; }
+.fc-summary h2 { font-size: 22px; font-weight: 800; color: var(--tp); outline: none; }
+.fc-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.fc-stat { padding: 10px 4px; background: var(--sf); border: 1px solid var(--br); border-radius: 12px; }
+.fc-stat dt { font-size: 11px; color: var(--tm); }
+.fc-stat dd { font-family: var(--fn); font-size: 22px; font-weight: 800; color: var(--ac); }
+.fc-stat--know dd { color: var(--ok); }
+.fc-stat--again dd { color: var(--bad); }
+.fc-note { font-size: 12.5px; color: var(--ts); line-height: 1.9; }
+.fc-note--warn { color: var(--ac-acad); }
+.fc-missed { text-align: right; background: var(--sf); border: 1px solid var(--br); border-radius: 12px; padding: 10px 14px; }
+.fc-missed summary { cursor: pointer; font-size: 13px; font-weight: 700; color: var(--ts); }
+.fc-missed ul { margin-top: 8px; display: grid; gap: 6px; }
+.fc-missed li { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; border-top: 1px solid var(--br); padding-top: 6px; }
+.fc-missed__fa { color: var(--tm); }
+.fc-summary__actions { display: flex; flex-direction: column; gap: 8px; }
+
+@media (max-width: 640px) {
+  .rv-modes { grid-template-columns: 1fr; }
+  .rv-options { grid-template-columns: 1fr; }
+  .fc-card { min-height: 260px; }
+  .fc-face { padding: 22px 16px; }
+  .fc-word { font-size: 26px; }
+  .fc-fa { font-size: 22px; }
+  .fc-stats { grid-template-columns: repeat(2, 1fr); }
+}
