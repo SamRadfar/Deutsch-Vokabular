@@ -14,6 +14,25 @@ export interface FirebaseHandles {
 
 let pending: Promise<FirebaseHandles> | null = null;
 
+/**
+ * The Google popup returns its result through an auth iframe in this page. Firebase loads that
+ * iframe at start-up only on mobile/Safari (`_shouldInitProactively`); on desktop it loads when
+ * the popup opens, and a fast sign-in on a slow connection can complete before the iframe is
+ * ready — the result is then lost and the popup stays open (reproduced with the Auth Emulator;
+ * docs/FIREBASE_VALIDATION.md §3). This subclass opts desktop into the same eager initialisation.
+ *
+ * `_shouldInitProactively` is an internal SDK member: a unit test fails if an SDK upgrade removes
+ * it, and if it ever disappears the behaviour silently falls back to Firebase's default.
+ */
+export function eagerPopupResolver<T>(resolver: T): T {
+  const Base = resolver as unknown as new () => object;
+  if (typeof Base !== 'function') return resolver;
+  class EagerPopupRedirectResolver extends Base {
+    get _shouldInitProactively() { return true; }
+  }
+  return EagerPopupRedirectResolver as unknown as T;
+}
+
 export function getFirebase(options: FirebaseClientOptions, emulators: EmulatorSettings | null): Promise<FirebaseHandles> {
   pending ??= (async () => {
     const [{ initializeApp }, authMod, fsMod] = await Promise.all([
@@ -26,7 +45,7 @@ export function getFirebase(options: FirebaseClientOptions, emulators: EmulatorS
     // IndexedDB first. Popup resolver enables signInWithPopup.
     const auth = authMod.initializeAuth(app, {
       persistence: [authMod.indexedDBLocalPersistence, authMod.browserLocalPersistence],
-      popupRedirectResolver: authMod.browserPopupRedirectResolver,
+      popupRedirectResolver: eagerPopupResolver(authMod.browserPopupRedirectResolver),
     });
     // Memory cache only: the app's own IndexedDB store is the single local source of truth
     // for progress (see docs/SYNC_DESIGN.md); a second persistent cache would compete with it.

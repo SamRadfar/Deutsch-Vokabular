@@ -20,7 +20,6 @@ export default defineConfig({
   retries: 0,
   reporter: [['list']],
   timeout: 60_000,
-  globalSetup: './tests/e2e-emulator/global-setup.ts',
   use: {
     baseURL: 'http://localhost:4174/',
     trace: 'retain-on-failure',

@@ -122,9 +122,12 @@ VITE_FIREBASE_PROJECT_ID=demo-deutsch-vokabular VITE_FIREBASE_APP_ID=demo-app \
 VITE_FIREBASE_USE_EMULATORS=true npm run dev
 ```
 
-The emulator shows its own fake Google account picker. Observed: the **first** popup sign-in
-after the emulator starts may complete in the popup but not report back. Use «لغو» and sign in
-again. This behaviour was not observed with later sign-ins.
+The emulator shows its own fake Google account picker.
+
+> Correction (validation phase): the Phase 3 note that the first emulator sign-in "completes in
+> the popup but does not report back" was wrong. The popup stayed open because the app's auth
+> iframe was not ready yet on **desktop** (Firebase initialises it lazily there). This is fixed in
+> the app (`eagerPopupResolver`, docs/FIREBASE_VALIDATION.md §3); the test warm-up was removed.
 
 ## 7. Firestore Security Rules: review, merge, deploy (product owner)
 
