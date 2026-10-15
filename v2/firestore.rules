@@ -2,9 +2,10 @@ rules_version = '2';
 
 // Deutsch Vokabular 2.0 — rules for per-user data (users/{uid}/…).
 //
-// ⚠ NOT DEPLOYED. Deploying this file on its own REPLACES every existing rule in the project,
-// including whatever currently allows the legacy app's `syncCodes/{code}` documents — the
-// legacy app would stop syncing. Merge procedure: docs/FIREBASE_SETUP.md §7.
+// Target: ONLY the separate v2 Firebase project(s) — currently deutsch-vokabular-v2-dev.
+// Deploy only via `npm run rules:deploy:dev` (allowlisted target, emulator tests, double
+// confirmation). NEVER deploy this file to the legacy project (deutsch-wortschatz-c7a11): a rules
+// deploy replaces ALL rules of a project and would break the legacy app's syncCodes sync.
 //
 // Principles: deny by default; a signed-in user can read/write only users/{their uid}/…;
 // documents are schema-validated; timestamps must be server time; nothing can be deleted

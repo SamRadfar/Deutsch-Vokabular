@@ -1,42 +1,72 @@
 #!/usr/bin/env node
 // Guarded deployment of v2/firestore.rules to the v2 DEVELOPMENT Firebase project.
 //
-//   node scripts/deploy-rules.mjs --project <dev-project-id>            # dry run: checks only
-//   node scripts/deploy-rules.mjs --project <dev-project-id> --confirm  # deploys (owner only)
+//   npm run rules:deploy:dev -- --project deutsch-vokabular-v2-dev
+//       → dry run: target checks + emulator rules tests. NO Firebase CLI cloud command is run.
+//   npm run rules:deploy:dev -- --project deutsch-vokabular-v2-dev --confirm deutsch-vokabular-v2-dev
+//       → deploys (product owner only, after approval).
 //
-// Refuses: the legacy production project, demo-/non-"-dev" project ids, and any run whose
-// emulator rules tests fail. Requires `firebase login` by the product owner; this script
-// never handles credentials. There is deliberately no .firebaserc default project.
+// Guards (scripts/lib/deploy-guard.mjs, unit-tested):
+//  - exact allowlist of target projects; the legacy production project is refused;
+//  - --project must match VITE_FIREBASE_PROJECT_ID in v2/.env.local;
+//  - emulator rules tests must pass;
+//  - before deploying, a read-only probe confirms the (default) database exists, because the
+//    Firebase CLI would otherwise CREATE a database (default location nam5/US) during deploy;
+//  - deployment needs "--confirm <project-id>" (double confirmation).
+// Credentials: the owner runs `npx firebase login` interactively; this script never handles tokens.
+// There is deliberately no .firebaserc default project.
 
 import { spawnSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { interpretDatabaseProbe, validateDeployArgs } from './lib/deploy-guard.mjs';
 
-const FORBIDDEN = ['deutsch-wortschatz-c7a11']; // legacy app (index.html firebaseConfig)
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const args = process.argv.slice(2);
-const project = args[args.indexOf('--project') + 1];
-const confirm = args.includes('--confirm');
 
 function fail(msg) {
   console.error(`✖ ${msg}`);
   process.exit(1);
 }
 
-if (!args.includes('--project') || !project || project.startsWith('--')) fail('missing --project <dev-project-id>');
-if (FORBIDDEN.includes(project)) fail(`"${project}" is the legacy production project — v2 rules must never be deployed there`);
-if (project.startsWith('demo-')) fail('"demo-" projects exist only in the emulator');
-if (!/(^|-)dev(-|$)/.test(project)) fail(`"${project}" is not marked as a development project (expected "-dev" in the id)`);
+function readEnvLocal() {
+  const file = resolve(root, '.env.local');
+  if (!existsSync(file)) return null;
+  const env = {};
+  for (const line of readFileSync(file, 'utf8').split(/\r?\n/)) {
+    const m = /^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/.exec(line);
+    if (m && !line.trim().startsWith('#')) env[m[1]] = m[2];
+  }
+  return env;
+}
 
-console.log('• Running the Firestore rules tests on the emulator first …');
+const envLocal = readEnvLocal();
+const check = validateDeployArgs(process.argv.slice(2), envLocal ? (envLocal.VITE_FIREBASE_PROJECT_ID ?? '') : null);
+if (!check.ok) fail(check.reason);
+const { project, confirmed } = check;
+console.log(`• Target project: ${project} (allowlisted${envLocal ? ', matches v2/.env.local' : ''})`);
+
+console.log('• Running the Firestore rules + sync security tests on the emulator (demo project, local only) …');
 const test = spawnSync('npm', ['run', 'test:emulator'], { cwd: root, stdio: 'inherit', shell: true });
-if (test.status !== 0) fail('rules tests failed — not deploying');
+if (test.status !== 0) fail('emulator tests failed — not deploying');
 
-const cmd = ['firebase', 'deploy', '--only', 'firestore:rules', '--project', project];
-if (!confirm) {
-  console.log(`\nDry run OK. To deploy, the product owner runs:\n  npx ${cmd.join(' ')}\nor re-runs this script with --confirm.`);
+const cmd = ['firebase', 'deploy', '--only', 'firestore:rules', '--project', project, '--non-interactive'];
+if (!confirmed) {
+  console.log('\n✔ Dry run OK — no Firebase CLI cloud command was executed.');
+  console.log(`  After explicit approval the owner runs:\n    npm run rules:deploy:dev -- --project ${project} --confirm ${project}`);
+  console.log(`  which executes (after a read-only database check):\n    npx ${cmd.join(' ')}`);
   process.exit(0);
 }
+
+// Read-only probe: refuse if the (default) database does not exist.
+const key = envLocal?.VITE_FIREBASE_API_KEY;
+if (!key) fail('VITE_FIREBASE_API_KEY missing in v2/.env.local (needed for the read-only database check)');
+const res = await fetch(`https://firestore.googleapis.com/v1/projects/${project}/databases/(default)/documents/users/deploy-precheck-readonly?key=${encodeURIComponent(key)}`);
+const body = await res.json().catch(() => ({}));
+const probe = interpretDatabaseProbe(res.status, body?.error?.status);
+if (!probe.exists) fail(probe.reason);
+console.log('• Firestore (default) database exists.');
+
 console.log(`• Deploying rules to ${project} …`);
 const deploy = spawnSync('npx', cmd, { cwd: root, stdio: 'inherit', shell: true });
 process.exit(deploy.status ?? 1);
