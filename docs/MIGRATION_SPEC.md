@@ -198,3 +198,23 @@ counterpart in the current vocabulary. 12 of their technical-info entries are st
 Execute the plan against real storage (with backup and download), write the v2 store, run the
 cloud merge after Google sign-in, compute the idempotency `inputHash`, and build the review UI
 for ambiguous mappings, orphans and deferred dvok5 data.
+
+## 8. Implementation status (Phase 3)
+
+The migration can now be **previewed and explicitly executed** by a signed-in user
+(account menu → «انتقال پیشرفت از نسخهٔ قدیمی…»). User guide: `docs/MIGRATION_GUIDE.md`.
+
+| Requirement | Implementation |
+|---|---|
+| Detect legacy data | Same origin: `readLegacySnapshot(localStorage)` (read-only; the API key is detected by name only). Other origins: JSON backup file (`features/progress/migration/backup.ts`) |
+| Validate | `parseBackup` (format, version, types, 5 MB limit; API key and sync code stripped with a warning) + Phase 2 parsers |
+| Preview | Matched entries, to import, already learned, **conflicts**, ambiguous keys (both entries marked), orphans with relocation hints, dvok5 status, items not migrated |
+| Backup | Secrets-free JSON download (`createBackup`) |
+| Confirmation | Explicit checkbox + button; nothing happens before it |
+| Import | Only adds `learned: true` (`origin: 'migration'`) for entries **without any record** in the account; an existing "not learned" is never overwritten (reported as a conflict) |
+| Verify | Waits for server confirmation; counts entries confirmed `learned` by the server |
+| Record | `users/{uid}/migrations/{sha256(input)}` (create-only by rules) + a local marker; a repeated import of the same data is blocked; a queued (offline) import resumes without duplicate writes |
+| Preserve | Legacy keys and `syncCodes` are never written; the same-origin test asserts `localStorage` is byte-identical afterwards |
+
+Not migrated in Phase 3: custom words, pronunciation settings and exposure (they remain in the
+legacy app). Relocation of the 7 orphaned Bautechnik words remains an open decision (ADR 0003).

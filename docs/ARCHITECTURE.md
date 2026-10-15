@@ -86,8 +86,12 @@ v2/src/models/, services/, hooks/, styles/
 v2/tests/unit/, v2/tests/e2e/
 ```
 
-Still planned (Phase 3+): Firebase Auth (Google, required for cloud features, see ADR 0003),
-`users/{uid}` Firestore data and `firestore.rules`, the server-side AI endpoint, the review and
+Phase 3 adds `v2/src/features/auth/` (Google sign-in), `v2/src/features/account/` (header account
+menu, sync status), `v2/src/features/progress/` (IndexedDB store, sync engine, Firestore adapters,
+migration workflow), `v2/firestore.rules`, `v2/firebase.json` and emulator tests
+(`v2/tests/emulator/`, `v2/tests/e2e-emulator/`). See ADR 0004 and `docs/SYNC_DESIGN.md`.
+
+Still planned (Phase 4+): production deployment, the server-side AI endpoint, the review and
 pronunciation engines, and a PWA service worker.
 
 ## v2 architecture (Phase 2)
@@ -120,3 +124,25 @@ Key rules:
 - Content is validated at startup (`ContentValidationError`). Ids come from the content and are
   never computed at runtime.
 - v2 writes exactly one browser key (`dv2.pref.theme.v1`). Legacy keys are never written.
+
+## v2 architecture (Phase 3: identity and progress)
+
+```mermaid
+flowchart LR
+  subgraph Browser["v2 app"]
+    UI["React UI<br/>AccountControl · ✓ checkboxes · SyncStatus · MigrationDialog"]
+    AP["AuthProvider<br/>(state machine)"]
+    PP["ProgressProvider<br/>one engine per uid"]
+    ENG["ProgressSyncEngine<br/>pending ?? confirmed"]
+    IDB[("IndexedDB<br/>[uid, wordId]")]
+  end
+  FA["Firebase Auth<br/>Google popup"]
+  FS[("Firestore<br/>users/{uid}/progress/{wordId}")]
+  RULES["firestore.rules<br/>owner-only, validated"]
+  UI --> AP --> FA
+  UI --> PP --> ENG
+  ENG <--> IDB
+  ENG -- "setDoc (serverTimestamp)" --> FS
+  FS -- "onSnapshot (confirmed docs)" --> ENG
+  RULES -. enforces .- FS
+```

@@ -34,7 +34,12 @@ npm run dev                         # http://localhost:5173/
 npm run typecheck && npm test       # strict TypeScript + Vitest
 npm run test:e2e                    # Playwright against the production build
 npm run build && npm run preview    # http://localhost:4173/
+npm run test:emulator               # Firestore rules + real-SDK sync tests (Java 21+)
+npm run test:e2e:emulator           # browser tests against the Firebase emulators (Java 21+)
 ```
+
+Firebase configuration and all manual console steps: [`FIREBASE_SETUP.md`](FIREBASE_SETUP.md).
+Copy `v2/.env.example` to `v2/.env.local` (git-ignored) for a real project; never commit it.
 
 Content in `v2/src/data/vocabulary/` was generated once by `v2/scripts/generate-content.mjs`.
 Do not re-run it for normal work: content is now edited in the JSON (ids stay), and every

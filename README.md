@@ -15,7 +15,10 @@ The production app is the single file `index.html` on `main` (unchanged).
 - **Phase 1 (foundation):** documentation and read-only baseline tests.
 - **Phase 2 (architecture, branch `refactor/pro-v2-architecture`):** an isolated React +
   TypeScript + Vite preview in [`v2/`](v2/README.md) that browses all 999 entries, with
-  stable word ids and tested, read-only migration-preparation logic. It is not deployed.
+  stable word ids and tested, read-only migration-preparation logic.
+- **Phase 3 (auth + sync, branch `feature/pro-v2-auth-sync`):** Google sign-in, personal progress
+  (IndexedDB + Firestore, per-user Security Rules, offline queue) and an explicit legacy migration.
+  Not deployed; Firebase must be configured manually ([docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md)).
 
 ## Quick start
 
@@ -37,4 +40,7 @@ cd v2 && npm ci && npm run dev   # v2 preview → http://localhost:5173/
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Current and target architecture |
 | [docs/adr/](docs/adr/) | Architecture Decision Records (0003 = accepted product requirements) |
 | [v2/README.md](v2/README.md) | v2 preview: commands, structure, visible differences |
+| [docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md) | Manual Firebase configuration (product owner) |
+| [docs/SYNC_DESIGN.md](docs/SYNC_DESIGN.md) | Progress storage, sync and conflict handling |
+| [docs/MIGRATION_GUIDE.md](docs/MIGRATION_GUIDE.md) | How users move legacy progress |
 | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Workflow, commands, rules |

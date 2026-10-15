@@ -1,8 +1,12 @@
 # Deutsch Vokabular 2.0: development preview (`v2/`)
 
-React 19 + TypeScript 7 (strict) + Vite 8. This is a **preview of vocabulary browsing only**.
-It is not deployed. The production app is still the legacy root `index.html`, which keeps all
-learning features (ticks, flashcards, pronunciation training, custom words, sync).
+React 19 + TypeScript 7 (strict) + Vite 8 + Firebase 13. Vocabulary browsing (public) plus, since
+Phase 3, **Google sign-in, personal learned-word progress, offline-capable cross-device sync and
+an explicit legacy migration**. It is not deployed. The production app is still the legacy root
+`index.html` (flashcards, pronunciation training, custom words remain there).
+
+Without Firebase configuration the app runs browse-only. Configure: `cp .env.example .env.local`
+and follow [`../docs/FIREBASE_SETUP.md`](../docs/FIREBASE_SETUP.md).
 
 ## Commands (run inside `v2/`)
 
@@ -14,6 +18,8 @@ learning features (ticks, flashcards, pronunciation training, custom words, sync
 | Type check | `npm run typecheck` |
 | Unit + component tests (Vitest, jsdom) | `npm test` |
 | Browser tests (Playwright; builds and previews automatically) | `npm run test:e2e` |
+| Firestore rules + real-SDK sync tests on the emulators (Java 21+) | `npm run test:emulator` |
+| Browser tests against the emulators (Java 21+) | `npm run test:e2e:emulator` |
 | Production build → `v2/dist/` | `npm run build` |
 | Preview the production build | `npm run preview`, then open <http://localhost:4173/> |
 | Absolute base path, e.g. for GitHub Pages | `V2_BASE=/Deutsch-Vokabular/ npm run build` (default `./` works under any sub-path) |
@@ -27,9 +33,13 @@ src/
   app/App.tsx                     application shell (header, navigation, active category)
   components/                     generic UI: Header, TabList (ARIA tabs), ThemeToggle, EmptyState
   features/
-    vocabulary/                   navigation state hook + table/cards/badges/technical info
+    vocabulary/                   navigation state hook + table/cards/badges/technical info, ✓ checkbox
     pronunciation/                Web Speech service, provider, PronunciationButton
-    progress/migration/           read-only legacy migration preparation (not used by the UI yet)
+    auth/                         AuthService (Firebase adapter), AuthProvider state machine, Persian errors
+    account/                      header account menu, sync status, error banner
+    progress/                     model, IndexedDB store, sync engine, Firestore adapters, provider, stats
+    progress/migration/           legacy parsing/plan (Phase 2) + backup, importer, MigrationDialog
+  services/firebase/              public config (VITE_FIREBASE_*), lazy SDK initialisation
   data/
     vocabulary/                   versioned content (*.v1.json) + immutable id registry
     legacy/                       historical dvok5 index maps
@@ -41,6 +51,9 @@ src/
 scripts/generate-content.mjs      one-time legacy → v2 content converter
 tests/unit/                       Vitest (data integrity, ids, migration, components, security, speech)
 tests/e2e/                        Playwright (desktop + Pixel 7 Chromium against `vite preview`)
+tests/emulator/                   rules + sync tests on the Firebase emulators
+tests/e2e-emulator/               Playwright against an emulator-configured build
+firestore.rules, firebase.json    Security Rules (NOT deployed) and emulator config
 ```
 
 Dependency direction: `app → features/components → services/hooks → models/data`. Features do
@@ -50,7 +63,8 @@ not import each other except `vocabulary → pronunciation`.
 
 | Difference | Reason |
 |---|---|
-| No ✓ checkbox column, no progress bars, no "🔄 مرور" tab, no ↺ / 🔗 buttons, no "+" button | Progress, review, sync and custom words are out of scope for Phase 2 and remain in the legacy app. |
+| ✓ column and progress bars appear **only when signed in** (Phase 3); no "🔄 مرور" tab, no ↺ / 🔗 buttons, no "+" button | Review, reset, code-based sync and custom words remain in the legacy app. Sync is now account-based. |
+| Header: «ورود با گوگل» / account avatar menu and a sync status indicator | Phase 3 sign-in. |
 | "v2 preview" badge in the header; word counter shows "156 Wörter" instead of "0/156" | Marks the preview. No progress exists yet. |
 | The Bauphysik main tab now shows its blue accent when active | Legacy CSS selector bug (`[data-theme="bauphysik"] .mbtn.active` never matches). |
 | The dark-mode table header stays dark and readable | Legacy uses `--tp` (near-white in dark mode) as the header background, which makes the white header text unreadable. |
@@ -65,5 +79,6 @@ not import each other except `vocabulary → pronunciation`.
 
 - Fonts (Inter, Vazir) still load from Google Fonts and jsDelivr, as in the legacy app.
   Without network access the system fonts are used.
-- There is no PWA/service worker yet, so the preview is not available offline.
+- There is no PWA/service worker yet: the app shell is not available offline, but progress changes made while offline are queued and synced later.
+- Real Google sign-in has not been verified in automated tests (emulator only); see FIREBASE_SETUP.md §5.
 - TTS quality depends on the German voices installed on the device.

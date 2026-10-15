@@ -159,3 +159,16 @@ flowchart LR
   dvok5_pron_selected_tabs -- "MainKey[]" --> DATA
   dvok5_apikey --> AI["api.anthropic.com"]
 ```
+
+## 8. v2 storage (Phase 3)
+
+v2 never writes the legacy keys above. Its own storage:
+
+| Store | Key | Content |
+|---|---|---|
+| `localStorage` | `dv2.pref.theme.v1` | `'light' \| 'dark'` (device preference) |
+| IndexedDB `deutsch-vokabular-v2` / `progress-confirmed` | `[uid, wordId]` | `{ uid, wordId, learned, serverUpdatedAt, opId, origin }` |
+| IndexedDB / `progress-pending` | `[uid, wordId]` | `{ uid, wordId, opId, learned, origin, clientUpdatedAt, state: 'queued' \| 'acked', attempts, lastError }` |
+| IndexedDB / `meta` | `[uid, key]` | e.g. `migration:<sha256>` markers; `['__device__', 'deviceId']` = random device id |
+| Firebase Auth | (SDK-managed IndexedDB) | session |
+| Firestore | `users/{uid}`, `users/{uid}/progress/{wordId}`, `users/{uid}/migrations/{sha256}` | see `docs/SYNC_DESIGN.md` and `v2/firestore.rules` |
