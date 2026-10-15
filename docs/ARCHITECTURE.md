@@ -94,8 +94,12 @@ migration workflow), `v2/firestore.rules`, `v2/firebase.json` and emulator tests
 Phase 4A adds `v2/src/features/review/` (flashcards: pure deck/session/outcome logic, a
 device-local review log in IndexedDB v2, and the «🔄 مرور» tab). See `docs/REVIEW_DESIGN.md`.
 
-Still planned: production deployment, the server-side AI endpoint, the pronunciation/shadowing
-engine, cloud-synced review state (proposal in `REVIEW_DESIGN.md` §6) and a PWA service worker.
+Phase 4B adds `v2/src/features/shadowing/` (pure step plan, weighted queue and a playback engine
+over the shared speech service, device-local exposure in IndexedDB v3, the «🗣 تلفظ» tab) and
+`v2/src/styles/practice.css` (shared practice UI). See `docs/SHADOWING_DESIGN.md`.
+
+Still planned: production deployment, the server-side AI endpoint, cloud-synced review/practice
+state (proposal in `REVIEW_DESIGN.md` §6) and a PWA service worker.
 
 ## v2 architecture (Phase 2)
 

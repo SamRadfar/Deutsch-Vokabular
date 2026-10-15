@@ -2,10 +2,9 @@
 
 Branch: `chore/pro-v2-firebase-validation`.
 
-**Status (2026-10-16): dev project configured, rules deployed and verified; real signed-in user tests (§7) still pending.** No real Firebase project is configured (there
-is no `v2/.env.local`), so **real Google sign-in and real Cloud Firestore have not been tested**.
-Everything that can be checked locally has been checked (§2–§6). The live protocol (§7) is ready
-for when the product owner has completed `FIREBASE_SETUP.md`.
+**Status (2026-10-16): dev project configured, rules deployed and verified; real Google sign-in and a first real progress write confirmed (§8); the rest of §7 is still pending.**
+Everything that can be checked locally has been checked (§2–§6). The remaining live protocol (§7)
+needs the product owner's Google account(s).
 
 ## 1. Result legend
 
@@ -208,7 +207,8 @@ Browser 2 must **not** flip back while its change is pending.
 | Firebase dev project | ✅ `deutsch-vokabular-v2-dev` (Spark, Firestore `(default)` in europe-west3, Google provider enabled, `localhost` authorised) |
 | Rules deployed to the dev project | ✅ 2026-10-15 22:06 UTC, ruleset `276744ea…`, released to `cloud.firestore` of `deutsch-vokabular-v2-dev` only; live source identical to `v2/firestore.rules` |
 | Deployed rules on Google's Rules engine (`projects.test`, no data access) | ✅ 14/14: owner allowed, other user/anonymous denied, deletes denied, `users` listing denied, `syncCodes` denied |
-| Real Google sign-in (§7.1) | ❌ Not tested |
-| Real Firestore and scenarios A–D (§7.2–7.6) | ❌ Not tested |
+| Real Google sign-in (§7.1) | ⚠️ Partly: on 2026-10-15 22:53 UTC the product owner signed in with Google on `localhost` (dev project). A read-only check found one `google.com` user. Reload, cancel, popup-blocked and other A-steps were not reported |
+| Real Firestore (§7.2) | ⚠️ Partly: `users/<uid>` exists with `schemaVersion: 1` and `profile` only (**no email**); one progress doc (`die Außenwand`) has `learned: true`, `origin: "toggle"`, a server `updatedAt` and 8 fields. Read-only check with the owner's CLI login; no data changed |
+| Reload persistence, flashcard result, offline scenario B, scenarios A/C/D | ❌ Not tested with real accounts (emulator only) |
 | Physical Android / iPhone | ❌ Not tested |
 | Production deployment | ❌ Not approved (out of scope) |
