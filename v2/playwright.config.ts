@@ -20,5 +20,7 @@ export default defineConfig({
     url: 'http://localhost:4173/',
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
+    // Build without any .env file: this suite verifies the unconfigured (browse-only) app.
+    env: { DV2_HERMETIC: '1' },
   },
 });

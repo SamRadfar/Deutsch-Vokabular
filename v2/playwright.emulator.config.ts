@@ -5,6 +5,8 @@ import { defineConfig, devices } from '@playwright/test';
 // the emulators first. The Auth Emulator's sign-in popup is a stand-in: these tests do NOT
 // verify real Google OAuth.
 export const EMULATOR_ENV = {
+  // Ignore any .env.local: the build must only see the emulator values below.
+  DV2_HERMETIC: '1',
   VITE_FIREBASE_ENV: 'emulator',
   VITE_FIREBASE_API_KEY: 'demo-api-key',
   VITE_FIREBASE_AUTH_DOMAIN: 'demo-deutsch-vokabular.firebaseapp.com',

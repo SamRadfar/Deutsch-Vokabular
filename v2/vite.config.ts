@@ -6,8 +6,14 @@ import react from '@vitejs/plugin-react';
 // Override with V2_BASE=/Deutsch-Vokabular/ for an absolute base if ever needed.
 const base = process.env.V2_BASE ?? './';
 
+// Tests must never pick up a developer's .env.local (it may point at a real Firebase project).
+// Vitest and the Playwright builds (DV2_HERMETIC=1) load NO .env files; they only see explicitly
+// set process variables (e.g. the emulator configuration).
+const hermetic = !!process.env.VITEST || process.env.DV2_HERMETIC === '1';
+
 export default defineConfig({
   base,
+  ...(hermetic ? { envDir: false as const } : {}),
   plugins: [react()],
   build: {
     outDir: 'dist',

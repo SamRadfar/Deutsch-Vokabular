@@ -25,6 +25,8 @@ test.describe('application', () => {
     await page.goto('./');
     await expect(page.getByRole('heading', { name: 'Deutsch Vokabular' })).toBeVisible();
     await expect(page.getByText('999 واژه')).toBeVisible();
+    // Hermetic build: no developer .env.local may leak in (badge would show "dev: …").
+    await expect(page.getByTestId('env-badge')).toHaveText('v2 preview');
     const tabs = page.getByRole('tablist', { name: 'Kategorien' }).getByRole('tab');
     await expect(tabs).toHaveCount(7);
     await expect(tabs).toHaveText(categories.map((c) => c.label));
