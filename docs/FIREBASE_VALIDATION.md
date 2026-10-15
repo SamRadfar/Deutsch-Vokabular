@@ -2,7 +2,7 @@
 
 Branch: `chore/pro-v2-firebase-validation`.
 
-**Status: ⏸ waiting for external configuration.** No real Firebase project is configured (there
+**Status (2026-10-16): dev project configured, rules deployed and verified; real signed-in user tests (§7) still pending.** No real Firebase project is configured (there
 is no `v2/.env.local`), so **real Google sign-in and real Cloud Firestore have not been tested**.
 Everything that can be checked locally has been checked (§2–§6). The live protocol (§7) is ready
 for when the product owner has completed `FIREBASE_SETUP.md`.
@@ -205,8 +205,9 @@ Browser 2 must **not** flip back while its change is pending.
 |---|---|
 | Code safeguards, fixes, documentation | ✅ done |
 | Emulator validation (rules, sync, 6 browser projects) | ✅ |
-| Firebase dev project | ⏸ waiting for owner |
-| Rules deployed to the dev project | ⏸ waiting for approval |
+| Firebase dev project | ✅ `deutsch-vokabular-v2-dev` (Spark, Firestore `(default)` in europe-west3, Google provider enabled, `localhost` authorised) |
+| Rules deployed to the dev project | ✅ 2026-10-15 22:06 UTC, ruleset `276744ea…`, released to `cloud.firestore` of `deutsch-vokabular-v2-dev` only; live source identical to `v2/firestore.rules` |
+| Deployed rules on Google's Rules engine (`projects.test`, no data access) | ✅ 14/14: owner allowed, other user/anonymous denied, deletes denied, `users` listing denied, `syncCodes` denied |
 | Real Google sign-in (§7.1) | ❌ Not tested |
 | Real Firestore and scenarios A–D (§7.2–7.6) | ❌ Not tested |
 | Physical Android / iPhone | ❌ Not tested |
