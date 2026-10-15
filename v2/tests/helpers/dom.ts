@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import type { SpeechService } from '../../src/features/pronunciation/speechService';
+import type { GermanVoiceStatus, SpeakOptions, SpeechService } from '../../src/features/pronunciation/speechService';
 
 /** Install a matchMedia whose result is decided per query. */
 export function mockMatchMedia(matches: (query: string) => boolean): void {
@@ -22,14 +22,33 @@ export function mockMatchMedia(matches: (query: string) => boolean): void {
 export const MOBILE = (q: string) => q.includes('max-width: 640px');
 export const DARK_SYSTEM = (q: string) => q.includes('prefers-color-scheme: dark');
 
-/** A fake speech service that records calls; `finish()` simulates the end of playback. */
-export function fakeSpeech(supported = true) {
-  let pendingEnd: (() => void) | undefined;
-  const service: SpeechService & { finish(): void } = {
+/**
+ * A fake speech service that records calls and behaves like the browser: a new speak() or cancel()
+ * interrupts the current utterance (onError "interrupted", then onEnd). `finish()` ends the current
+ * utterance normally, `fail(code)` makes it fail.
+ */
+export function fakeSpeech(supported = true, voice: GermanVoiceStatus = 'available') {
+  let pending: SpeakOptions | undefined;
+  const interrupt = () => {
+    const p = pending;
+    pending = undefined;
+    if (p) { p.onError?.('interrupted'); p.onEnd?.(); }
+  };
+  const service: SpeechService & { finish(): void; fail(code: string): void; readonly speaking: boolean } = {
     supported,
-    speak: vi.fn((_text: string, opts?: { onEnd?: () => void }) => { pendingEnd = opts?.onEnd; }),
-    cancel: vi.fn(),
-    finish: () => pendingEnd?.(),
+    speak: vi.fn((_text: string, opts?: SpeakOptions) => {
+      interrupt();
+      if (!supported) { opts?.onError?.('unsupported'); opts?.onEnd?.(); return; }
+      pending = opts ?? {};
+      pending.onStart?.();
+    }),
+    cancel: vi.fn(interrupt),
+    germanVoice: () => voice,
+    whenVoicesReady: () => Promise.resolve(),
+    onVoicesChanged: () => () => {},
+    finish: () => { const p = pending; pending = undefined; p?.onEnd?.(); },
+    fail: (code: string) => { const p = pending; pending = undefined; p?.onError?.(code); p?.onEnd?.(); },
+    get speaking() { return pending !== undefined; },
   };
   return service;
 }

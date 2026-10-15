@@ -3,6 +3,8 @@ import { createSpeechService, type SpeechService } from './speechService';
 
 interface PronunciationContextValue {
   supported: boolean;
+  /** The one speech service of the app (the shadowing player drives it directly). */
+  service: SpeechService;
   /** Key of the item currently being spoken (null = silent). */
   speakingKey: string | null;
   /** Speak `text`; calling again with the same key while it is speaking stops it (legacy behaviour). */
@@ -38,7 +40,7 @@ export function PronunciationProvider({ children, service }: { children: ReactNo
     });
   }, [speech]);
 
-  const value = useMemo(() => ({ supported: speech.supported, speakingKey, toggle }), [speech.supported, speakingKey, toggle]);
+  const value = useMemo(() => ({ supported: speech.supported, service: speech, speakingKey, toggle }), [speech, speakingKey, toggle]);
   return <PronunciationContext.Provider value={value}>{children}</PronunciationContext.Provider>;
 }
 

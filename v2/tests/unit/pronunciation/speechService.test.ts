@@ -67,4 +67,65 @@ describe('speechService', () => {
     expect(speechTextForWord('dieser Satz')).toBe('dieser Satz');
     expect(speechTextForWord('belegen')).toBe('belegen');
   });
+
+  it('reports errors with their code before onEnd (e.g. autoplay blocked)', () => {
+    const { synth, spoken } = fakeSynth([{ lang: 'de-DE', name: 'Anna' }]);
+    const service = createSpeechService({ speechSynthesis: synth as never, SpeechSynthesisUtterance: FakeUtterance as never });
+    const calls: string[] = [];
+    service.speak('Wand', { onError: (c) => calls.push(`error:${c}`), onEnd: () => calls.push('end') });
+    (spoken[0]!.onerror as unknown as (e: { error: string }) => void)({ error: 'not-allowed' });
+    spoken[0]!.onend?.();
+    expect(calls).toEqual(['error:not-allowed', 'end']);
+  });
+
+  it('unsupported browsers report "unsupported" and have no German voice', () => {
+    const service = createSpeechService({});
+    const onError = vi.fn();
+    service.speak('x', { onError });
+    expect(onError).toHaveBeenCalledWith('unsupported');
+    expect(service.germanVoice()).toBe('missing');
+  });
+
+  it('German voice status: unknown while the list is empty, then available / missing', () => {
+    const list: Array<{ lang: string; name: string }> = [];
+    const { synth } = fakeSynth(list);
+    const service = createSpeechService({ speechSynthesis: synth as never, SpeechSynthesisUtterance: FakeUtterance as never });
+    expect(service.germanVoice()).toBe('unknown');
+    list.push({ lang: 'en-GB', name: 'Daniel' });
+    expect(service.germanVoice()).toBe('missing');
+    list.push({ lang: 'de-AT', name: 'Anna' });
+    expect(service.germanVoice()).toBe('available');
+  });
+
+  it('waits for asynchronously loaded voices (voiceschanged), bounded by a timeout', async () => {
+    vi.useFakeTimers();
+    try {
+      const list: Array<{ lang: string; name: string }> = [];
+      const target = new EventTarget();
+      const synth = Object.assign(target, { getVoices: () => list, speak: vi.fn(), cancel: vi.fn() });
+      const service = createSpeechService({ speechSynthesis: synth as never, SpeechSynthesisUtterance: FakeUtterance as never });
+      const changed = vi.fn();
+      const off = service.onVoicesChanged(changed);
+      let ready = false;
+      void service.whenVoicesReady(1500).then(() => { ready = true; });
+      list.push({ lang: 'de-DE', name: 'Anna' });
+      target.dispatchEvent(new Event('voiceschanged'));
+      await Promise.resolve();
+      expect(ready).toBe(true);
+      expect(changed).toHaveBeenCalledOnce();
+      off();
+      target.dispatchEvent(new Event('voiceschanged'));
+      expect(changed).toHaveBeenCalledOnce();
+
+      list.length = 0;
+      let late = false;
+      void service.whenVoicesReady(1500).then(() => { late = true; });
+      await vi.advanceTimersByTimeAsync(1499);
+      expect(late).toBe(false);
+      await vi.advanceTimersByTimeAsync(1);
+      expect(late).toBe(true); // no voices ever: the session still starts
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

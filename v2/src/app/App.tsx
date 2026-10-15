@@ -4,8 +4,9 @@ import { useTheme } from '../hooks/useTheme';
 import { PronunciationProvider } from '../features/pronunciation/PronunciationProvider';
 import type { SpeechService } from '../features/pronunciation/speechService';
 import type { CategoryKey } from '../models/vocabulary';
-import { MainNavigation, MAIN_TABS_PREFIX, REVIEW_TAB_ID } from '../features/vocabulary/components/MainNavigation';
+import { MainNavigation, MAIN_TABS_PREFIX, REVIEW_TAB_ID, SHADOWING_TAB_ID } from '../features/vocabulary/components/MainNavigation';
 import { ReviewPanel } from '../features/review/components/ReviewPanel';
+import { ShadowingPanel } from '../features/shadowing/components/ShadowingPanel';
 import { CategoryView } from '../features/vocabulary/components/CategoryView';
 import type { EntryProgress } from '../features/vocabulary/components/LearnedCheckbox';
 import { useVocabularyNavigation } from '../features/vocabulary/useVocabularyNavigation';
@@ -57,19 +58,20 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
   const category = nav.activeCategory;
   const progress = useProgress();
   const [migrationOpen, setMigrationOpen] = useState(false);
-  const [reviewOpen, setReviewOpen] = useState(false);
-  // The review panel stays mounted once opened, so a running session survives a look at a category.
-  const [reviewMounted, setReviewMounted] = useState(false);
+  /** null = a vocabulary category; otherwise the practice tab that is open. */
+  const [practiceTab, setPracticeTab] = useState<typeof REVIEW_TAB_ID | typeof SHADOWING_TAB_ID | null>(null);
+  // Practice panels stay mounted once opened, so a running session survives a look at another tab.
+  const [mounted, setMounted] = useState<ReadonlySet<string>>(new Set());
   const selectMainTab = useCallback((id: string) => {
-    if (id === REVIEW_TAB_ID) {
-      setReviewOpen(true);
-      setReviewMounted(true);
+    if (id === REVIEW_TAB_ID || id === SHADOWING_TAB_ID) {
+      setPracticeTab(id);
+      setMounted((m) => (m.has(id) ? m : new Set([...m, id])));
     } else {
-      setReviewOpen(false);
+      setPracticeTab(null);
       nav.selectCategory(id as CategoryKey);
     }
   }, [nav.selectCategory]);
-  // A session belongs to one account: switching or signing out starts the review tab afresh.
+  // A session belongs to one account: switching or signing out starts the practice tabs afresh.
   const reviewOwner = progress.status === 'unavailable' ? 'signed-out' : progress.uid;
 
   const ready = progress.status === 'ready' ? progress : null;
@@ -101,11 +103,11 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
             <AccountControl totalEntries={repository.totalEntries} learnedCount={learnedCount} onOpenMigration={() => setMigrationOpen(true)} />
           </>
         )}
-        navigation={<MainNavigation categories={repository.categories} activeId={reviewOpen ? REVIEW_TAB_ID : category.key} onSelect={selectMainTab} />}
+        navigation={<MainNavigation categories={repository.categories} activeId={practiceTab ?? category.key} onSelect={selectMainTab} />}
       />
       <AuthErrorBanner />
       <main className="mcontent">
-        {reviewOpen ? null : (
+        {practiceTab ? null : (
           <div role="tabpanel" id={panelElementId(MAIN_TABS_PREFIX, category.key)} aria-labelledby={tabElementId(MAIN_TABS_PREFIX, category.key)}>
             <CategoryView
               key={category.key}
@@ -118,9 +120,14 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
             />
           </div>
         )}
-        {reviewMounted ? (
-          <div role="tabpanel" id={panelElementId(MAIN_TABS_PREFIX, REVIEW_TAB_ID)} aria-labelledby={tabElementId(MAIN_TABS_PREFIX, REVIEW_TAB_ID)} hidden={!reviewOpen}>
-            <ReviewPanel key={reviewOwner} categories={repository.categories} active={reviewOpen} />
+        {mounted.has(REVIEW_TAB_ID) ? (
+          <div role="tabpanel" id={panelElementId(MAIN_TABS_PREFIX, REVIEW_TAB_ID)} aria-labelledby={tabElementId(MAIN_TABS_PREFIX, REVIEW_TAB_ID)} hidden={practiceTab !== REVIEW_TAB_ID}>
+            <ReviewPanel key={reviewOwner} categories={repository.categories} active={practiceTab === REVIEW_TAB_ID} />
+          </div>
+        ) : null}
+        {mounted.has(SHADOWING_TAB_ID) ? (
+          <div role="tabpanel" id={panelElementId(MAIN_TABS_PREFIX, SHADOWING_TAB_ID)} aria-labelledby={tabElementId(MAIN_TABS_PREFIX, SHADOWING_TAB_ID)} hidden={practiceTab !== SHADOWING_TAB_ID}>
+            <ShadowingPanel key={reviewOwner} categories={repository.categories} active={practiceTab === SHADOWING_TAB_ID} />
           </div>
         ) : null}
       </main>

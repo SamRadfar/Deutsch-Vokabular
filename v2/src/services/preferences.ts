@@ -5,6 +5,7 @@
 export const PREFERENCE_KEYS = {
   theme: 'dv2.pref.theme.v1',
   review: 'dv2.pref.review.v1',
+  shadowing: 'dv2.pref.shadowing.v1',
 } as const;
 
 export type ThemePreference = 'light' | 'dark';
@@ -65,6 +66,24 @@ export function readReviewPreferences(): Partial<ReviewPreferences> {
 export function writeReviewPreferences(prefs: ReviewPreferences): void {
   try {
     safeStorage()?.setItem(PREFERENCE_KEYS.review, JSON.stringify(prefs));
+  } catch {
+    /* ignore: the choice still applies for this session */
+  }
+}
+
+/** Raw JSON preference (the feature sanitises it); null when absent or unreadable. */
+export function readJsonPreference(key: string): unknown {
+  try {
+    const raw = safeStorage()?.getItem(key);
+    return raw ? (JSON.parse(raw) as unknown) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function writeJsonPreference(key: string, value: unknown): void {
+  try {
+    safeStorage()?.setItem(key, JSON.stringify(value));
   } catch {
     /* ignore: the choice still applies for this session */
   }

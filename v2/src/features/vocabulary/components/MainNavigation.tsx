@@ -4,10 +4,12 @@ import { TabList } from '../../../components/TabList/TabList';
 export const MAIN_TABS_PREFIX = 'main';
 /** Id of the flashcard review tab, next to the category tabs (legacy "🔄 مرور"). */
 export const REVIEW_TAB_ID = 'review';
+/** Id of the shadowing / pronunciation practice tab. */
+export const SHADOWING_TAB_ID = 'shadowing';
 
 interface Props {
   categories: readonly Category[];
-  /** A category key or REVIEW_TAB_ID. */
+  /** A category key, REVIEW_TAB_ID or SHADOWING_TAB_ID. */
   activeId: string;
   onSelect(id: string): void;
 }
@@ -25,6 +27,7 @@ export function MainNavigation({ categories, activeId, onSelect }: Props) {
         items={[
           ...categories.map((c) => ({ id: c.key, content: c.label, dataCategory: c.theme })),
           { id: REVIEW_TAB_ID, content: <span lang="fa">🔄 مرور</span>, dataCategory: 'review' },
+          { id: SHADOWING_TAB_ID, content: <span lang="fa">🗣 تلفظ</span>, dataCategory: 'review' },
         ]}
       />
     </nav>

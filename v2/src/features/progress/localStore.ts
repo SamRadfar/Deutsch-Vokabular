@@ -4,6 +4,7 @@
 
 import type { ConfirmedProgress, PendingOp } from './model';
 import { mergeReview, type ReviewEvent, type ReviewRecord } from '../review/model';
+import { bumpExposure, type ExposureRecord } from '../shadowing/model';
 
 export interface LocalSnapshot {
   confirmed: ConfirmedProgress[];
@@ -23,12 +24,19 @@ export interface ProgressLocalStore {
   loadReviews(uid: string): Promise<ReviewRecord[]>;
   /** Merges one answer into the stored record inside a single transaction (safe across tabs). */
   recordReview(uid: string, event: ReviewEvent): Promise<ReviewRecord>;
+  /** Shadowing exposure (how often each word was practised) of this uid — device-local only. */
+  loadExposure(uid: string): Promise<ExposureRecord[]>;
+  /** Adds one completed practice of a word inside a single transaction and returns the record. */
+  recordExposure(uid: string, wordId: string, at: number): Promise<ExposureRecord>;
 }
 
 export const DB_NAME = 'deutsch-vokabular-v2';
-// v1: progress + meta. v2 (Phase 4A): + review-state. Upgrades only ever add stores.
-const DB_VERSION = 2;
-const STORES = { confirmed: 'progress-confirmed', pending: 'progress-pending', meta: 'meta', reviews: 'review-state' } as const;
+// v1: progress + meta. v2 (Phase 4A): + review-state. v3 (Phase 4B): + shadowing-exposure.
+// Upgrades only ever add stores.
+const DB_VERSION = 3;
+const STORES = {
+  confirmed: 'progress-confirmed', pending: 'progress-pending', meta: 'meta', reviews: 'review-state', exposure: 'shadowing-exposure',
+} as const;
 
 const req = <T>(r: IDBRequest<T>) => new Promise<T>((resolve, reject) => {
   r.onsuccess = () => resolve(r.result);
@@ -50,6 +58,7 @@ export function openProgressDb(factory: IDBFactory = indexedDB, name = DB_NAME):
       if (!db.objectStoreNames.contains(STORES.pending)) db.createObjectStore(STORES.pending, { keyPath: ['uid', 'wordId'] });
       if (!db.objectStoreNames.contains(STORES.meta)) db.createObjectStore(STORES.meta, { keyPath: ['uid', 'key'] });
       if (!db.objectStoreNames.contains(STORES.reviews)) db.createObjectStore(STORES.reviews, { keyPath: ['uid', 'wordId'] });
+      if (!db.objectStoreNames.contains(STORES.exposure)) db.createObjectStore(STORES.exposure, { keyPath: ['uid', 'wordId'] });
     };
     open.onsuccess = () => {
       // A newer version opened in another tab: release this connection so its upgrade is not blocked.
@@ -130,6 +139,22 @@ export function createIndexedDbStore(dbPromise: Promise<IDBDatabase>): ProgressL
       await done(tx);
       return next;
     },
+    async loadExposure(uid) {
+      const db = await dbPromise;
+      const rows = (await req(db.transaction(STORES.exposure, 'readonly').objectStore(STORES.exposure).getAll(uidRange(uid)))) as
+        Stored<ExposureRecord>[];
+      return rows.filter((r) => r.uid === uid).map(strip);
+    },
+    async recordExposure(uid, wordId, at) {
+      const db = await dbPromise;
+      const tx = db.transaction(STORES.exposure, 'readwrite');
+      const store = tx.objectStore(STORES.exposure);
+      const current = (await req(store.get([uid, wordId]))) as Stored<ExposureRecord> | undefined;
+      const next = bumpExposure(current ? strip(current) : undefined, wordId, at);
+      store.put({ ...next, uid });
+      await done(tx);
+      return next;
+    },
   };
 }
 
@@ -139,6 +164,7 @@ export function createMemoryStore(): ProgressLocalStore {
   const pending = new Map<string, Map<string, PendingOp>>();
   const meta = new Map<string, unknown>();
   const reviews = new Map<string, Map<string, ReviewRecord>>();
+  const exposure = new Map<string, Map<string, ExposureRecord>>();
   const part = <T>(m: Map<string, Map<string, T>>, uid: string) => {
     let p = m.get(uid);
     if (!p) { p = new Map(); m.set(uid, p); }
@@ -162,6 +188,12 @@ export function createMemoryStore(): ProgressLocalStore {
     async recordReview(uid, event) {
       const next = mergeReview(part(reviews, uid).get(event.wordId), event);
       part(reviews, uid).set(event.wordId, next);
+      return clone(next);
+    },
+    async loadExposure(uid) { return [...part(exposure, uid).values()].map(clone); },
+    async recordExposure(uid, wordId, at) {
+      const next = bumpExposure(part(exposure, uid).get(wordId), wordId, at);
+      part(exposure, uid).set(wordId, next);
       return clone(next);
     },
   };
