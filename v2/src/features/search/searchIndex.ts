@@ -2,8 +2,8 @@
 // index is built; a search is a linear scan of pre-folded strings (well under a millisecond-range
 // cost per keystroke for this dataset), so no worker or external index is needed.
 
-import type { CategoryKey, WordId } from '../../models/vocabulary';
-import type { DeckCard } from '../review/deck';
+import type { WordId } from '../../models/vocabulary';
+import type { DeckCard, PracticeCategoryKey } from '../review/deck';
 import { fold, originalRange, queryTerms, type Folded } from './normalize';
 
 export type SearchField = 'word' | 'fa' | 'example' | 'exampleFa';
@@ -12,7 +12,7 @@ export const SEARCH_FIELDS: readonly SearchField[] = ['word', 'fa', 'example', '
 export type StatusFilter = 'all' | 'learned' | 'unlearned';
 
 export interface SearchFilters {
-  category: 'all' | CategoryKey;
+  category: 'all' | PracticeCategoryKey;
   /** Subcategory id within the chosen category, or 'all'. */
   subtab: string;
   status: StatusFilter;

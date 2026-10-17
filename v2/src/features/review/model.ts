@@ -1,4 +1,5 @@
-import { WORD_ID_PATTERN, type WordId } from '../../models/vocabulary';
+import type { WordId } from '../../models/vocabulary';
+import { isPracticeWordId } from '../personal/model';
 
 /**
  * Flashcard review outcomes (device-local, schema version 1).
@@ -46,7 +47,7 @@ const count = (v: unknown) => typeof v === 'number' && Number.isInteger(v) && v 
 export function isValidReviewRecord(r: unknown): r is ReviewRecord {
   if (typeof r !== 'object' || r === null) return false;
   const x = r as Record<string, unknown>;
-  return typeof x.wordId === 'string' && WORD_ID_PATTERN.test(x.wordId)
+  return typeof x.wordId === 'string' && isPracticeWordId(x.wordId) // built-in or personal word
     && (x.lastResult === 'know' || x.lastResult === 'again')
     && typeof x.lastReviewedAt === 'number' && Number.isFinite(x.lastReviewedAt)
     && count(x.knowCount) && count(x.againCount);

@@ -34,10 +34,10 @@ async function signedIn() {
 }
 
 describe('navigation', () => {
-  it('four main sections as links with aria-current; categories are secondary tabs of "words"', async () => {
+  it('main sections as links with aria-current; categories are secondary tabs of "words"', async () => {
     const { user } = signedOut();
     const nav = screen.getByRole('navigation', { name: 'بخش‌های اصلی' });
-    expect(within(nav).getAllByRole('link').map((l) => l.textContent)).toEqual(['📚واژه‌ها', '🔄مرور', '🗣تلفظ', '📊پیشرفت']);
+    expect(within(nav).getAllByRole('link').map((l) => l.textContent)).toEqual(['📚واژه‌ها', '⭐واژه‌های من', '🔄مرور', '🗣تلفظ', '📊پیشرفت']);
     expect(link('واژه‌ها')).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('tablist', { name: 'Kategorien' })).toBeInTheDocument();
     expect(document.title).toMatch(/^واژه‌ها · /);

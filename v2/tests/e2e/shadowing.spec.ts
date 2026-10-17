@@ -127,7 +127,7 @@ test('leaving the tab stops the sound; coming back offers to continue', async ({
   await openSetup(page);
   await page.getByRole('button', { name: 'شروع تمرین (5 واژه)' }).click();
   await page.getByRole('link', { name: 'مرور', exact: true }).click();
-  expect(await page.evaluate(() => window.__speaking)).toBe(0);
+  await expect.poll(() => page.evaluate(() => window.__speaking)).toBe(0); // the pause runs in an effect after the render
   const n = (await spoken(page)).length;
   await page.waitForTimeout(2000);
   expect((await spoken(page)).length).toBe(n);

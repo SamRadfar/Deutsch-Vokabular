@@ -79,3 +79,7 @@
   .db-actions { grid-template-columns: 1fr; }
   .db-local { grid-template-columns: 1fr; }
 }
+
+.db-personal { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.db-personal .db-card__title { margin-bottom: 4px; }
+.db-personal .db-card__note { margin: 0; }

@@ -103,7 +103,7 @@ describe('ReviewLog persistence', () => {
 });
 
 describe('IndexedDB schema upgrade v1 → current', () => {
-  it('adds the review and shadowing stores and keeps existing progress data', async () => {
+  it('adds the review, shadowing and personal-word stores and keeps existing progress data', async () => {
     const factory = new IDBFactory();
     // A database as written by the Phase 3 app (version 1, three stores).
     await new Promise<void>((resolve, reject) => {
@@ -126,12 +126,13 @@ describe('IndexedDB schema upgrade v1 → current', () => {
     });
 
     const db = await openProgressDb(factory);
-    expect(db.version).toBe(3);
-    expect([...db.objectStoreNames].sort()).toEqual(['meta', 'progress-confirmed', 'progress-pending', 'review-state', 'shadowing-exposure']);
+    expect(db.version).toBe(4);
+    expect([...db.objectStoreNames].sort()).toEqual(['meta', 'personal-words', 'progress-confirmed', 'progress-pending', 'review-state', 'shadowing-exposure']);
     const store = createIndexedDbStore(Promise.resolve(db));
     expect((await store.load('alice')).confirmed).toEqual([{ wordId: A, learned: true, serverUpdatedAt: 5, opId: 'o1', origin: 'toggle' }]);
     expect(await store.getMeta('__device__', 'deviceId')).toBe('device-1');
     expect(await store.loadReviews('alice')).toEqual([]);
+    expect(await store.loadPersonalWords('alice')).toEqual([]);
   });
 
   it('an open older connection is released so the upgrade is not blocked', async () => {
@@ -142,12 +143,12 @@ describe('IndexedDB schema upgrade v1 → current', () => {
     first.close = () => { closed = true; originalClose(); };
     // Simulate a newer app version opening the same database in another tab.
     const upgraded = await new Promise<IDBDatabase>((resolve, reject) => {
-      const open = factory.open(DB_NAME, 4);
+      const open = factory.open(DB_NAME, 5);
       open.onsuccess = () => resolve(open.result);
       open.onerror = () => reject(open.error);
       open.onblocked = () => reject(new Error('blocked'));
     });
     expect(closed).toBe(true);
-    expect(upgraded.version).toBe(4);
+    expect(upgraded.version).toBe(5);
   });
 });

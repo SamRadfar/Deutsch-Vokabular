@@ -5,6 +5,7 @@
 import type { ConfirmedProgress, PendingOp } from './model';
 import { mergeReview, type ReviewEvent, type ReviewRecord } from '../review/model';
 import { bumpExposure, type ExposureRecord } from '../shadowing/model';
+import type { PersonalWord } from '../personal/model';
 
 export interface LocalSnapshot {
   confirmed: ConfirmedProgress[];
@@ -28,14 +29,21 @@ export interface ProgressLocalStore {
   loadExposure(uid: string): Promise<ExposureRecord[]>;
   /** Adds one completed practice of a word inside a single transaction and returns the record. */
   recordExposure(uid: string, wordId: string, at: number): Promise<ExposureRecord>;
+  /** Personal vocabulary of this uid (device-local; cloud sync pending approval). */
+  loadPersonalWords(uid: string): Promise<PersonalWord[]>;
+  putPersonalWord(uid: string, word: PersonalWord): Promise<void>;
+  /** Writes several words in one transaction (all or nothing), e.g. a legacy import. */
+  putPersonalWords(uid: string, words: PersonalWord[]): Promise<void>;
+  deletePersonalWord(uid: string, id: string): Promise<void>;
 }
 
 export const DB_NAME = 'deutsch-vokabular-v2';
 // v1: progress + meta. v2 (Phase 4A): + review-state. v3 (Phase 4B): + shadowing-exposure.
-// Upgrades only ever add stores.
-const DB_VERSION = 3;
+// v4 (Phase 5A): + personal-words. Upgrades only ever add stores.
+const DB_VERSION = 4;
 const STORES = {
   confirmed: 'progress-confirmed', pending: 'progress-pending', meta: 'meta', reviews: 'review-state', exposure: 'shadowing-exposure',
+  personal: 'personal-words',
 } as const;
 
 const req = <T>(r: IDBRequest<T>) => new Promise<T>((resolve, reject) => {
@@ -59,6 +67,7 @@ export function openProgressDb(factory: IDBFactory = indexedDB, name = DB_NAME):
       if (!db.objectStoreNames.contains(STORES.meta)) db.createObjectStore(STORES.meta, { keyPath: ['uid', 'key'] });
       if (!db.objectStoreNames.contains(STORES.reviews)) db.createObjectStore(STORES.reviews, { keyPath: ['uid', 'wordId'] });
       if (!db.objectStoreNames.contains(STORES.exposure)) db.createObjectStore(STORES.exposure, { keyPath: ['uid', 'wordId'] });
+      if (!db.objectStoreNames.contains(STORES.personal)) db.createObjectStore(STORES.personal, { keyPath: ['uid', 'id'] });
     };
     open.onsuccess = () => {
       // A newer version opened in another tab: release this connection so its upgrade is not blocked.
@@ -155,6 +164,32 @@ export function createIndexedDbStore(dbPromise: Promise<IDBDatabase>): ProgressL
       await done(tx);
       return next;
     },
+    async loadPersonalWords(uid) {
+      const db = await dbPromise;
+      const rows = (await req(db.transaction(STORES.personal, 'readonly').objectStore(STORES.personal).getAll(uidRange(uid)))) as
+        Stored<PersonalWord>[];
+      return rows.filter((r) => r.uid === uid).map(strip);
+    },
+    async putPersonalWord(uid, word) {
+      const db = await dbPromise;
+      const tx = db.transaction(STORES.personal, 'readwrite');
+      tx.objectStore(STORES.personal).put({ ...word, uid });
+      await done(tx);
+    },
+    async putPersonalWords(uid, words) {
+      if (!words.length) return;
+      const db = await dbPromise;
+      const tx = db.transaction(STORES.personal, 'readwrite');
+      const store = tx.objectStore(STORES.personal);
+      for (const w of words) store.put({ ...w, uid });
+      await done(tx);
+    },
+    async deletePersonalWord(uid, id) {
+      const db = await dbPromise;
+      const tx = db.transaction(STORES.personal, 'readwrite');
+      tx.objectStore(STORES.personal).delete([uid, id]);
+      await done(tx);
+    },
   };
 }
 
@@ -165,6 +200,7 @@ export function createMemoryStore(): ProgressLocalStore {
   const meta = new Map<string, unknown>();
   const reviews = new Map<string, Map<string, ReviewRecord>>();
   const exposure = new Map<string, Map<string, ExposureRecord>>();
+  const personal = new Map<string, Map<string, PersonalWord>>();
   const part = <T>(m: Map<string, Map<string, T>>, uid: string) => {
     let p = m.get(uid);
     if (!p) { p = new Map(); m.set(uid, p); }
@@ -196,6 +232,10 @@ export function createMemoryStore(): ProgressLocalStore {
       part(exposure, uid).set(wordId, next);
       return clone(next);
     },
+    async loadPersonalWords(uid) { return [...part(personal, uid).values()].map(clone); },
+    async putPersonalWord(uid, word) { part(personal, uid).set(word.id, clone(word)); },
+    async putPersonalWords(uid, words) { for (const w of words) part(personal, uid).set(w.id, clone(w)); },
+    async deletePersonalWord(uid, id) { part(personal, uid).delete(id); },
   };
 }
 

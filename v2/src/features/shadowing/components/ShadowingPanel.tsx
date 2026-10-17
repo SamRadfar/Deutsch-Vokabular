@@ -3,7 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore
 import type { Category, WordId } from '../../../models/vocabulary';
 import { PREFERENCE_KEYS, readJsonPreference, writeJsonPreference } from '../../../services/preferences';
 import { usePronunciation } from '../../pronunciation/PronunciationProvider';
-import { flattenCards, modeAvailable, shuffle, type DeckCard, type DeckProgress } from '../../review/deck';
+import { modeAvailable, shuffle, type DeckCard, type DeckProgress } from '../../review/deck';
+import { practiceScopes, usePersonal, usePracticeCards } from '../../personal/usePersonal';
 import { ShadowingPlayer, type PlayerSnapshot } from '../player';
 import { buildShadowingQueue, selectShadowingCards } from '../queue';
 import { sanitizePreferences, type ShadowingPreferences } from '../settings';
@@ -35,7 +36,9 @@ export function ShadowingPanel({ categories, active, random, wakeLock }: Props) 
   const backend = useShadowingBackend();
   const { service: speech } = usePronunciation();
   const port = useMemo(() => wakeLock ?? createWakeLockPort(), [wakeLock]);
-  const cards = useMemo(() => flattenCards(categories), [categories]);
+  const cards = usePracticeCards(categories); // built-in + personal words
+  const { snapshot: personal } = usePersonal();
+  const scopes = useMemo(() => practiceScopes(categories, personal?.words.length ?? 0), [categories, personal]);
   const cardsById = useMemo(() => new Map(cards.map((c) => [c.entry.id, c])), [cards]);
 
   const [prefs, setPrefs] = useState(() => sanitizePreferences(readJsonPreference(PREFERENCE_KEYS.shadowing)));
@@ -91,7 +94,7 @@ export function ShadowingPanel({ categories, active, random, wakeLock }: Props) 
   };
 
   if (!session || !snap) {
-    return <ShadowingSetup cards={cards} categories={categories} backend={backend} prefs={shown} onChange={updatePrefs} onStart={startNew} />;
+    return <ShadowingSetup cards={cards} scopes={scopes} backend={backend} prefs={shown} onChange={updatePrefs} onStart={startNew} />;
   }
 
   if (snap.status === 'finished') {

@@ -32,7 +32,7 @@ const overflow = (page: Page) => page.evaluate(() => document.documentElement.sc
 test('main navigation: four sections, hash routes, back button, page titles', async ({ page }) => {
   const errors = trackErrors(page);
   await page.goto('./');
-  await expect(nav(page).getByRole('link')).toHaveText(['📚واژه‌ها', '🔄مرور', '🗣تلفظ', '📊پیشرفت']);
+  await expect(nav(page).getByRole('link')).toHaveText(['📚واژه‌ها', '⭐واژه‌های من', '🔄مرور', '🗣تلفظ', '📊پیشرفت']);
   await expect(page).toHaveTitle(/^واژه‌ها · /);
   await nav(page).getByRole('link', { name: 'پیشرفت' }).click();
   await expect(page).toHaveURL(/#\/progress$/);
@@ -130,7 +130,7 @@ test('dashboard (signed out): totals, categories, quick access', async ({ page }
 
 test('layout: every section fits the viewport; phones use a bottom tab bar', async ({ page, isMobile }) => {
   await page.goto('./');
-  for (const section of ['', 'review', 'shadowing', 'progress']) {
+  for (const section of ['', 'mine', 'review', 'shadowing', 'progress']) {
     await page.goto(`./#/${section}`);
     await page.waitForTimeout(100);
     expect(await overflow(page), `#/${section} overflows`).toBeLessThanOrEqual(0);

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ALLOWED_PROJECTS, interpretDatabaseProbe, validateDeployArgs } from '../../../scripts/lib/deploy-guard.mjs';
 
@@ -38,5 +40,14 @@ describe('rules deployment guard', () => {
     expect(interpretDatabaseProbe(404, 'NOT_FOUND')).toMatchObject({ exists: false, reason: expect.stringContaining('nam5') });
     expect(interpretDatabaseProbe(400, 'INVALID_ARGUMENT')).toMatchObject({ exists: false });
     expect(interpretDatabaseProbe(500, undefined)).toMatchObject({ exists: false });
+  });
+
+  it('the proposed rules (Phase 5A) can never be deployed by the tooling', () => {
+    const root = resolve(__dirname, '../../..');
+    const firebaseJson = JSON.parse(readFileSync(resolve(root, 'firebase.json'), 'utf8')) as { firestore: { rules: string } };
+    expect(firebaseJson.firestore.rules).toBe('firestore.rules');
+    expect(readFileSync(resolve(root, 'scripts/deploy-rules.mjs'), 'utf8')).not.toContain('proposed');
+    expect(readFileSync(resolve(root, 'firestore.rules'), 'utf8')).not.toContain('customWords');
+    expect(readFileSync(resolve(root, 'firestore.proposed.rules'), 'utf8')).toContain('PROPOSAL ONLY');
   });
 });

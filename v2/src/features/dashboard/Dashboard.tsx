@@ -7,12 +7,14 @@ import type { ReviewSnapshot } from '../review/reviewLog';
 import type { ShadowingLogSnapshot } from '../shadowing/shadowingLog';
 import { formatDuration } from '../shadowing/components/format';
 import { learningOverview, reviewActivity } from './stats';
+import { usePersonal } from '../personal/usePersonal';
 
 interface Props {
   categories: readonly Category[];
   onOpenCategory(key: CategoryKey): void;
   onOpenReview(): void;
   onOpenShadowing(): void;
+  onOpenPersonal(): void;
 }
 
 const noop = () => () => {};
@@ -33,17 +35,21 @@ function Ring({ percent }: { percent: number }) {
   );
 }
 
-export function Dashboard({ categories, onOpenCategory, onOpenReview, onOpenShadowing }: Props) {
+export function Dashboard({ categories, onOpenCategory, onOpenReview, onOpenShadowing, onOpenPersonal }: Props) {
   const progress = useProgress();
   const ready = progress.status === 'ready' ? progress : null;
   const reviews: ReviewSnapshot | null = useSyncExternalStore(ready?.reviews.subscribe ?? noop, ready?.reviews.getSnapshot ?? none, ready?.reviews.getSnapshot ?? none);
   const shadow: ShadowingLogSnapshot | null = useSyncExternalStore(ready?.shadowing.subscribe ?? noop, ready?.shadowing.getSnapshot ?? none, ready?.shadowing.getSnapshot ?? none);
 
+  const { snapshot: personal } = usePersonal();
+  // Practice statistics count built-in words and the current personal words (deleted ones drop out).
   const knownIds = useMemo(() => {
     const ids = new Set<string>();
     for (const c of categories) for (const s of c.subtabs) for (const g of s.groups) for (const e of g.entries) ids.add(e.id);
+    for (const w of personal?.words ?? []) ids.add(w.id);
     return ids;
-  }, [categories]);
+  }, [categories, personal]);
+  const personalLearned = personal?.words.filter((w) => w.learned).length ?? 0;
   const learned = ready?.view.learned ?? null;
   const overview = useMemo(() => learningOverview(categories, learned ?? new Set()), [categories, learned]);
   const activity = useMemo(() => (reviews ? reviewActivity(reviews.records, knownIds) : null), [reviews, knownIds]);
@@ -98,7 +104,7 @@ export function Dashboard({ categories, onOpenCategory, onOpenReview, onOpenShad
       </div>
 
       <div className="db-card">
-        <h3 className="db-card__title">{ready ? 'پیشرفت در هر دسته' : 'دسته‌ها'}</h3>
+        <h3 className="db-card__title">{ready ? 'پیشرفت در هر دسته (۹۹۹ واژهٔ داخلی، همگام با حساب)' : 'دسته‌ها'}</h3>
         <ul className="db-cats">
           {overview.categories.map((c) => (
             <li key={c.key} data-category={c.theme}>
@@ -115,6 +121,20 @@ export function Dashboard({ categories, onOpenCategory, onOpenReview, onOpenShad
           ))}
         </ul>
       </div>
+
+      {ready && personal ? (
+        <div className="db-card db-personal" data-testid="db-personal">
+          <div>
+            <h3 className="db-card__title">واژه‌های من</h3>
+            <p className="db-card__note">
+              {personal.words.length
+                ? `${personal.words.length} واژهٔ شخصی، ${personalLearned} یادگرفته — روی همین دستگاه ذخیره می‌شود (همگام‌سازی ابری هنوز فعال نیست).`
+                : 'هنوز واژهٔ شخصی‌ای اضافه نکرده‌اید.'}
+            </p>
+          </div>
+          <button type="button" className="fc-secondary" onClick={onOpenPersonal}>{personal.words.length ? 'مدیریت واژه‌های من' : 'افزودن واژه'}</button>
+        </div>
+      ) : null}
 
       {ready ? (
         <div className="db-card" data-testid="db-local">

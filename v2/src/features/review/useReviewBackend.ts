@@ -1,6 +1,8 @@
 import { useMemo, useSyncExternalStore } from 'react';
 import { useProgress } from '../progress/ProgressProvider';
 import type { WordId } from '../../models/vocabulary';
+import { isPersonalId } from '../personal/model';
+import { mergeLearned, routeLearned, usePersonal } from '../personal/usePersonal';
 import type { ReviewResult } from './model';
 import type { LearnedTarget } from './outcome';
 import type { ReviewSnapshot } from './reviewLog';
@@ -10,6 +12,7 @@ export interface ReviewBackend {
   /** `unavailable`: signed out or Firebase not configured — practice works, nothing is saved. */
   status: 'unavailable' | 'loading' | 'ready';
   uid: string | null;
+  /** Built-in (synced) and personal (local) learned words. */
   learned: ReadonlySet<WordId> | null;
   againIds: ReadonlySet<WordId> | null;
   /** False when the last local review write failed. */
@@ -26,6 +29,7 @@ export function useReviewBackend(): ReviewBackend {
   const ready = progress.status === 'ready' ? progress : null;
   const log = ready?.reviews ?? null;
   const snapshot: ReviewSnapshot | null = useSyncExternalStore(log?.subscribe ?? noop, log?.getSnapshot ?? none, log?.getSnapshot ?? none);
+  const { vocab, snapshot: personal } = usePersonal();
 
   return useMemo<ReviewBackend>(() => {
     if (!ready || !log || !snapshot) {
@@ -35,17 +39,18 @@ export function useReviewBackend(): ReviewBackend {
         learned: null, againIds: null, saved: true, target: null, record: null,
       };
     }
+    const learned = mergeLearned(ready.view.learned, personal);
     return {
       status: 'ready',
       uid: ready.uid,
-      learned: ready.view.learned,
+      learned,
       againIds: snapshot.againIds,
       saved: snapshot.saved,
       target: {
-        isLearned: (id) => ready.view.learned.has(id),
-        setLearned: (id, value) => { void ready.engine.setLearned(id, value); },
+        isLearned: (id) => (isPersonalId(id) ? personal?.byId.get(id)?.learned ?? false : ready.view.learned.has(id)),
+        setLearned: routeLearned((id, value) => { void ready.engine.setLearned(id, value); }, vocab),
       },
       record: (id, result) => { void log.record(id, result); },
     };
-  }, [progress, ready, log, snapshot]);
+  }, [progress, ready, log, snapshot, personal, vocab]);
 }

@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useSyncExternalStore } from 'react';
 
-/** The four top-level sections. Vocabulary categories are secondary navigation inside "words". */
-export const SECTIONS = ['words', 'review', 'shadowing', 'progress'] as const;
+/** The top-level sections. Vocabulary categories are secondary navigation inside "words". */
+export const SECTIONS = ['words', 'mine', 'review', 'shadowing', 'progress'] as const;
 export type Section = (typeof SECTIONS)[number];
 
 export const SECTION_META: Record<Section, { label: string; icon: string; title: string }> = {
   words: { label: 'واژه‌ها', icon: '📚', title: 'واژه‌ها' },
+  mine: { label: 'واژه‌های من', icon: '⭐', title: 'واژه‌های من' },
   review: { label: 'مرور', icon: '🔄', title: 'مرور با فلش‌کارت' },
   shadowing: { label: 'تلفظ', icon: '🗣', title: 'تمرین تلفظ' },
   progress: { label: 'پیشرفت', icon: '📊', title: 'پیشرفت یادگیری' },

@@ -3,15 +3,15 @@
 // then the batch is shuffled again so the preferred words are not always first.
 // Exposure is keyed by stable word id here (the legacy app keyed it by the word text).
 
-import type { CategoryKey, WordId } from '../../models/vocabulary';
-import { selectCards, shuffle, type DeckCard, type DeckProgress, type ReviewMode } from '../review/deck';
+import type { WordId } from '../../models/vocabulary';
+import { selectCards, shuffle, type DeckCard, type DeckProgress, type PracticeCategoryKey, type ReviewMode } from '../review/deck';
 
 export function exposureWeight(count: number): number {
   return count <= 0 ? 3 : count < 3 ? 2 : 1;
 }
 
 export function selectShadowingCards(
-  cards: readonly DeckCard[], mode: ReviewMode, categories: ReadonlySet<CategoryKey>, progress: DeckProgress,
+  cards: readonly DeckCard[], mode: ReviewMode, categories: ReadonlySet<PracticeCategoryKey>, progress: DeckProgress,
 ): DeckCard[] {
   return selectCards(cards, mode, 'all', progress).filter((c) => categories.has(c.categoryKey));
 }

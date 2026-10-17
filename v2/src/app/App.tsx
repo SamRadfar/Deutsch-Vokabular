@@ -10,6 +10,9 @@ import { ShadowingPanel } from '../features/shadowing/components/ShadowingPanel'
 import { WordsSection, type WordsSearchState } from '../features/search/WordsSection';
 import { filtersActive, NO_FILTERS } from '../features/search/searchIndex';
 import { Dashboard } from '../features/dashboard/Dashboard';
+import { PersonalPanel } from '../features/personal/components/PersonalPanel';
+import { mergeLearned, routeLearned, usePersonal } from '../features/personal/usePersonal';
+import { isPersonalId } from '../features/personal/model';
 import { PrimaryNav } from '../components/PrimaryNav/PrimaryNav';
 import { OfflineBanner } from '../components/OfflineBanner/OfflineBanner';
 import { useMediaQuery } from '../hooks/useMediaQuery';
@@ -68,6 +71,8 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
   const [migrationOpen, setMigrationOpen] = useState(false);
   const [search, setSearch] = useState<WordsSearchState>({ query: '', filters: NO_FILTERS });
   const [focusEntryId, setFocusEntryId] = useState<string | null>(null);
+  const [focusPersonalId, setFocusPersonalId] = useState<string | null>(null);
+  const { vocab: personalVocab, snapshot: personal } = usePersonal();
   // Practice panels stay mounted once opened, so a running session survives a look at another section.
   const [mounted, setMounted] = useState<ReadonlySet<Section>>(() => new Set([section]));
   useEffect(() => { setMounted((m) => (m.has(section) ? m : new Set([...m, section]))); }, [section]);
@@ -75,17 +80,32 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
   const owner = progress.status === 'unavailable' ? 'signed-out' : progress.uid;
 
   const ready = progress.status === 'ready' ? progress : null;
-  const learned = ready?.view.learned;
-  const learnedCount = learned ? countCategories(repository.categories, learned).learned : null;
+  // Built-in learned words are synced (Firestore); personal words keep their flag locally.
+  const learned = useMemo(() => (ready ? mergeLearned(ready.view.learned, personal) : undefined), [ready, personal]);
+  const learnedCount = ready ? countCategories(repository.categories, ready.view.learned).learned : null;
 
   const entryProgress = useMemo<EntryProgress | undefined>(() => {
     if (!ready) return undefined;
     return {
-      isLearned: (id) => ready.view.learned.has(id),
-      stateOf: (id) => ready.view.stateOf(id),
-      setLearned: (id, value) => { void ready.engine.setLearned(id, value); },
+      isLearned: (id) => (isPersonalId(id) ? personal?.byId.get(id)?.learned ?? false : ready.view.learned.has(id)),
+      stateOf: (id) => (isPersonalId(id) ? 'synced' : ready.view.stateOf(id)),
+      setLearned: routeLearned((id, value) => { void ready.engine.setLearned(id, value); }, personalVocab),
     };
-  }, [ready]);
+  }, [ready, personal, personalVocab]);
+
+  /** Search "show in list" for a personal word: its category placement, otherwise "my words". */
+  const showPersonal = useCallback((id: string) => {
+    const w = personal?.byId.get(id);
+    const placement = w?.placement;
+    const category = placement ? repository.getCategory(placement.category as CategoryKey) : undefined;
+    if (placement && category?.subtabs.some((s) => s.id === placement.subtab)) {
+      nav.show(category.key, placement.subtab);
+      setFocusEntryId(id);
+      return;
+    }
+    setFocusPersonalId(id);
+    navigate('mine');
+  }, [personal, repository, nav.show, navigate]);
 
   /** Category tabs (and dashboard rows): browsing a category leaves search mode. */
   const selectCategory = useCallback((key: string) => {
@@ -127,6 +147,7 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
             activeSubtabId={nav.activeSubtabId}
             onSelectSubtab={nav.selectSubtab}
             onShow={nav.show}
+            onShowPersonal={showPersonal}
             getTechnicalInfo={repository.getTechnicalInfo}
             progress={entryProgress}
             learned={learned}
@@ -134,6 +155,16 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
             onSearch={setSearch}
             focusEntryId={focusEntryId}
             onFocusEntry={setFocusEntryId}
+          />
+        ) : null}
+        {section === 'mine' ? (
+          <PersonalPanel
+            key={owner}
+            categories={repository.categories}
+            focusId={focusPersonalId}
+            onFocused={() => setFocusPersonalId(null)}
+            onOpenReview={() => navigate('review')}
+            onOpenShadowing={() => navigate('shadowing')}
           />
         ) : null}
         {mounted.has('review') ? (
@@ -152,6 +183,7 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
             onOpenCategory={selectCategory}
             onOpenReview={() => navigate('review')}
             onOpenShadowing={() => navigate('shadowing')}
+            onOpenPersonal={() => navigate('mine')}
           />
         ) : null}
       </main>

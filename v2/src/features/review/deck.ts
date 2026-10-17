@@ -2,16 +2,22 @@
 // and the review-again list — never over the DOM (the legacy app scraped rendered table rows).
 
 import type { Category, CategoryKey, VocabularyEntry, WordId } from '../../models/vocabulary';
+import { toEntry, type PersonalWord } from '../personal/model';
 
 export type ReviewMode = 'all' | 'unlearned' | 'learned' | 'again';
+
+/** Pseudo category of the user's personal words in decks, search and filters. */
+export const PERSONAL_KEY = 'mine';
+export type PracticeCategoryKey = CategoryKey | typeof PERSONAL_KEY;
+export const PERSONAL_LABEL = '⭐ واژه‌های من';
 export const REVIEW_MODES: readonly ReviewMode[] = ['all', 'unlearned', 'learned', 'again'];
 
-/** `all` or one category key. */
-export type ReviewScope = 'all' | CategoryKey;
+/** `all` or one category key (including the personal words). */
+export type ReviewScope = 'all' | PracticeCategoryKey;
 
 export interface DeckCard {
   entry: VocabularyEntry;
-  categoryKey: CategoryKey;
+  categoryKey: PracticeCategoryKey;
   categoryLabel: string;
   /** Accent theme of the category (CSS `data-category`). */
   theme: string;
@@ -78,4 +84,17 @@ export const DEFAULT_SESSION_SIZE = 30;
 export function buildDeck(selected: readonly DeckCard[], size: number | null, random?: () => number): WordId[] {
   const ids = shuffle(selected.map((c) => c.entry.id), random);
   return size === null ? ids : ids.slice(0, size);
+}
+
+/** Practice cards for personal words (after the built-in cards in `order`). */
+export function personalCards(words: readonly PersonalWord[], firstOrder: number): DeckCard[] {
+  return words.map((w, i) => ({
+    entry: toEntry(w),
+    categoryKey: PERSONAL_KEY,
+    categoryLabel: PERSONAL_LABEL,
+    theme: 'review',
+    subtabId: PERSONAL_KEY,
+    subtabLabel: w.placement ? 'Meine Wörter' : 'واژه‌های من',
+    order: firstOrder + i,
+  }));
 }

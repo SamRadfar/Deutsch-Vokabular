@@ -1,8 +1,10 @@
 // Shadowing settings and session choice, remembered on this device (dv2.pref.shadowing.v1).
 // Values read back from storage are sanitised: anything out of range falls back to the default.
 
-import { CATEGORY_KEYS, type CategoryKey } from '../../models/vocabulary';
-import type { ReviewMode } from '../review/deck';
+import { CATEGORY_KEYS } from '../../models/vocabulary';
+import { PERSONAL_KEY, type PracticeCategoryKey, type ReviewMode } from '../review/deck';
+
+const PRACTICE_KEYS: readonly PracticeCategoryKey[] = [...CATEGORY_KEYS, PERSONAL_KEY];
 
 export interface ShadowingSettings {
   /** How often the German word is played; each play is followed by a pause to repeat it. */
@@ -19,7 +21,7 @@ export interface ShadowingSettings {
 export interface ShadowingChoice {
   mode: ReviewMode;
   /** Selected categories; empty = none selected (start disabled). */
-  categories: CategoryKey[];
+  categories: PracticeCategoryKey[];
   /** Items per session. */
   size: number;
 }
@@ -45,7 +47,7 @@ export const DEFAULT_PREFERENCES: ShadowingPreferences = {
   rate: 0.85,
   showTranslation: true,
   mode: 'all',
-  categories: [...CATEGORY_KEYS],
+  categories: [...PRACTICE_KEYS],
   size: 30,
 };
 
@@ -58,7 +60,7 @@ export function sanitizePreferences(raw: unknown): ShadowingPreferences {
     && v.pauseSec >= PAUSE_RANGE.min && v.pauseSec <= PAUSE_RANGE.max
     ? Math.round(v.pauseSec / PAUSE_RANGE.step) * PAUSE_RANGE.step : d.pauseSec;
   const categories = Array.isArray(v.categories)
-    ? [...new Set(v.categories.filter((k): k is CategoryKey => (CATEGORY_KEYS as readonly unknown[]).includes(k)))]
+    ? [...new Set(v.categories.filter((k): k is PracticeCategoryKey => (PRACTICE_KEYS as readonly unknown[]).includes(k)))]
     : d.categories;
   return {
     wordRepeats: oneOf(WORD_REPEATS, v.wordRepeats, d.wordRepeats),

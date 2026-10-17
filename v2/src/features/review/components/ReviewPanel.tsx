@@ -1,9 +1,10 @@
 import '../review.css';
 import { useMemo, useState } from 'react';
 import { CATEGORY_KEYS, type Category } from '../../../models/vocabulary';
+import { practiceScopes, usePersonal, usePracticeCards } from '../../personal/usePersonal';
 import { readReviewPreferences, writeReviewPreferences } from '../../../services/preferences';
 import {
-  buildDeck, DEFAULT_SESSION_SIZE, flattenCards, modeAvailable, selectCards, shuffle,
+  buildDeck, DEFAULT_SESSION_SIZE, modeAvailable, PERSONAL_KEY, selectCards, shuffle,
   type DeckProgress, type ReviewScope,
 } from '../deck';
 import { summarize } from '../session';
@@ -23,14 +24,16 @@ interface Props {
 
 function initialChoice(): SetupChoice {
   const p = readReviewPreferences();
-  const scope: ReviewScope = p.scope && (CATEGORY_KEYS as readonly string[]).includes(p.scope) ? (p.scope as ReviewScope) : 'all';
+  const scope: ReviewScope = p.scope && ([...CATEGORY_KEYS, PERSONAL_KEY] as readonly string[]).includes(p.scope) ? (p.scope as ReviewScope) : 'all';
   return { mode: p.mode ?? 'all', scope, size: p.size === undefined ? DEFAULT_SESSION_SIZE : p.size, autoSpeak: p.autoSpeak ?? true };
 }
 
 /** The "🔄 مرور" tab: setup → flashcard session → summary. */
 export function ReviewPanel({ categories, active, random }: Props) {
   const backend = useReviewBackend();
-  const cards = useMemo(() => flattenCards(categories), [categories]);
+  const cards = usePracticeCards(categories); // built-in + personal words
+  const { snapshot: personal } = usePersonal();
+  const scopes = useMemo(() => practiceScopes(categories, personal?.words.length ?? 0), [categories, personal]);
   const cardsById = useMemo(() => new Map(cards.map((c) => [c.entry.id, c])), [cards]);
   const [choice, setChoice] = useState(initialChoice);
   const session = useFlashcardSession(backend);
@@ -46,7 +49,7 @@ export function ReviewPanel({ categories, active, random }: Props) {
 
   const state = session.state;
   if (!state) {
-    return <ReviewSetup cards={cards} categories={categories} backend={backend} choice={shown} onChange={setChoice} onStart={start} />;
+    return <ReviewSetup cards={cards} scopes={scopes} backend={backend} choice={shown} onChange={setChoice} onStart={start} />;
   }
 
   const restart = () => session.start(shuffle(state.cards, random));

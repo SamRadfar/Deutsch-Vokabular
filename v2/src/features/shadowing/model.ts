@@ -1,4 +1,5 @@
-import { WORD_ID_PATTERN, type WordId } from '../../models/vocabulary';
+import type { WordId } from '../../models/vocabulary';
+import { isPracticeWordId } from '../personal/model';
 
 /**
  * Shadowing practice data (device-local, schema version 1, partitioned by uid).
@@ -35,7 +36,7 @@ const count = (v: unknown) => typeof v === 'number' && Number.isInteger(v) && v 
 export function isValidExposure(r: unknown): r is ExposureRecord {
   if (typeof r !== 'object' || r === null) return false;
   const x = r as Record<string, unknown>;
-  return typeof x.wordId === 'string' && WORD_ID_PATTERN.test(x.wordId) && count(x.count)
+  return typeof x.wordId === 'string' && isPracticeWordId(x.wordId) && count(x.count)
     && typeof x.lastPracticedAt === 'number' && Number.isFinite(x.lastPracticedAt);
 }
 

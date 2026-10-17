@@ -1,7 +1,6 @@
 import { useEffect, useId, useState } from 'react';
-import type { Category, CategoryKey } from '../../../models/vocabulary';
 import { usePronunciation } from '../../pronunciation/PronunciationProvider';
-import { modeAvailable, REVIEW_MODES, type DeckCard, type DeckProgress, type ReviewMode } from '../../review/deck';
+import { modeAvailable, REVIEW_MODES, type DeckCard, type DeckProgress, type PracticeCategoryKey, type ReviewMode } from '../../review/deck';
 import { selectShadowingCards } from '../queue';
 import {
   EXAMPLE_REPEATS, PAUSE_RANGE, RATES, SHADOWING_SIZES, WORD_REPEATS, type ShadowingPreferences,
@@ -11,7 +10,8 @@ import { formatDuration, formatSeconds } from './format';
 
 interface Props {
   cards: readonly DeckCard[];
-  categories: readonly Category[];
+  /** Built-in categories, plus "my words" when the user has personal words. */
+  scopes: ReadonlyArray<{ key: PracticeCategoryKey; label: string; theme: string }>;
   backend: ShadowingBackend;
   prefs: ShadowingPreferences;
   onChange(prefs: ShadowingPreferences): void;
@@ -36,16 +36,16 @@ function useGermanVoice() {
   return { supported: service.supported, status };
 }
 
-export function ShadowingSetup({ cards, categories, backend, prefs, onChange, onStart }: Props) {
+export function ShadowingSetup({ cards, scopes, backend, prefs, onChange, onStart }: Props) {
   const ids = { size: useId(), word: useId(), example: useId(), pause: useId(), rate: useId(), tr: useId() };
   const voice = useGermanVoice();
   const progress: DeckProgress = { learned: backend.learned, againIds: backend.againIds };
   const selectedCats = new Set(prefs.categories);
-  const count = (mode: ReviewMode, cats: ReadonlySet<CategoryKey> = selectedCats) => selectShadowingCards(cards, mode, cats, progress).length;
+  const count = (mode: ReviewMode, cats: ReadonlySet<PracticeCategoryKey> = selectedCats) => selectShadowingCards(cards, mode, cats, progress).length;
   const selected = modeAvailable(prefs.mode, progress) ? count(prefs.mode) : 0;
   const sessionCount = Math.min(selected, prefs.size);
   const set = (patch: Partial<ShadowingPreferences>) => onChange({ ...prefs, ...patch });
-  const toggleCategory = (key: CategoryKey, on: boolean) =>
+  const toggleCategory = (key: PracticeCategoryKey, on: boolean) =>
     set({ categories: on ? [...prefs.categories.filter((k) => k !== key), key] : prefs.categories.filter((k) => k !== key) });
 
   return (
@@ -96,11 +96,11 @@ export function ShadowingSetup({ cards, categories, backend, prefs, onChange, on
         <legend>
           دسته‌ها
           <span className="sh-cats__bulk">
-            <button type="button" onClick={() => set({ categories: categories.map((c) => c.key) })}>همه</button>
+            <button type="button" onClick={() => set({ categories: scopes.map((c) => c.key) })}>همه</button>
             <button type="button" onClick={() => set({ categories: [] })}>هیچ‌کدام</button>
           </span>
         </legend>
-        {categories.map((c) => {
+        {scopes.map((c) => {
           const on = selectedCats.has(c.key);
           const n = modeAvailable(prefs.mode, progress) ? count(prefs.mode, new Set([c.key])) : 0;
           return (

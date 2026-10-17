@@ -3,11 +3,14 @@ import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { MOBILE_QUERY } from '../vocabulary/components/SubtabPanel';
 import type { Category } from '../../models/vocabulary';
 import { filtersActive, type SearchFilters, type StatusFilter } from './searchIndex';
+import { PERSONAL_KEY, PERSONAL_LABEL } from '../review/deck';
 
 interface Props {
   query: string;
   filters: SearchFilters;
   categories: readonly Category[];
+  /** Number of personal words; the category filter offers "my words" when there are any. */
+  personalCount: number;
   /** Learned/unlearned filters need the signed-in user's progress. */
   statusAvailable: boolean;
   /** Number of results (null while browsing without search or filters). */
@@ -25,10 +28,10 @@ const STATUS: Array<{ value: StatusFilter; label: string }> = [
 
 /** Search field + filters. Purely controlled; the results are rendered by the words section. */
 export const VocabularySearch = forwardRef<HTMLInputElement, Props>(function VocabularySearch(
-  { query, filters, categories, statusAvailable, resultCount, onQuery, onFilters, onReset }, inputRef,
+  { query, filters, categories, personalCount, statusAvailable, resultCount, onQuery, onFilters, onReset }, inputRef,
 ) {
   const ids = { q: useId(), cat: useId(), sub: useId(), hint: useId(), filters: useId() };
-  const category = filters.category === 'all' ? null : categories.find((c) => c.key === filters.category) ?? null;
+  const category = filters.category === 'all' || filters.category === PERSONAL_KEY ? null : categories.find((c) => c.key === filters.category) ?? null;
   const active = query.trim() !== '' || filtersActive(filters);
   const activeFilters = [filters.category !== 'all', filters.subtab !== 'all', filters.status !== 'all'].filter(Boolean).length;
   // Phones: the filters fold away behind a button so the words start right below the search field.
@@ -72,12 +75,13 @@ export const VocabularySearch = forwardRef<HTMLInputElement, Props>(function Voc
             onChange={(e) => onFilters({ ...filters, category: e.currentTarget.value as SearchFilters['category'], subtab: 'all' })}>
             <option value="all">همهٔ دسته‌ها</option>
             {categories.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}
+            {personalCount > 0 || filters.category === PERSONAL_KEY ? <option value={PERSONAL_KEY}>{PERSONAL_LABEL}</option> : null}
           </select>
         </label>
         <label className="vsearch__field">
           <span>زیرمجموعه</span>
           <select id={ids.sub} value={filters.subtab} disabled={!category} onChange={(e) => onFilters({ ...filters, subtab: e.currentTarget.value })}>
-            <option value="all">{category ? 'همهٔ زیرمجموعه‌ها' : 'ابتدا دسته را انتخاب کنید'}</option>
+            <option value="all">{category ? 'همهٔ زیرمجموعه‌ها' : filters.category === PERSONAL_KEY ? '—' : 'ابتدا دسته را انتخاب کنید'}</option>
             {category?.subtabs.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
           </select>
         </label>
