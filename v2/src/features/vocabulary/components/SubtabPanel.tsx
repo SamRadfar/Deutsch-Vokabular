@@ -15,12 +15,13 @@ interface Props {
   getTechnicalInfo(id: string): TechnicalInfo | undefined;
   progress?: EntryProgress | undefined;
   learned?: ReadonlySet<string> | undefined;
+  focusEntryId?: string | null | undefined;
 }
 
 export const countEntries = (subtab: Subtab) => subtab.groups.reduce((n, g) => n + g.entries.length, 0);
 
 /** Section header, legend and the subtab's vocabulary (table on desktop, cards on mobile). */
-export function SubtabPanel({ subtab, getTechnicalInfo, progress, learned }: Props) {
+export function SubtabPanel({ subtab, getTechnicalInfo, progress, learned, focusEntryId }: Props) {
   const mobile = useMediaQuery(MOBILE_QUERY);
   const [openInfoId, setOpenInfoId] = useState<string | null>(null);
   const total = countEntries(subtab);
@@ -48,6 +49,7 @@ export function SubtabPanel({ subtab, getTechnicalInfo, progress, learned }: Pro
     onToggleInfo: (id: string) => setOpenInfoId((cur) => (cur === id ? null : id)),
     caption: `${subtab.label} — ${total} Wörter`,
     progress,
+    focusEntryId,
   };
 
   return (

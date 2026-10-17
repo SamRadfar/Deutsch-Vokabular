@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from '../../../src/app/App';
 import { createBackup } from '../../../src/features/progress/migration/backup';
 import { getVocabularyRepository } from '../../../src/services/content/vocabularyRepository';
-import { fakeSpeech, mockMatchMedia } from '../../helpers/dom';
+import { fakeSpeech, mockMatchMedia, waitForLearnedCheckboxes } from '../../helpers/dom';
 import { ALICE } from '../../helpers/fakeAuth';
 import { createFakeServices } from '../../helpers/fakeServices';
 import { dvok6, snapshot } from './legacy-snapshots';
@@ -30,7 +30,7 @@ describe('legacy migration dialog', () => {
     const user = userEvent.setup();
     const env = createFakeServices({ restored: ALICE });
     render(<App services={env.services} speechService={fakeSpeech()} />);
-    await waitFor(() => expect(screen.getByRole('checkbox', { name: `یادگرفتم: ${first.word}` })).toBeInTheDocument());
+    await waitForLearnedCheckboxes();
 
     let dialog = await openMigration(user);
     expect(dialog).toHaveTextContent('حافظهٔ مرورگر به دامنه وابسته است');
@@ -58,7 +58,7 @@ describe('legacy migration dialog', () => {
     const user = userEvent.setup();
     const env = createFakeServices({ restored: ALICE });
     render(<App services={env.services} speechService={fakeSpeech()} />);
-    await waitFor(() => expect(screen.getByRole('checkbox', { name: `یادگرفتم: ${first.word}` })).toBeInTheDocument());
+    await waitForLearnedCheckboxes();
     const dialog = await openMigration(user);
     await user.upload(within(dialog).getByTestId('migration-file'), new File(['{oops'], 'x.json', { type: 'application/json' }));
     expect(await within(dialog).findByRole('alert')).toHaveTextContent('JSON معتبر نیست');
@@ -72,7 +72,7 @@ describe('legacy migration dialog', () => {
     const before = JSON.stringify({ ...localStorage });
     const env = createFakeServices({ restored: ALICE });
     render(<App services={env.services} speechService={fakeSpeech()} />);
-    await waitFor(() => expect(screen.getByRole('checkbox', { name: `یادگرفتم: ${first.word}` })).toBeInTheDocument());
+    await waitForLearnedCheckboxes();
     const dialog = await openMigration(user);
     await user.click(within(dialog).getByRole('button', { name: 'بررسی داده‌های این مرورگر' }));
     const preview = await screen.findByTestId('migration-preview');

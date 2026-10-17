@@ -5,6 +5,9 @@
   max-width: 1480px;
   margin: 0 auto;
 }
+/* Room for the fixed bottom tab bar on phones (58px + safe area) */
+.mcontent--bottom-nav { padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)); }
+.mcontent:focus { outline: none; }
 
 /* Main category tabs */
 .mtabs {

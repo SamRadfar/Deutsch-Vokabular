@@ -8,7 +8,7 @@ import {
 import type { EntryListProps } from './VocabularyTable';
 
 /** Mobile layout (≤ 640px): grouped cards, same fields as the table (legacy card grid). */
-export function VocabularyCards({ groups, getTechnicalInfo, openInfoId, onToggleInfo, caption, progress }: EntryListProps) {
+export function VocabularyCards({ groups, getTechnicalInfo, openInfoId, onToggleInfo, caption, progress, focusEntryId }: EntryListProps) {
   return (
     <div className="vcards" data-caption={caption}>
       {groups.map((group, gi) => (
@@ -23,6 +23,7 @@ export function VocabularyCards({ groups, getTechnicalInfo, openInfoId, onToggle
                   infoOpen={openInfoId === entry.id}
                   onToggleInfo={() => onToggleInfo(entry.id)}
                   progress={progress}
+                  focused={focusEntryId === entry.id}
                 />
               </li>
             ))}
@@ -39,13 +40,14 @@ interface CardProps {
   infoOpen: boolean;
   onToggleInfo(): void;
   progress: EntryProgress | undefined;
+  focused?: boolean;
 }
 
-export function VocabularyCard({ entry, info, infoOpen, onToggleInfo, progress }: CardProps) {
+export function VocabularyCard({ entry, info, infoOpen, onToggleInfo, progress, focused = false }: CardProps) {
   const learned = progress?.isLearned(entry.id) ?? false;
   return (
     <>
-      <article className={`vcard${progress ? ' vcard--with-chk' : ''}${learned ? ' is-learned' : ''}`} data-entry-id={entry.id} aria-label={entry.word}>
+      <article className={`vcard${progress ? ' vcard--with-chk' : ''}${learned ? ' is-learned' : ''}${focused ? ' is-focused' : ''}`} data-entry-id={entry.id} aria-label={entry.word} tabIndex={focused ? -1 : undefined}>
         {progress ? <div className="vcard__chk"><LearnedCheckbox entryId={entry.id} word={entry.word} progress={progress} /></div> : null}
         <div className="vcard__word"><GermanWord entry={entry} /></div>
         <div className="vcard__type">

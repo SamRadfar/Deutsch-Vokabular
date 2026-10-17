@@ -12,10 +12,11 @@ interface Props {
   getTechnicalInfo(id: string): TechnicalInfo | undefined;
   progress?: EntryProgress | undefined;
   learned?: ReadonlySet<string> | undefined;
+  focusEntryId?: string | null | undefined;
 }
 
 /** Subtab navigation + the active subtab panel, inside the category's accent scope. */
-export function CategoryView({ category, activeSubtabId, onSelectSubtab, getTechnicalInfo, progress, learned }: Props) {
+export function CategoryView({ category, activeSubtabId, onSelectSubtab, getTechnicalInfo, progress, learned, focusEntryId }: Props) {
   const subtab = category.subtabs.find((s) => s.id === activeSubtabId) ?? category.subtabs[0];
   if (!subtab) return null;
   const prefix = `sub-${category.key}`;
@@ -45,7 +46,7 @@ export function CategoryView({ category, activeSubtabId, onSelectSubtab, getTech
         })}
       />
       <div role="tabpanel" id={panelElementId(prefix, subtab.id)} aria-labelledby={tabElementId(prefix, subtab.id)} tabIndex={0}>
-        <SubtabPanel key={subtab.id} subtab={subtab} getTechnicalInfo={getTechnicalInfo} progress={progress} learned={learned} />
+        <SubtabPanel key={subtab.id} subtab={subtab} getTechnicalInfo={getTechnicalInfo} progress={progress} learned={learned} focusEntryId={focusEntryId} />
       </div>
     </div>
   );

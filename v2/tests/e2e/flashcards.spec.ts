@@ -23,7 +23,7 @@ const currentEntry = async (page: Page) => entries.get((await card(page).getAttr
 
 async function startSession(page: Page, size = '10') {
   await page.goto('./');
-  await page.getByRole('tab', { name: '🔄 مرور' }).click();
+  await page.getByRole('link', { name: 'مرور', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'مرور با فلش‌کارت' })).toBeVisible();
   await page.getByLabel('تعداد کارت در جلسه').selectOption(size);
   await page.getByRole('button', { name: `شروع مرور (${size} کارت)` }).click();

@@ -91,12 +91,51 @@
 }
 
 @media (max-width: 640px) {
-  .hdr { padding: 10px 10px 0; }
+  .hdr { padding: 8px 10px 0; }
+  .hdr__top { margin-bottom: 6px; }
   .preview-badge { display: none; }
   .icon-btn { width: 40px; height: 40px; }
-}
-@media (max-width: 380px) {
+  /* One compact line on phones: icon + title, actions; the subtitle lives in the page title. */
   .brand__sub { display: none; }
+  .brand__icon { width: 34px; height: 34px; border-radius: 10px; }
+  .brand__title { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pill__unit { display: none; }
+}
+
+/* Header without secondary navigation (practice sections, dashboard) */
+.hdr--flat { padding-bottom: 10px; }
+.hdr--flat .hdr__top { margin-bottom: 0; }
+
+/* Desktop primary navigation sits between brand and actions */
+.hdr__nav { flex: 1; display: flex; justify-content: center; min-width: 0; }
+.brand__text { min-width: 0; }
+
+/* Keyboard users can skip the header */
+.skip-link {
+  position: absolute;
+  inset-inline-start: 12px;
+  top: -60px;
+  z-index: 400;
+  padding: 8px 14px;
+  font-family: var(--fp);
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--ac-review);
+  border-radius: 8px;
+  text-decoration: none;
+}
+.skip-link:focus { top: 8px; }
+
+/* Offline banner (all sections) */
+.offline-banner {
+  padding: 8px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--ts);
+  background: var(--sfalt);
+  border-bottom: 1px solid var(--br);
 }
 
 /* Learned progress in the header (restores the legacy .pwrap progress) */

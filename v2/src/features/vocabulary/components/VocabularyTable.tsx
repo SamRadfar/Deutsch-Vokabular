@@ -15,10 +15,12 @@ export interface EntryListProps {
   caption: string;
   /** Present only when the user is signed in and progress is loaded; otherwise no ✓ column. */
   progress?: EntryProgress | undefined;
+  /** Entry opened from search ("show in list"): highlighted and focusable. */
+  focusEntryId?: string | null | undefined;
 }
 
 /** Desktop layout: one <tbody> per group, headed by a group row (legacy .grp). */
-export function VocabularyTable({ groups, getTechnicalInfo, openInfoId, onToggleInfo, caption, progress }: EntryListProps) {
+export function VocabularyTable({ groups, getTechnicalInfo, openInfoId, onToggleInfo, caption, progress, focusEntryId }: EntryListProps) {
   const columns = progress ? 8 : 7;
   return (
     <div className="tscr">
@@ -55,6 +57,7 @@ export function VocabularyTable({ groups, getTechnicalInfo, openInfoId, onToggle
                 onToggleInfo={() => onToggleInfo(entry.id)}
                 progress={progress}
                 columns={columns}
+                focused={focusEntryId === entry.id}
               />
             ))}
           </tbody>
@@ -71,13 +74,14 @@ interface RowProps {
   onToggleInfo(): void;
   progress: EntryProgress | undefined;
   columns: number;
+  focused?: boolean;
 }
 
-export function VocabularyRow({ entry, info, infoOpen, onToggleInfo, progress, columns }: RowProps) {
+export function VocabularyRow({ entry, info, infoOpen, onToggleInfo, progress, columns, focused = false }: RowProps) {
   const learned = progress?.isLearned(entry.id) ?? false;
   return (
     <Fragment>
-      <tr className={`vrow${learned ? ' is-learned' : ''}`} data-entry-id={entry.id}>
+      <tr className={`vrow${learned ? ' is-learned' : ''}${focused ? ' is-focused' : ''}`} data-entry-id={entry.id} tabIndex={focused ? -1 : undefined}>
         {progress ? <td className="td-chk"><LearnedCheckbox entryId={entry.id} word={entry.word} progress={progress} /></td> : null}
         <th scope="row" className="td-word"><GermanWord entry={entry} /></th>
         <td className="td-type">

@@ -6,12 +6,11 @@ import { App } from '../../../src/app/App';
 import { getVocabularyRepository } from '../../../src/services/content/vocabularyRepository';
 import { DEFAULT_PREFERENCES, type ShadowingPreferences } from '../../../src/features/shadowing/settings';
 import { STATS_META_KEY } from '../../../src/features/shadowing/model';
-import { fakeSpeech, mockMatchMedia } from '../../helpers/dom';
+import { fakeSpeech, mockMatchMedia, waitForLearnedCheckboxes } from '../../helpers/dom';
 import { ALICE } from '../../helpers/fakeAuth';
 import { createFakeServices } from '../../helpers/fakeServices';
 
 const repo = getVocabularyRepository();
-const first = repo.categories[0]!.subtabs[0]!.groups[0]!.entries[0]!;
 
 beforeEach(() => {
   mockMatchMedia(() => false);
@@ -22,7 +21,7 @@ afterEach(() => vi.useRealTimers());
 
 const storePrefs = (p: Partial<ShadowingPreferences>) =>
   localStorage.setItem('dv2.pref.shadowing.v1', JSON.stringify({ ...DEFAULT_PREFERENCES, ...p }));
-const tab = () => screen.getByRole('tab', { name: '🗣 تلفظ' });
+const tab = () => screen.getByRole('link', { name: 'تلفظ' });
 const button = (name: string | RegExp) => screen.getByRole('button', { name });
 const phase = () => screen.getByTestId('sh-phase').textContent;
 const count = () => screen.getByTestId('sh-count').textContent;
@@ -163,7 +162,7 @@ describe('shadowing — playback workflow', () => {
   it('completes the session and records the practice for the signed-in user (device-local)', async () => {
     storePrefs({ wordRepeats: 1, exampleRepeats: 0, pauseSec: 1, size: 5 });
     const { user, speech, env } = setup(fakeSpeech(), ALICE);
-    await waitFor(() => expect(screen.getByRole('checkbox', { name: `یادگرفتم: ${first.word}` })).toBeInTheDocument());
+    await waitForLearnedCheckboxes();
     await user.click(tab());
     expect(screen.getByRole('radio', { name: /یادنگرفته‌ها/ })).toBeEnabled();
     await user.click(button('شروع تمرین (5 واژه)'));
@@ -215,7 +214,7 @@ describe('shadowing — cleanup', () => {
     await user.click(tab());
     await user.click(button('شروع تمرین (5 واژه)'));
     await user.click(button('واژهٔ بعدی'));
-    await user.click(screen.getByRole('tab', { name: repo.categories[0]!.label }));
+    await user.click(screen.getByRole('link', { name: 'واژه‌ها' }));
     expect(speech.speaking).toBe(false);
     const calls = vi.mocked(speech.speak).mock.calls.length;
     act(() => { vi.advanceTimersByTime(30_000); });

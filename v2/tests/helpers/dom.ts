@@ -1,4 +1,5 @@
 import { vi } from 'vitest';
+import { waitFor } from '@testing-library/react';
 import type { GermanVoiceStatus, SpeakOptions, SpeechService } from '../../src/features/pronunciation/speechService';
 
 /** Install a matchMedia whose result is decided per query. */
@@ -51,4 +52,13 @@ export function fakeSpeech(supported = true, voice: GermanVoiceStatus = 'availab
     get speaking() { return pending !== undefined; },
   };
   return service;
+}
+
+/**
+ * Waits until the signed-in vocabulary view shows its learned checkboxes, using a cheap DOM query.
+ * (A *ByRole query over a full category table costs 50–250 ms in jsdom; inside waitFor it runs on
+ * every DOM mutation and can starve the very updates it is waiting for.)
+ */
+export async function waitForLearnedCheckboxes(): Promise<void> {
+  await waitFor(() => { if (!document.querySelector('input.vchk')) throw new Error('learned checkboxes are not rendered yet'); });
 }

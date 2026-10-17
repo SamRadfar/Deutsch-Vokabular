@@ -1,16 +1,22 @@
-import { lazy, Suspense, useCallback, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { Header } from '../components/Header/Header';
 import { useTheme } from '../hooks/useTheme';
 import { PronunciationProvider } from '../features/pronunciation/PronunciationProvider';
 import type { SpeechService } from '../features/pronunciation/speechService';
 import type { CategoryKey } from '../models/vocabulary';
-import { MainNavigation, MAIN_TABS_PREFIX, REVIEW_TAB_ID, SHADOWING_TAB_ID } from '../features/vocabulary/components/MainNavigation';
+import { MainNavigation } from '../features/vocabulary/components/MainNavigation';
 import { ReviewPanel } from '../features/review/components/ReviewPanel';
 import { ShadowingPanel } from '../features/shadowing/components/ShadowingPanel';
-import { CategoryView } from '../features/vocabulary/components/CategoryView';
+import { WordsSection, type WordsSearchState } from '../features/search/WordsSection';
+import { filtersActive, NO_FILTERS } from '../features/search/searchIndex';
+import { Dashboard } from '../features/dashboard/Dashboard';
+import { PrimaryNav } from '../components/PrimaryNav/PrimaryNav';
+import { OfflineBanner } from '../components/OfflineBanner/OfflineBanner';
+import { useMediaQuery } from '../hooks/useMediaQuery';
+import { MOBILE_QUERY } from '../features/vocabulary/components/SubtabPanel';
+import { useSection, type Section } from './sections';
 import type { EntryProgress } from '../features/vocabulary/components/LearnedCheckbox';
 import { useVocabularyNavigation } from '../features/vocabulary/useVocabularyNavigation';
-import { panelElementId, tabElementId } from '../components/TabList/TabList';
 import { getVocabularyRepository, type VocabularyRepository } from '../services/content/vocabularyRepository';
 import { AuthProvider } from '../features/auth/AuthProvider';
 import { ProgressProvider, useProgress } from '../features/progress/ProgressProvider';
@@ -57,22 +63,16 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
   const nav = useVocabularyNavigation(repository.categories);
   const category = nav.activeCategory;
   const progress = useProgress();
+  const { section, navigate } = useSection();
+  const mobile = useMediaQuery(MOBILE_QUERY);
   const [migrationOpen, setMigrationOpen] = useState(false);
-  /** null = a vocabulary category; otherwise the practice tab that is open. */
-  const [practiceTab, setPracticeTab] = useState<typeof REVIEW_TAB_ID | typeof SHADOWING_TAB_ID | null>(null);
-  // Practice panels stay mounted once opened, so a running session survives a look at another tab.
-  const [mounted, setMounted] = useState<ReadonlySet<string>>(new Set());
-  const selectMainTab = useCallback((id: string) => {
-    if (id === REVIEW_TAB_ID || id === SHADOWING_TAB_ID) {
-      setPracticeTab(id);
-      setMounted((m) => (m.has(id) ? m : new Set([...m, id])));
-    } else {
-      setPracticeTab(null);
-      nav.selectCategory(id as CategoryKey);
-    }
-  }, [nav.selectCategory]);
-  // A session belongs to one account: switching or signing out starts the practice tabs afresh.
-  const reviewOwner = progress.status === 'unavailable' ? 'signed-out' : progress.uid;
+  const [search, setSearch] = useState<WordsSearchState>({ query: '', filters: NO_FILTERS });
+  const [focusEntryId, setFocusEntryId] = useState<string | null>(null);
+  // Practice panels stay mounted once opened, so a running session survives a look at another section.
+  const [mounted, setMounted] = useState<ReadonlySet<Section>>(() => new Set([section]));
+  useEffect(() => { setMounted((m) => (m.has(section) ? m : new Set([...m, section]))); }, [section]);
+  // A session belongs to one account: switching or signing out starts the practice sections afresh.
+  const owner = progress.status === 'unavailable' ? 'signed-out' : progress.uid;
 
   const ready = progress.status === 'ready' ? progress : null;
   const learned = ready?.view.learned;
@@ -87,7 +87,16 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
     };
   }, [ready]);
 
+  /** Category tabs (and dashboard rows): browsing a category leaves search mode. */
+  const selectCategory = useCallback((key: string) => {
+    setFocusEntryId(null);
+    setSearch((s) => (s.query || filtersActive(s.filters) ? { query: '', filters: NO_FILTERS } : s));
+    nav.selectCategory(key as CategoryKey);
+    navigate('words');
+  }, [nav.selectCategory, navigate]);
+
   const closeMigration = useCallback(() => setMigrationOpen(false), []);
+  const primaryNav = <PrimaryNav active={section} onNavigate={navigate} variant={mobile ? 'bottom' : 'top'} />;
 
   return (
     <>
@@ -97,40 +106,56 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
         environmentLabel={environmentLabel}
         theme={theme}
         onToggleTheme={toggle}
+        primaryNav={mobile ? null : primaryNav}
         account={(
           <>
             <SyncStatusIndicator />
             <AccountControl totalEntries={repository.totalEntries} learnedCount={learnedCount} onOpenMigration={() => setMigrationOpen(true)} />
           </>
         )}
-        navigation={<MainNavigation categories={repository.categories} activeId={practiceTab ?? category.key} onSelect={selectMainTab} />}
+        navigation={section === 'words'
+          ? <MainNavigation categories={repository.categories} activeId={category.key} onSelect={selectCategory} />
+          : null}
       />
+      <OfflineBanner signedIn={progress.status !== 'unavailable'} />
       <AuthErrorBanner />
-      <main className="mcontent">
-        {practiceTab ? null : (
-          <div role="tabpanel" id={panelElementId(MAIN_TABS_PREFIX, category.key)} aria-labelledby={tabElementId(MAIN_TABS_PREFIX, category.key)}>
-            <CategoryView
-              key={category.key}
-              category={category}
-              activeSubtabId={nav.activeSubtabId}
-              onSelectSubtab={nav.selectSubtab}
-              getTechnicalInfo={repository.getTechnicalInfo}
-              progress={entryProgress}
-              learned={learned}
-            />
-          </div>
-        )}
-        {mounted.has(REVIEW_TAB_ID) ? (
-          <div role="tabpanel" id={panelElementId(MAIN_TABS_PREFIX, REVIEW_TAB_ID)} aria-labelledby={tabElementId(MAIN_TABS_PREFIX, REVIEW_TAB_ID)} hidden={practiceTab !== REVIEW_TAB_ID}>
-            <ReviewPanel key={reviewOwner} categories={repository.categories} active={practiceTab === REVIEW_TAB_ID} />
+      <main className={`mcontent${mobile ? ' mcontent--bottom-nav' : ''}`} id="main" tabIndex={-1}>
+        {section === 'words' ? (
+          <WordsSection
+            categories={repository.categories}
+            category={category}
+            activeSubtabId={nav.activeSubtabId}
+            onSelectSubtab={nav.selectSubtab}
+            onShow={nav.show}
+            getTechnicalInfo={repository.getTechnicalInfo}
+            progress={entryProgress}
+            learned={learned}
+            search={search}
+            onSearch={setSearch}
+            focusEntryId={focusEntryId}
+            onFocusEntry={setFocusEntryId}
+          />
+        ) : null}
+        {mounted.has('review') ? (
+          <div hidden={section !== 'review'} data-section="review">
+            <ReviewPanel key={owner} categories={repository.categories} active={section === 'review'} />
           </div>
         ) : null}
-        {mounted.has(SHADOWING_TAB_ID) ? (
-          <div role="tabpanel" id={panelElementId(MAIN_TABS_PREFIX, SHADOWING_TAB_ID)} aria-labelledby={tabElementId(MAIN_TABS_PREFIX, SHADOWING_TAB_ID)} hidden={practiceTab !== SHADOWING_TAB_ID}>
-            <ShadowingPanel key={reviewOwner} categories={repository.categories} active={practiceTab === SHADOWING_TAB_ID} />
+        {mounted.has('shadowing') ? (
+          <div hidden={section !== 'shadowing'} data-section="shadowing">
+            <ShadowingPanel key={owner} categories={repository.categories} active={section === 'shadowing'} />
           </div>
+        ) : null}
+        {section === 'progress' ? (
+          <Dashboard
+            categories={repository.categories}
+            onOpenCategory={selectCategory}
+            onOpenReview={() => navigate('review')}
+            onOpenShadowing={() => navigate('shadowing')}
+          />
         ) : null}
       </main>
+      {mobile ? primaryNav : null}
       {migrationOpen && ready ? (
         <Suspense fallback={<p className="visually-hidden" role="status">در حال بارگذاری…</p>}>
           <MigrationDialog repository={repository} onClose={closeMigration} />

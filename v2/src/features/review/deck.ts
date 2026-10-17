@@ -15,7 +15,10 @@ export interface DeckCard {
   categoryLabel: string;
   /** Accent theme of the category (CSS `data-category`). */
   theme: string;
+  subtabId: string;
   subtabLabel: string;
+  /** Position in content order (stable sort key). */
+  order: number;
 }
 
 /** Personal data a deck may depend on; `null` when it is not available (signed out, loading). */
@@ -34,7 +37,7 @@ export function flattenCards(categories: readonly Category[]): DeckCard[] {
         for (const entry of g.entries) {
           if (seen.has(entry.id)) continue;
           seen.add(entry.id);
-          cards.push({ entry, categoryKey: c.key, categoryLabel: c.label, theme: c.theme, subtabLabel: s.label });
+          cards.push({ entry, categoryKey: c.key, categoryLabel: c.label, theme: c.theme, subtabId: s.id, subtabLabel: s.label, order: cards.length });
         }
   return cards;
 }

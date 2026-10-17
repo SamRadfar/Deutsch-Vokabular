@@ -37,7 +37,7 @@
   color: var(--tp);
 }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn--primary { background: var(--ac-arch); border-color: var(--ac-arch); color: #fff; }
+.btn--primary { background: #3a56d4; border-color: #3a56d4; color: #fff; } /* fixed: white text needs the dark accent in both themes */
 .btn--danger { color: #b42318; }
 @media (max-width: 640px) {
   .dialog-backdrop { align-items: flex-end; padding: 0; }

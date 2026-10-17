@@ -22,7 +22,7 @@ const count = (page: Page) => page.getByTestId('sh-count');
 async function openSetup(page: Page, opts: { size?: string; word?: string; example?: string; pause?: string; speakMs?: number } = {}) {
   await installSpeechMock(page, opts.speakMs);
   await page.goto('./');
-  await page.getByRole('tab', { name: '🗣 تلفظ' }).click();
+  await page.getByRole('link', { name: 'تلفظ', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'تمرین تلفظ (Shadowing)' })).toBeVisible();
   await page.getByLabel('تعداد واژه در جلسه').selectOption(opts.size ?? '5');
   await page.getByLabel('تکرار هر واژه').selectOption(opts.word ?? '1');
@@ -113,7 +113,7 @@ test('settings persist across reloads', async ({ page }) => {
   await openSetup(page, { size: '10', word: '3', example: '2' });
   await page.getByLabel('سرعت گفتار').selectOption('1.2');
   await page.reload();
-  await page.getByRole('tab', { name: '🗣 تلفظ' }).click();
+  await page.getByRole('link', { name: 'تلفظ', exact: true }).click();
   await expect(page.getByLabel('تعداد واژه در جلسه')).toHaveValue('10');
   await expect(page.getByLabel('تکرار هر واژه')).toHaveValue('3');
   await expect(page.getByLabel('تکرار جملهٔ مثال')).toHaveValue('2');
@@ -126,12 +126,12 @@ test('settings persist across reloads', async ({ page }) => {
 test('leaving the tab stops the sound; coming back offers to continue', async ({ page }) => {
   await openSetup(page);
   await page.getByRole('button', { name: 'شروع تمرین (5 واژه)' }).click();
-  await page.getByRole('tab', { name: '🔄 مرور' }).click();
+  await page.getByRole('link', { name: 'مرور', exact: true }).click();
   expect(await page.evaluate(() => window.__speaking)).toBe(0);
   const n = (await spoken(page)).length;
   await page.waitForTimeout(2000);
   expect((await spoken(page)).length).toBe(n);
-  await page.getByRole('tab', { name: '🗣 تلفظ' }).click();
+  await page.getByRole('link', { name: 'تلفظ', exact: true }).click();
   await expect(page.getByText('از تب تمرین خارج شدید')).toBeVisible();
   await expect(page.getByRole('button', { name: 'ادامه' })).toBeVisible();
 });

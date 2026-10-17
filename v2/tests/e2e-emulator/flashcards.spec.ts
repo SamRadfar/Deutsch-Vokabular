@@ -9,7 +9,7 @@ const radio = (page: Page, name: RegExp) => page.getByRole('radio', { name });
 const synced = (page: Page) => expect(page.getByTestId('sync-status')).toHaveAttribute('class', /sync-pill--ok/, { timeout: 15_000 });
 
 async function openReview(page: Page) {
-  await page.getByRole('tab', { name: '🔄 مرور' }).click();
+  await page.getByRole('link', { name: 'مرور', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'مرور با فلش‌کارت' })).toBeVisible();
 }
 

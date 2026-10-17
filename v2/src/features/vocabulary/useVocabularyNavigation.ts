@@ -19,5 +19,11 @@ export function useVocabularyNavigation(categories: readonly Category[]) {
     [activeKey],
   );
 
-  return { activeCategory, activeSubtabId, selectCategory: setActiveKey, selectSubtab };
+  /** Opens a category on a given subtab (e.g. "show in list" from search). */
+  const show = useCallback((key: CategoryKey, subtabId: string) => {
+    setActiveKey(key);
+    setSubtabByCategory((prev) => ({ ...prev, [key]: subtabId }));
+  }, []);
+
+  return { activeCategory, activeSubtabId, selectCategory: setActiveKey, selectSubtab, show };
 }

@@ -28,8 +28,8 @@ test.describe('application', () => {
     // Hermetic build: no developer .env.local may leak in (badge would show "dev: …").
     await expect(page.getByTestId('env-badge')).toHaveText('v2 preview');
     const tabs = page.getByRole('tablist', { name: 'Kategorien' }).getByRole('tab');
-    await expect(tabs).toHaveCount(9); // 7 categories + flashcard review + shadowing
-    await expect(tabs).toHaveText([...categories.map((c) => c.label), '🔄 مرور', '🗣 تلفظ']);
+    await expect(tabs).toHaveCount(7); // categories; practice sections are in the main navigation
+    await expect(tabs).toHaveText(categories.map((c) => c.label));
     // The legacy brand logo (extracted from index.html) loads under the relative base path.
     await expect.poll(() => page.locator('.brand__icon').evaluate((img: HTMLImageElement) => img.naturalWidth)).toBe(300);
     expect(errors).toEqual([]);
@@ -43,7 +43,7 @@ test.describe('application', () => {
       await expect(mainTab(page, c.label)).toHaveAttribute('aria-selected', 'true');
       const first = c.subtabs.flatMap((s) => s.groups.flatMap((g) => g.entries))[0];
       const firstSubtabEmpty = c.subtabs[0]!.groups.every((g) => g.entries.length === 0);
-      if (firstSubtabEmpty) await expect(page.getByRole('status')).toContainText('هنوز واژه‌ای');
+      if (firstSubtabEmpty) await expect(page.getByText('هنوز واژه‌ای در این بخش وجود ندارد')).toBeVisible();
       else await expect(page.locator(`[data-entry-id="${first!.id}"]`)).toBeVisible();
     }
     expect(errors).toEqual([]);
@@ -117,7 +117,7 @@ test.describe('layout', () => {
   test('touch targets on mobile are at least 32px', async ({ page, isMobile }) => {
     test.skip(!isMobile, 'mobile only');
     await page.goto('./');
-    const sizes = await page.locator('.mbtn, .sbtn, .speak-btn, .icon-btn').evaluateAll((els) =>
+    const sizes = await page.locator('.mbtn, .sbtn, .speak-btn, .icon-btn, .pnav__link').evaluateAll((els) =>
       els.slice(0, 40).map((e) => { const r = e.getBoundingClientRect(); return Math.min(r.width, r.height); }));
     expect(Math.min(...sizes)).toBeGreaterThanOrEqual(32);
   });

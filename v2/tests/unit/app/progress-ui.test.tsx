@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { App } from '../../../src/app/App';
 import { getVocabularyRepository } from '../../../src/services/content/vocabularyRepository';
 import { buildLegacyKeyIndex } from '../../../src/services/content/idRegistry';
-import { fakeSpeech, mockMatchMedia, MOBILE } from '../../helpers/dom';
+import { fakeSpeech, mockMatchMedia, MOBILE, waitForLearnedCheckboxes } from '../../helpers/dom';
 import { ALICE, BOB } from '../../helpers/fakeAuth';
 import { createFakeServices } from '../../helpers/fakeServices';
 
@@ -18,7 +18,7 @@ const checkbox = (word: string) => screen.getByRole('checkbox', { name: `یاد�
 async function signedInApp(restored = ALICE) {
   const env = createFakeServices({ restored });
   const view = render(<App services={env.services} speechService={fakeSpeech()} />);
-  await waitFor(() => expect(checkbox(first.word)).toBeInTheDocument());
+  await waitForLearnedCheckboxes();
   return { ...env, ...view };
 }
 
@@ -44,7 +44,7 @@ describe('authentication UI', () => {
     render(<App services={env.services} speechService={fakeSpeech()} />);
     expect(screen.getByRole('status', { name: 'در حال بررسی وضعیت ورود…' })).toBeInTheDocument();
     expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
-    await waitFor(() => expect(checkbox(first.word)).toBeInTheDocument());
+    await waitForLearnedCheckboxes();
   });
 
   it('sign in via the button, then sign out from the account menu', async () => {
@@ -52,7 +52,7 @@ describe('authentication UI', () => {
     const env = createFakeServices();
     render(<App services={env.services} speechService={fakeSpeech()} />);
     await user.click(await screen.findByRole('button', { name: 'ورود با گوگل' }));
-    await waitFor(() => expect(checkbox(first.word)).toBeInTheDocument());
+    await waitForLearnedCheckboxes();
     await user.click(screen.getByTestId('account-button'));
     const menu = screen.getByRole('menu');
     expect(menu).toHaveTextContent(ALICE.displayName!);
@@ -128,7 +128,8 @@ describe('learned progress UI', () => {
     await waitFor(() => expect(env.cloud.serverState(ALICE.uid).get(first.id)).toBe(true));
     env.unmount();
     render(<App services={env.services} speechService={fakeSpeech()} />);
-    await waitFor(() => expect(checkbox(first.word)).toBeChecked());
+    await waitFor(() => expect(document.querySelector(`[data-entry-id="${first.id}"] input.vchk`)).toBeChecked()); // cheap query (see waitForLearnedCheckboxes)
+    expect(checkbox(first.word)).toBeChecked();
   });
 
   it('account switching never shows the previous account’s progress', async () => {
@@ -140,7 +141,8 @@ describe('learned progress UI', () => {
     await waitFor(() => expect(screen.getByTestId('header-progress')).toHaveTextContent(`0/${repo.totalEntries}`));
     expect(checkbox(first.word)).not.toBeChecked();
     act(() => env.auth.switchUserExternally(ALICE));
-    await waitFor(() => expect(checkbox(first.word)).toBeChecked());
+    await waitFor(() => expect(document.querySelector(`[data-entry-id="${first.id}"] input.vchk`)).toBeChecked()); // cheap query (see waitForLearnedCheckboxes)
+    expect(checkbox(first.word)).toBeChecked();
   });
 
   it('signing out with unsynced changes explains that they are kept on this device', async () => {
@@ -174,7 +176,7 @@ describe('Firestore write cost', () => {
     await waitFor(() => expect(env.account.profileWrites).toBe(1));
     env.unmount();
     render(<App services={env.services} speechService={fakeSpeech()} />);
-    await waitFor(() => expect(checkbox(first.word)).toBeInTheDocument());
+    await waitForLearnedCheckboxes();
     await new Promise((r) => setTimeout(r, 50));
     expect(env.account.profileWrites).toBe(1);
   });

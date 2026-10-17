@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { App } from '../../../src/app/App';
 import { getVocabularyRepository } from '../../../src/services/content/vocabularyRepository';
 import { speechTextForWord } from '../../../src/features/pronunciation/speechService';
-import { fakeSpeech, mockMatchMedia } from '../../helpers/dom';
+import { fakeSpeech, mockMatchMedia, waitForLearnedCheckboxes } from '../../helpers/dom';
 import { ALICE } from '../../helpers/fakeAuth';
 import { createFakeServices } from '../../helpers/fakeServices';
 
@@ -14,7 +14,7 @@ const first = repo.categories[0]!.subtabs[0]!.groups[0]!.entries[0]!;
 beforeEach(() => mockMatchMedia(() => false));
 
 type User = ReturnType<typeof userEvent.setup>;
-const reviewTab = () => screen.getByRole('tab', { name: '🔄 مرور' });
+const reviewTab = () => screen.getByRole('link', { name: 'مرور' });
 const card = () => screen.getByTestId('flashcard');
 const currentId = () => card().getAttribute('data-entry-id')!;
 const currentEntry = () => repo.getEntry(currentId())!;
@@ -39,7 +39,7 @@ async function signedIn() {
   const speech = fakeSpeech();
   const env = createFakeServices({ restored: ALICE });
   render(<App services={env.services} speechService={speech} />);
-  await waitFor(() => expect(screen.getByRole('checkbox', { name: `یادگرفتم: ${first.word}` })).toBeInTheDocument());
+  await waitForLearnedCheckboxes();
   return { ...env, speech };
 }
 
@@ -48,7 +48,8 @@ describe('flashcards — signed out (practice without saving)', () => {
     const user = userEvent.setup();
     signedOut();
     await user.click(reviewTab());
-    expect(reviewTab()).toHaveAttribute('aria-selected', 'true');
+    expect(reviewTab()).toHaveAttribute('aria-current', 'page');
+    expect(window.location.hash).toBe('#/review');
     expect(screen.getByRole('note')).toHaveTextContent('نتیجه‌ها ذخیره نمی‌شوند');
     expect(screen.getByRole('radio', { name: /همهٔ واژه‌ها/ })).toBeChecked();
     for (const name of [/یادنگرفته‌ها/, /یادگرفته‌ها/, /مرور دوباره/]) expect(screen.getByRole('radio', { name })).toBeDisabled();
@@ -218,13 +219,14 @@ describe('flashcards — signed out (practice without saving)', () => {
     expect(button('شروع مرور (10 کارت)')).toBeInTheDocument();
   });
 
-  it('a running session survives a visit to a category tab', async () => {
+  it('a running session survives a visit to another section', async () => {
     const user = userEvent.setup();
     signedOut();
     await openReview(user);
     await user.click(button('شروع مرور (10 کارت)'));
     await user.click(knowBtn());
     const id = currentId();
+    await user.click(screen.getByRole('link', { name: 'واژه‌ها' }));
     await user.click(screen.getByRole('tab', { name: repo.categories[1]!.label }));
     expect(screen.queryByTestId('flashcard')).not.toBeVisible();
     await user.keyboard('2'); // hidden session: no shortcuts
@@ -298,7 +300,7 @@ describe('flashcards — signed in (saved through the progress system)', () => {
     await user.selectOptions(screen.getByLabelText('دسته'), 'arch');
     expect(button(`شروع مرور (${archTotal} کارت)`)).toBeEnabled();
 
-    await user.click(screen.getByRole('tab', { name: repo.categories[0]!.label }));
+    await user.click(screen.getByRole('link', { name: 'واژه‌ها' }));
     await user.click(screen.getByRole('checkbox', { name: `یادگرفتم: ${first.word}` }));
     await user.click(reviewTab());
     expect(screen.getByRole('radio', { name: /یادنگرفته‌ها/ })).toBeChecked();

@@ -8,7 +8,7 @@ import { signIn, signOut, trackErrors, uniqueEmail } from './helpers';
 const stat = (page: Page, label: string) => page.locator('.rv-stat').filter({ hasText: label }).locator('.rv-stat__n');
 
 async function openShadowing(page: Page) {
-  await page.getByRole('tab', { name: '🗣 تلفظ' }).click();
+  await page.getByRole('link', { name: 'تلفظ', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'تمرین تلفظ (Shadowing)' })).toBeVisible();
 }
 

@@ -2,18 +2,15 @@ import type { Category } from '../../../models/vocabulary';
 import { TabList } from '../../../components/TabList/TabList';
 
 export const MAIN_TABS_PREFIX = 'main';
-/** Id of the flashcard review tab, next to the category tabs (legacy "🔄 مرور"). */
-export const REVIEW_TAB_ID = 'review';
-/** Id of the shadowing / pronunciation practice tab. */
-export const SHADOWING_TAB_ID = 'shadowing';
 
 interface Props {
   categories: readonly Category[];
-  /** A category key, REVIEW_TAB_ID or SHADOWING_TAB_ID. */
+  /** The active category key. */
   activeId: string;
   onSelect(id: string): void;
 }
 
+/** Secondary navigation of the "words" section: the vocabulary categories (WAI-ARIA tabs). */
 export function MainNavigation({ categories, activeId, onSelect }: Props) {
   return (
     <nav aria-label="Kategorien">
@@ -24,11 +21,7 @@ export function MainNavigation({ categories, activeId, onSelect }: Props) {
         tabClassName="mbtn"
         selectedId={activeId}
         onSelect={onSelect}
-        items={[
-          ...categories.map((c) => ({ id: c.key, content: c.label, dataCategory: c.theme })),
-          { id: REVIEW_TAB_ID, content: <span lang="fa">🔄 مرور</span>, dataCategory: 'review' },
-          { id: SHADOWING_TAB_ID, content: <span lang="fa">🗣 تلفظ</span>, dataCategory: 'review' },
-        ]}
+        items={categories.map((c) => ({ id: c.key, content: c.label, dataCategory: c.theme }))}
       />
     </nav>
   );
