@@ -98,6 +98,11 @@ Phase 4B adds `v2/src/features/shadowing/` (pure step plan, weighted queue and a
 over the shared speech service, device-local exposure in IndexedDB v3, the «🗣 تلفظ» tab) and
 `v2/src/styles/practice.css` (shared practice UI). See `docs/SHADOWING_DESIGN.md`.
 
+Phase 4C adds the four main sections with hash routes (`v2/src/app/sections.ts`,
+`components/PrimaryNav`), vocabulary search and filters (`features/search/`), the learning dashboard
+(`features/dashboard/`), an offline banner and accessibility/contrast fixes. See
+`docs/UI_UX_PHASE4C.md`.
+
 Still planned: production deployment, the server-side AI endpoint, cloud-synced review/practice
 state (proposal in `REVIEW_DESIGN.md` §6) and a PWA service worker.
 
