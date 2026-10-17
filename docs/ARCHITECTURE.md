@@ -103,8 +103,14 @@ Phase 4C adds the four main sections with hash routes (`v2/src/app/sections.ts`,
 (`features/dashboard/`), an offline banner and accessibility/contrast fixes. See
 `docs/UI_UX_PHASE4C.md`.
 
-Still planned: production deployment, the server-side AI endpoint, cloud-synced review/practice
-state (proposal in `REVIEW_DESIGN.md` §6) and a PWA service worker.
+Phase 5A adds `v2/src/features/personal/` (personal vocabulary: `pw_` ids, IndexedDB v4 store
+`personal-words`, CRUD UI, duplicate detection, preview-first legacy import) integrated into search,
+browse, flashcards, shadowing and the dashboard, plus the **proposed** (not deployed) rules
+`v2/firestore.proposed.rules`. See `docs/PERSONAL_VOCABULARY.md`.
+
+Still planned: production deployment, the server-side AI endpoint, cloud sync of personal words and
+review/practice state (proposals in `PERSONAL_VOCABULARY.md` §5 and `REVIEW_DESIGN.md` §6) and a PWA
+service worker.
 
 ## v2 architecture (Phase 2)
 

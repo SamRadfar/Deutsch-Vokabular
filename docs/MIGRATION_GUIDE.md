@@ -9,7 +9,8 @@ Technical rules: `docs/MIGRATION_SPEC.md`.
 |---|---|
 | Ticks «یادگرفتم» (`dvok6`, and old `dvok5` if there are no newer ticks) | **Yes**, *added* to your account |
 | Ticks for words that no longer exist (e.g. 39 removed Bautechnik words) | No; listed in the preview |
-| Custom words, pronunciation settings, exposure counters | Not in this version; they stay in the legacy app |
+| Custom words | Yes, since Phase 5A, separately: «واژه‌های من» → «انتقال از نسخهٔ قدیمی» (preview first, idempotent, see `PERSONAL_VOCABULARY.md` §6) |
+| Pronunciation settings, exposure counters | Not in this version; they stay in the legacy app |
 | Anthropic API key, sync code | **Never** |
 
 Nothing in the legacy app is changed or deleted. A word that your account already marks as
