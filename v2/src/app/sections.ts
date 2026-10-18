@@ -36,7 +36,7 @@ export function parseSection(hash: string): Section {
 
 export const sectionHref = (s: Section) => (s === 'words' ? '#/' : `#/${s}`);
 
-const BASE_TITLE = 'Deutsch Vokabular 2.0 (Preview)';
+const BASE_TITLE = import.meta.env.VITE_FIREBASE_ENV === 'production' ? 'Deutsch Vokabular' : 'Deutsch Vokabular 2.0 (Preview)';
 
 /**
  * The active section lives in the URL hash, so the browser's back button and links work, and a

@@ -9,7 +9,7 @@
  *  - the legacy production project can never be used by v2,
  *  - emulator mode only ever uses "demo-" projects (which cannot reach real Google services),
  *  - development uses a project whose id marks it as development,
- *  - production is refused until a production configuration has been approved,
+ *  - production is allowed only for the explicitly approved production project(s),
  *  - values copied from two different Firebase projects are detected.
  * Diagnostics name variables, never their values.
  */
@@ -59,8 +59,11 @@ const REQUIRED = [
 /** Firebase projects that v2 must never talk to (legacy app: index.html `firebaseConfig`). */
 export const FORBIDDEN_PROJECT_IDS = ['deutsch-wortschatz-c7a11'] as const;
 
-/** Production stays disabled until Phase 4 is approved (ADR 0003 R7). */
-export const PRODUCTION_APPROVED = false;
+/**
+ * The ONLY Firebase projects a production build may use (approved by the product owner for the
+ * public release on Firebase Hosting; docs/PRODUCTION.md). Any other id is refused in production.
+ */
+export const PRODUCTION_PROJECT_IDS = ['deutsch-vokabular'] as const;
 
 const str = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
 const ENVIRONMENTS: readonly FirebaseEnvironment[] = ['emulator', 'development', 'production'];
@@ -112,10 +115,12 @@ export function readFirebaseConfig(env: Env = import.meta.env as Env): FirebaseC
     else if (sender && sender !== appIdMatch[1]) problems.push('VITE_FIREBASE_MESSAGING_SENDER_ID belongs to a different project than VITE_FIREBASE_APP_ID');
   }
   if (environment === 'development' && !/(^|-)dev(-|$)/.test(id)) {
-    problems.push('VITE_FIREBASE_ENV=development requires a development project (id containing "-dev", e.g. deutsch-vokabular-v2-dev)');
+    problems.push('VITE_FIREBASE_ENV=development requires a development project (project id containing "-dev")');
   }
   if (environment === 'production') {
-    if (!PRODUCTION_APPROVED) problems.push('production configuration is not approved yet (Phase 4)');
+    if (!(PRODUCTION_PROJECT_IDS as readonly string[]).includes(id)) {
+      problems.push(`VITE_FIREBASE_ENV=production is only allowed for the approved production project (${PRODUCTION_PROJECT_IDS.join(', ')})`);
+    }
     if (/(^|-)dev(-|$)/.test(id)) problems.push('VITE_FIREBASE_ENV=production must not use a development project');
   }
 

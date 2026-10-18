@@ -33,6 +33,12 @@ import { AuthErrorBanner } from '../features/account/AuthErrorBanner';
 import { SyncStatusIndicator } from '../features/account/SyncStatusIndicator';
 import { createAppServices, type AppServices } from './services';
 import { AiProvider } from '../features/ai/AiProvider';
+import { UpdateNotice } from '../pwa/UpdateNotice';
+
+/** Production release (set by scripts/build-production.mjs); null in development and test builds. */
+const RELEASE = import.meta.env.VITE_FIREBASE_ENV === 'production' && import.meta.env.VITE_APP_VERSION
+  ? { version: String(import.meta.env.VITE_APP_VERSION), build: String(import.meta.env.VITE_APP_BUILD ?? '') }
+  : null;
 
 /** Desktop layout with the sidebar. */
 export const WIDE_QUERY = '(min-width: 1024px)';
@@ -132,7 +138,11 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
   }, [nav.selectCategory, navigate]);
 
   const closeMigration = useCallback(() => setMigrationOpen(false), []);
-  const envBadge = (
+  const envBadge = RELEASE ? (
+    <span className="env-badge" title={`Deutsch Vokabular ${RELEASE.version} (${RELEASE.build})`} data-testid="env-badge" lang="en" dir="ltr">
+      v{RELEASE.version}
+    </span>
+  ) : (
     <span className="env-badge" title="Development preview — not the production app" data-testid="env-badge" lang="en" dir="ltr">
       v2 preview{environmentLabel ? ` · ${environmentLabel}` : ''}
     </span>
@@ -164,6 +174,7 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
         />
       )}
       <main className={`mcontent${wide ? '' : ' mcontent--bottom-nav'}`} id="main" tabIndex={-1}>
+        <UpdateNotice />
         <OfflineBanner signedIn={progress.status !== 'unavailable'} />
         <AuthErrorBanner />
         {section === 'words' ? (

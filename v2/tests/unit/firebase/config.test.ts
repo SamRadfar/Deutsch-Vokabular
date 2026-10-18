@@ -55,9 +55,16 @@ describe('readFirebaseConfig', () => {
     }
   });
 
-  it('development requires a -dev project; production is refused until approved', () => {
+  it('development requires a -dev project; production only the approved production project', () => {
     expect(problems({ ...dev, VITE_FIREBASE_PROJECT_ID: 'deutsch-vokabular-v2', VITE_FIREBASE_AUTH_DOMAIN: 'deutsch-vokabular-v2.firebaseapp.com' })).toContain('requires a development project');
-    expect(problems({ ...dev, VITE_FIREBASE_ENV: 'production', VITE_FIREBASE_PROJECT_ID: 'deutsch-vokabular-v2', VITE_FIREBASE_AUTH_DOMAIN: 'deutsch-vokabular-v2.firebaseapp.com' })).toContain('not approved yet');
+    const prod = { ...dev, VITE_FIREBASE_ENV: 'production', VITE_FIREBASE_PROJECT_ID: 'deutsch-vokabular', VITE_FIREBASE_AUTH_DOMAIN: 'deutsch-vokabular.firebaseapp.com' };
+    expect(readFirebaseConfig(prod)).toMatchObject({ status: 'configured', environment: 'production', emulators: null, personalWordsSync: false });
+    expect(readFirebaseConfig({ ...prod, VITE_PERSONAL_WORDS_SYNC: 'true' })).toMatchObject({ status: 'configured', personalWordsSync: true });
+    // Any other project, the dev project, emulators or a mixed config is refused in production.
+    expect(problems({ ...prod, VITE_FIREBASE_PROJECT_ID: 'deutsch-vokabular-v2', VITE_FIREBASE_AUTH_DOMAIN: 'deutsch-vokabular-v2.firebaseapp.com' })).toContain('only allowed for the approved production project');
+    expect(problems({ ...prod, VITE_FIREBASE_PROJECT_ID: 'deutsch-vokabular-v2-dev', VITE_FIREBASE_AUTH_DOMAIN: 'deutsch-vokabular-v2-dev.firebaseapp.com' })).toContain('must not use a development project');
+    expect(problems({ ...prod, VITE_FIREBASE_USE_EMULATORS: 'true' })).toContain('only allowed with VITE_FIREBASE_ENV=emulator');
+    expect(problems({ ...prod, VITE_FIREBASE_AUTH_DOMAIN: 'deutsch-vokabular-v2-dev.firebaseapp.com' })).toContain('AUTH_DOMAIN belongs to a different project');
     expect(problems({ ...dev, VITE_FIREBASE_ENV: 'staging' })).toContain('must be one of');
   });
 

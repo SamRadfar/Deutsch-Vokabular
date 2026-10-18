@@ -11,10 +11,23 @@ const base = process.env.V2_BASE ?? './';
 // set process variables (e.g. the emulator configuration).
 const hermetic = !!process.env.VITEST || process.env.DV2_HERMETIC === '1';
 
+// Production release build (scripts/build-production.mjs sets the variables): a public, indexable page
+// with the product title. Every other build keeps the "preview, noindex" head.
+const production = process.env.VITE_FIREBASE_ENV === 'production';
+const productionHtml = {
+  name: 'dv2-production-html',
+  transformIndexHtml(html: string) {
+    if (!production) return html;
+    return html
+      .replace(/\s*<meta name="robots" content="noindex" \/>/, '')
+      .replace(/<title>[^<]*<\/title>/, '<title>Deutsch Vokabular · واژه‌نامهٔ تخصصی آلمانی</title>');
+  },
+};
+
 export default defineConfig({
   base,
   ...(hermetic ? { envDir: false as const } : {}),
-  plugins: [react()],
+  plugins: [react(), productionHtml],
   build: {
     outDir: 'dist',
     sourcemap: true,

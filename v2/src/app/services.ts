@@ -35,7 +35,7 @@ export function createAppServices(): AppServices {
   const aiConfig = readAiEndpoint();
   if (aiConfig.status === 'invalid') console.warn(`AI disabled: ${aiConfig.problem}`);
   return {
-    environmentLabel: config.environment === 'emulator' ? 'emulator' : `${config.environment === 'development' ? 'dev' : config.environment}: ${config.options.projectId}`,
+    environmentLabel: config.environment === 'emulator' ? 'emulator' : `${config.environment === 'development' ? 'dev' : 'production'}: ${config.options.projectId}`,
     auth,
     ai: aiConfig.status === 'configured' ? createAiClient({ endpoint: aiConfig.endpoint, getIdToken: () => auth.getIdToken() }) : null,
     progress: {

@@ -49,6 +49,7 @@ describe('rules deployment guard', () => {
     const rules = readFileSync(resolve(root, 'firestore.rules'), 'utf8');
     expect(rules).toContain('match /customWords/{wordId}');
     expect(rules).toContain('resource.data.deleted == false'); // tombstones are final
-    expect(rules).toContain('awaits the');                     // deployment status is documented in the file
+    expect(rules).toContain('Deployment record: docs/PRODUCTION.md'); // where the deployments are recorded
+    expect(rules).toContain('NEVER deploy this');                       // legacy-project warning stays in the file
   });
 });

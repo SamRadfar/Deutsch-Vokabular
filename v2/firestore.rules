@@ -2,18 +2,17 @@ rules_version = '2';
 
 // Deutsch Vokabular 2.0 — rules for per-user data (users/{uid}/…).
 //
-// Target: ONLY the separate v2 Firebase project(s) — currently deutsch-vokabular-v2-dev.
-// Deploy only via `npm run rules:deploy:dev` (allowlisted target, emulator tests, double
-// confirmation). NEVER deploy this file to the legacy project (deutsch-wortschatz-c7a11): a rules
-// deploy replaces ALL rules of a project and would break the legacy app's syncCodes sync.
+// Targets: ONLY the separate v2 Firebase projects — deutsch-vokabular (production, via
+// `npm run deploy:production`) and deutsch-vokabular-v2-dev (via `npm run rules:deploy:dev`); both
+// scripts are allowlisted, run the emulator tests and need a double confirmation. NEVER deploy this
+// file to the legacy project (deutsch-wortschatz-c7a11): a rules deploy replaces ALL rules of a
+// project and would break the legacy app's syncCodes sync.
 //
 // Principles: deny by default; a signed-in user can read/write only users/{their uid}/…;
 // documents are schema-validated; timestamps must be server time; nothing can be deleted
 // from the client; migration records are create-only; personal-word tombstones are final.
 //
-// Deployment status: the dev project runs the Phase 3 version of this file (ruleset 276744ea…,
-// without customWords). The customWords block (Phase 5A.1) is emulator-tested and awaits the
-// product owner's approval before the guarded deployment (docs/PERSONAL_SYNC.md §7).
+// Deployment record: docs/PRODUCTION.md (production) and docs/PERSONAL_SYNC.md §7 (dev).
 
 service cloud.firestore {
   match /databases/{database}/documents {

@@ -68,3 +68,21 @@
 }
 .offline-banner svg.lucide { width: 18px; height: 18px; }
 .offline-banner span { color: var(--ts); font-weight: 500; }
+
+/* New release available (service worker) */
+.update-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  font-family: var(--fp);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--tp);
+  background: var(--sf);
+  border: 1px solid color-mix(in srgb, var(--brand) 40%, transparent);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-2);
+}
+.update-notice svg.lucide { width: 18px; height: 18px; color: var(--brand); }
+.update-notice span { flex: 1; }
