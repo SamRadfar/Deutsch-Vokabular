@@ -3,6 +3,7 @@
 
 import { expect, test, type Page } from '@playwright/test';
 import vocabulary from '../../src/data/vocabulary/vocabulary.v1.json' with { type: 'json' };
+import { categoryName } from '../../src/models/vocabulary';
 
 const AUSSENWAND = vocabulary.categories[0]!.subtabs[0]!.groups[0]!.entries[0]!;
 const fitness = vocabulary.categories.find((c) => c.key === 'fitness')!;
@@ -29,10 +30,13 @@ async function openFilters(page: Page) {
 }
 const overflow = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
 
-test('main navigation: four sections, hash routes, back button, page titles', async ({ page }) => {
+test('main navigation: five sections, hash routes, back button, page titles', async ({ page, isMobile }) => {
   const errors = trackErrors(page);
   await page.goto('./');
-  await expect(nav(page).getByRole('link')).toHaveText(['📚واژه‌ها', '⭐واژه‌های من', '🔄مرور', '🗣تلفظ', '📊پیشرفت']);
+  // Phones: bottom tab bar in section order. Desktop: sidebar grouped into «یادگیری» and «شخصی» (with counters).
+  await expect(nav(page).getByRole('link')).toHaveText(isMobile
+    ? ['واژه‌ها', 'واژه‌های من', 'مرور', 'تلفظ', 'پیشرفت']
+    : [/^واژه‌ها/, /^مرور/, /^تلفظ/, /^واژه‌های من/, /^پیشرفت/]);
   await expect(page).toHaveTitle(/^واژه‌ها · /);
   await nav(page).getByRole('link', { name: 'پیشرفت' }).click();
   await expect(page).toHaveURL(/#\/progress$/);
@@ -61,7 +65,7 @@ test('search: German with ß/umlaut folding, Persian, highlighting, show in list
   await searchBox(page).fill(target.word);
   const card = page.locator(`article.sres[data-entry-id="${target.id}"]`);
   await card.getByRole('button', { name: 'نمایش در فهرست' }).click();
-  await expect(page.getByRole('tab', { name: fitness.label, exact: true })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('tab', { name: categoryName(fitness.label), exact: true })).toHaveAttribute('aria-selected', 'true');
   const row = page.locator(`.mcontent [data-entry-id="${target.id}"]`);
   await expect(row).toHaveClass(/is-focused/);
   await expect(row).toBeFocused();
@@ -121,8 +125,8 @@ test('dashboard (signed out): totals, categories, quick access', async ({ page }
   await expect(page.getByTestId('db-total')).toHaveText('999');
   await expect(page.getByRole('note')).toContainText('برای ثبت پیشرفت');
   await expect(page.locator('.db-cat')).toHaveCount(7);
-  await page.locator('.db-cat').filter({ hasText: fitness.label }).click();
-  await expect(page.getByRole('tab', { name: fitness.label, exact: true })).toHaveAttribute('aria-selected', 'true');
+  await page.locator('.db-cat').filter({ hasText: categoryName(fitness.label) }).click();
+  await expect(page.getByRole('tab', { name: categoryName(fitness.label), exact: true })).toHaveAttribute('aria-selected', 'true');
   await page.goto('./#/progress');
   await page.getByRole('button', { name: /تمرین تلفظ/ }).click();
   await expect(page).toHaveURL(/#\/shadowing$/);
@@ -160,12 +164,12 @@ test('dark mode: new screens use the dark palette and readable accents', async (
   await page.emulateMedia({ colorScheme: 'dark' });
   await page.goto('./#/progress');
   const card = await page.locator('.db-card').first().evaluate((el) => getComputedStyle(el).backgroundColor);
-  expect(card).toBe('rgb(27, 30, 41)');
+  expect(card).toBe('rgba(26, 18, 19, 0.8)'); // --sf (dark, translucent over the frame)
   await page.goto('./');
   await searchBox(page).fill('wand');
   await expect(page.getByTestId('search-count')).toHaveText(/واژه پیدا شد$/);
   // Polled: the list may still be re-rendering for the deferred query when first read.
-  await expect.poll(() => page.locator('.sres').first().evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgb(27, 30, 41)');
+  await expect.poll(() => page.locator('.sres').first().evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgba(26, 18, 19, 0.8)');
   // Muted text meets WCAG AA on dark surfaces (≥ 4.5:1).
   const ratio = await page.locator('.sres__crumb').first().evaluate((el) => {
     const rgb = (s: string) => s.match(/\d+/g)!.slice(0, 3).map(Number);

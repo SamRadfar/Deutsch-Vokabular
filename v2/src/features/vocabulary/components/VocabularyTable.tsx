@@ -1,3 +1,4 @@
+import { Check, Volume2 } from 'lucide-react';
 import { Fragment } from 'react';
 import type { TechnicalInfo, VocabularyEntry, VocabularyGroup } from '../../../models/vocabulary';
 import { WordTypeBadge } from './WordTypeBadge';
@@ -33,14 +34,14 @@ export function VocabularyTable({ groups, getTechnicalInfo, openInfoId, onToggle
         </colgroup>
         <thead>
           <tr>
-            {progress ? <th scope="col" className="c-chk-h"><span aria-hidden="true">✓</span><span className="visually-hidden">یادگرفتم</span></th> : null}
+            {progress ? <th scope="col" className="c-chk-h"><Check /><span className="visually-hidden">یادگرفتم</span></th> : null}
             <th scope="col">Wort</th>
             <th scope="col">Wortart</th>
             <th scope="col" className="rh" lang="fa" dir="rtl">فارسی</th>
             <th scope="col">Beispiel auf Deutsch</th>
             <th scope="col" className="rh" lang="fa" dir="rtl">ترجمه مثال</th>
             <th scope="col" className="rh" lang="fa" dir="rtl">تلفظ فارسی</th>
-            <th scope="col" className="c-spk-h"><span aria-hidden="true">🔊</span><span className="visually-hidden">Aussprache</span></th>
+            <th scope="col" className="c-spk-h"><Volume2 /><span className="visually-hidden">Aussprache</span></th>
           </tr>
         </thead>
         {groups.map((group, gi) => (

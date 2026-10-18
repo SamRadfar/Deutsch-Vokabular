@@ -72,7 +72,7 @@ test('complete flashcard workflow: flip, navigate, answer, summary, repeat, rest
   // Restart: back to card 1 with nothing answered.
   await page.getByRole('button', { name: 'شروع دوباره', exact: true }).click();
   await expect(count(page)).toHaveText('1 / 3');
-  await expect(page.locator('.fc-tally__know')).toHaveText('✓ 0');
+  await expect(page.locator('.fc-tally__know')).toHaveText(/^\s*0$/);
 
   // End session → summary → new session setup.
   await page.getByRole('button', { name: 'پایان جلسه' }).click();
@@ -95,8 +95,8 @@ test('keyboard controls (desktop)', async ({ page, isMobile }) => {
   await page.keyboard.press('2');
   await page.keyboard.press('1');
   await expect(count(page)).toHaveText('3 / 10');
-  await expect(page.locator('.fc-tally__know')).toHaveText('✓ 1');
-  await expect(page.locator('.fc-tally__again')).toHaveText('✗ 1');
+  await expect(page.locator('.fc-tally__know')).toHaveText(/^\s*1$/);
+  await expect(page.locator('.fc-tally__again')).toHaveText(/^\s*1$/);
   await page.keyboard.press('Escape');
   await expect(page.getByRole('heading', { level: 2 })).toBeFocused();
   await expect(page.getByTestId('summary-unanswered')).toHaveText('8');
@@ -121,8 +121,8 @@ test('swipe gestures: right = know, left = don\'t know, short drag snaps back', 
   await expect(card(page)).toHaveAttribute('data-side', 'front'); // the click ending the swipe did not flip the next card
   await swipe(-140);
   await expect(count(page)).toHaveText('3 / 10');
-  await expect(page.locator('.fc-tally__know')).toHaveText('✓ 1');
-  await expect(page.locator('.fc-tally__again')).toHaveText('✗ 1');
+  await expect(page.locator('.fc-tally__know')).toHaveText(/^\s*1$/);
+  await expect(page.locator('.fc-tally__again')).toHaveText(/^\s*1$/);
 });
 
 test('review screens fit the viewport and controls are touch-sized', async ({ page, isMobile }) => {
@@ -142,5 +142,5 @@ test('dark mode applies to the flashcards', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'dark' });
   await startSession(page);
   const bg = await card(page).locator('.fc-face--front').evaluate((el) => getComputedStyle(el).backgroundColor);
-  expect(bg).toBe('rgb(27, 30, 41)'); // --sf (dark)
+  expect(bg).toBe('rgb(26, 19, 20)'); // --sf-solid (dark)
 });

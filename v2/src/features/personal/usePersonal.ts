@@ -1,5 +1,6 @@
 import { useMemo, useSyncExternalStore } from 'react';
 import type { Category, WordId } from '../../models/vocabulary';
+import { categoryName } from '../../models/vocabulary';
 import { useProgress } from '../progress/ProgressProvider';
 import { flattenCards, PERSONAL_KEY, PERSONAL_LABEL, personalCards, type DeckCard, type PracticeCategoryKey } from '../review/deck';
 import { isPersonalId } from './model';
@@ -54,7 +55,7 @@ export function usePracticeCards(categories: readonly Category[]): DeckCard[] {
 
 /** Scopes offered in practice setups: the built-in categories, plus "my words" when there are any. */
 export function practiceScopes(categories: readonly Category[], personalCount: number): Array<{ key: PracticeCategoryKey; label: string; theme: string }> {
-  const scopes: Array<{ key: PracticeCategoryKey; label: string; theme: string }> = categories.map((c) => ({ key: c.key, label: c.label, theme: c.theme }));
+  const scopes: Array<{ key: PracticeCategoryKey; label: string; theme: string }> = categories.map((c) => ({ key: c.key, label: categoryName(c.label), theme: c.theme }));
   if (personalCount > 0) scopes.push({ key: PERSONAL_KEY, label: PERSONAL_LABEL, theme: 'review' });
   return scopes;
 }

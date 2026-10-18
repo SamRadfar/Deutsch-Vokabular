@@ -28,7 +28,7 @@ const review = () => within(screen.getByTestId('ai-review'));
 const rowCheckbox = (field: string) => document.querySelector<HTMLInputElement>(`tr[data-field="${field}"] input[type="checkbox"]`)!;
 
 async function addManually(user: User, lemma: string, fa: string) {
-  await user.click(button('+ افزودن واژه'));
+  await user.click(button('افزودن واژه'));
   const d = within(screen.getByRole('dialog', { name: 'افزودن واژهٔ جدید' }));
   await user.type(d.getByLabelText(/واژه یا عبارت آلمانی/), lemma);
   await user.type(d.getByRole('textbox', { name: 'معنی فارسی' }), fa);
@@ -39,14 +39,14 @@ async function addManually(user: User, lemma: string, fa: string) {
 describe('AI suggestions — new word', () => {
   it('generates from a German word, shows the review, fills the form only after "apply", saves only on "save"', async () => {
     const { user, env, ai } = await setup();
-    await user.click(button('✨ افزودن با هوش مصنوعی'));
+    await user.click(button('افزودن با هوش مصنوعی'));
     const dialog = within(screen.getByRole('dialog', { name: 'افزودن واژهٔ جدید' }));
     const aiWord = dialog.getByLabelText('واژهٔ آلمانی برای پیشنهاد');
     expect(aiWord).toHaveFocus();
     await user.type(aiWord, 'nachhaltigkeit');
     await user.type(dialog.getByLabelText(/جمله‌ای که واژه را در آن دیدید/), 'Nachhaltigkeit ist wichtig.');
     ai.willSuggest(NACHHALTIGKEIT);
-    await user.click(dialog.getByRole('button', { name: '✨ دریافت پیشنهاد' }));
+    await user.click(dialog.getByRole('button', { name: 'دریافت پیشنهاد' }));
     await screen.findByTestId('ai-review');
     expect(ai.calls).toEqual([{ mode: 'from-german', word: 'nachhaltigkeit', context: 'Nachhaltigkeit ist wichtig.' }]);
     expect(review().getByText(/پیشنهاد هوش مصنوعی — ممکن است اشتباه باشد/)).toBeInTheDocument();
@@ -74,7 +74,7 @@ describe('AI suggestions — new word', () => {
 
   it('never overwrites what the user typed unless explicitly ticked; Persian → German mode', async () => {
     const { user, ai } = await setup();
-    await user.click(button('+ افزودن واژه'));
+    await user.click(button('افزودن واژه'));
     const dialog = within(screen.getByRole('dialog', { name: 'افزودن واژهٔ جدید' }));
     await user.type(dialog.getByRole('textbox', { name: 'معنی فارسی' }), 'دوام');
     await user.click(dialog.getByLabelText('از معنی فارسی'));
@@ -83,7 +83,7 @@ describe('AI suggestions — new word', () => {
     await user.clear(faInput);
     await user.type(faInput, 'پایداری');
     ai.willSuggest(NACHHALTIGKEIT);
-    await user.click(dialog.getByRole('button', { name: '✨ دریافت پیشنهاد' }));
+    await user.click(dialog.getByRole('button', { name: 'دریافت پیشنهاد' }));
     await screen.findByTestId('ai-review');
     expect(ai.calls[0]).toEqual({ mode: 'from-persian', fa: 'پایداری' });
     expect(rowCheckbox('fa')).not.toBeChecked();
@@ -95,24 +95,24 @@ describe('AI suggestions — new word', () => {
 
   it('shows errors in Persian, a mock label for the local provider, and can be cancelled', async () => {
     const { user, ai } = await setup();
-    await user.click(button('✨ افزودن با هوش مصنوعی'));
+    await user.click(button('افزودن با هوش مصنوعی'));
     const dialog = within(screen.getByRole('dialog', { name: 'افزودن واژهٔ جدید' }));
     await user.type(dialog.getByLabelText('واژهٔ آلمانی برای پیشنهاد'), 'Wand');
     ai.willFail('daily-limit');
-    await user.click(dialog.getByRole('button', { name: '✨ دریافت پیشنهاد' }));
+    await user.click(dialog.getByRole('button', { name: 'دریافت پیشنهاد' }));
     expect(await dialog.findByRole('alert')).toHaveTextContent('سهم امروز شما از پیشنهادهای هوش مصنوعی تمام شده است');
 
     const release = ai.holdNext();
     ai.willSuggest(NACHHALTIGKEIT);
-    await user.click(dialog.getByRole('button', { name: '✨ دریافت پیشنهاد' }));
+    await user.click(dialog.getByRole('button', { name: 'دریافت پیشنهاد' }));
     expect(dialog.getByRole('button', { name: 'در حال دریافت پیشنهاد…' })).toBeDisabled();
     await user.click(dialog.getByRole('button', { name: 'لغو' }));
-    await waitFor(() => expect(dialog.getByRole('button', { name: '✨ دریافت پیشنهاد' })).toBeEnabled());
+    await waitFor(() => expect(dialog.getByRole('button', { name: 'دریافت پیشنهاد' })).toBeEnabled());
     expect(screen.queryByTestId('ai-review')).toBeNull();
     release();
 
     ai.willSuggest({ ...NACHHALTIGKEIT, fa: '[آزمایشی] معنی' }, { mock: true });
-    await user.click(dialog.getByRole('button', { name: '✨ دریافت پیشنهاد' }));
+    await user.click(dialog.getByRole('button', { name: 'دریافت پیشنهاد' }));
     expect(await screen.findByText(/پیشنهاد آزمایشی — از سرویس محلیِ بدون هوش مصنوعی واقعی/)).toBeInTheDocument();
   });
 });
@@ -154,7 +154,7 @@ describe('AI suggestions — complete an existing word', () => {
 describe('AI not configured', () => {
   it('no AI buttons; the form explains it and manual entry works', async () => {
     const { user } = await setup(false);
-    expect(screen.queryByRole('button', { name: '✨ افزودن با هوش مصنوعی' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'افزودن با هوش مصنوعی' })).toBeNull();
     await addManually(user, 'die Traufe', 'لبهٔ بام');
     expect(screen.queryByRole('button', { name: /تکمیل .* با هوش مصنوعی/ })).toBeNull();
     await user.click(button('ویرایش die Traufe'));

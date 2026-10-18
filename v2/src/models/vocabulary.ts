@@ -83,3 +83,11 @@ export interface TechnicalInfoDataset {
   schemaVersion: 1;
   entries: TechnicalInfo[];
 }
+
+/**
+ * Category name for display: the content labels start with a decorative emoji ("🏛 Architecture"),
+ * which the UI replaces with a line icon. The content itself (and its legacy fixture) is unchanged.
+ */
+export function categoryName(label: string): string {
+  return label.replace(/^[\p{Extended_Pictographic}\p{Emoji_Presentation}\u{FE0F}\u{200D}\u{20E3}\s]+/u, '').trim() || label;
+}

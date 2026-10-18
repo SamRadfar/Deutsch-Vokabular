@@ -1,5 +1,6 @@
 import './vocabulary.css';
 import type { Category, TechnicalInfo } from '../../../models/vocabulary';
+import { categoryName } from '../../../models/vocabulary';
 import { TabList, panelElementId, tabElementId } from '../../../components/TabList/TabList';
 import { countSubtab } from '../../progress/stats';
 import { SubtabPanel, countEntries } from './SubtabPanel';
@@ -23,7 +24,7 @@ export function CategoryView({ category, activeSubtabId, onSelectSubtab, getTech
   return (
     <div className="stw" data-category={category.theme}>
       <TabList
-        label={`${category.label}: Unterbereiche`}
+        label={`${categoryName(category.label)}: Unterbereiche`}
         idPrefix={prefix}
         className="stnav"
         tabClassName="sbtn"
@@ -38,7 +39,7 @@ export function CategoryView({ category, activeSubtabId, onSelectSubtab, getTech
             id: s.id,
             content: (
               <>
-                <span aria-hidden="true">{s.icon}</span> {s.label}{' '}
+                {s.label}{' '}
                 <span className="sctr" aria-label={done > 0 ? `${done} von ${total} gelernt` : `${total} Wörter`}>{text}</span>
               </>
             ),

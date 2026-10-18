@@ -1,3 +1,4 @@
+import { Volume1, Volume2 } from 'lucide-react';
 import { usePronunciation } from './PronunciationProvider';
 import './PronunciationButton.css';
 
@@ -24,7 +25,7 @@ export function PronunciationButton({ speechKey, text, label, variant = 'word' }
       aria-pressed={supported ? speaking : undefined}
       title={supported ? label : unsupportedLabel}
     >
-      <span aria-hidden="true">{speaking ? '🔉' : '🔊'}</span>
+      {speaking ? <Volume1 /> : <Volume2 />}
     </button>
   );
 }

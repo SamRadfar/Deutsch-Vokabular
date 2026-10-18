@@ -1,55 +1,44 @@
-/* Ported from legacy .speak-btn / .speak-ex */
+/* Speak buttons (word / example). */
 .speak-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 7px;
-  border: none;
-  cursor: pointer;
-  background: transparent;
-  color: var(--tm);
-  transition: all 0.2s;
-  font-size: 14px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
   vertical-align: middle;
+  color: var(--tm);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
 }
+.speak-btn svg.lucide { width: 17px; height: 17px; }
 .speak-btn:hover:not(:disabled),
-.speak-btn.is-speaking {
-  background: var(--acl);
-  color: var(--ac);
-}
-.speak-btn.is-speaking {
-  animation: pulse-speak 0.6s ease-in-out infinite alternate;
-}
-.speak-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.35;
-}
+.speak-btn.is-speaking { color: var(--ac); background: var(--acl); }
+.speak-btn.is-speaking { animation: pulse-speak 0.6s ease-in-out infinite alternate; }
+.speak-btn:disabled { cursor: not-allowed; opacity: 0.35; }
 .speak-btn--example {
-  width: 22px;
-  height: 22px;
-  font-size: 11px;
-  border-radius: 5px;
+  width: 24px;
+  height: 24px;
   margin-inline-start: 6px;
-  opacity: 0.6;
+  border-radius: var(--r-xs);
+  opacity: 0.7;
 }
-.speak-btn--example:hover:not(:disabled) {
-  opacity: 1;
-}
+.speak-btn--example svg.lucide { width: 14px; height: 14px; }
+.speak-btn--example:hover:not(:disabled) { opacity: 1; }
 
 @keyframes pulse-speak {
-  from { opacity: 0.5; transform: scale(0.92); }
-  to { opacity: 1; transform: scale(1.08); }
+  from { opacity: 0.55; transform: scale(0.94); }
+  to { opacity: 1; transform: scale(1.06); }
 }
-
 @media (prefers-reduced-motion: reduce) {
   .speak-btn.is-speaking { animation: none; }
 }
-
 @media (max-width: 640px) {
-  /* Touch-friendly targets (legacy: 24–28px) */
-  .speak-btn { width: 36px; height: 36px; }
-  .speak-btn--example { width: 32px; height: 32px; font-size: 13px; margin-inline-start: 4px; }
+  /* Touch-friendly targets */
+  .speak-btn { width: 40px; height: 40px; }
+  .speak-btn--example { width: 34px; height: 34px; margin-inline-start: 4px; }
+  .speak-btn--example svg.lucide { width: 16px; height: 16px; }
 }

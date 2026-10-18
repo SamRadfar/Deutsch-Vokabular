@@ -1,14 +1,13 @@
-.mig__box { background: var(--sfalt); border: 1px solid var(--br); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
-.mig__note { font-size: 12px; color: var(--tm); }
-.mig__warn { background: #fffbeb; color: #92400e; border: 1px solid #fcd34d; border-radius: 8px; padding: 8px 10px; font-size: 12px; }
-html[data-theme='dark'] .mig__warn { background: #3a2c12; color: #f0c674; border-color: #5c4720; }
-.mig__error { color: #b42318; font-size: 13px; }
-.mig__file { display: flex; flex-direction: column; gap: 6px; font-size: 13px; margin: 8px 0; }
-.mig__file input { font-family: var(--fn); font-size: 12px; min-height: 40px; }
+.mig__box { padding: 14px; margin-bottom: 12px; background: var(--sfalt); border: 1px solid var(--br); border-radius: var(--r-md); }
+.mig__note { font-size: var(--fs-xs); color: var(--tm); }
+.mig__warn { padding: 10px 12px; font-size: var(--fs-xs); color: var(--warn); background: var(--warnl); border: 1px solid color-mix(in srgb, var(--warn) 35%, transparent); border-radius: var(--r-sm); }
+.mig__error { color: var(--bad); font-size: var(--fs-sm); }
+.mig__file { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; font-size: var(--fs-sm); }
+.mig__file input { font-family: var(--fn); font-size: var(--fs-xs); min-height: 40px; color: var(--ts); }
 .mig__stats { display: grid; gap: 4px; margin: 8px 0 12px; }
-.mig__stats > div { display: flex; justify-content: space-between; gap: 12px; padding: 6px 8px; border-radius: 6px; background: var(--sfalt); font-size: 12px; }
+.mig__stats > div { display: flex; justify-content: space-between; gap: 12px; padding: 8px 10px; font-size: var(--fs-xs); background: var(--sfalt); border-radius: var(--r-sm); }
 .mig__stats dd { font-weight: 700; font-family: var(--fn); }
-.mig__h { font-size: 12px; font-weight: 700; margin: 10px 0 4px; }
-.mig__list { font-family: var(--fn); font-size: 12px; color: var(--ts); padding-left: 18px; list-style: disc; max-height: 160px; overflow-y: auto; }
-.mig__confirm { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; margin-top: 12px; }
+.mig__h { margin: 12px 0 4px; font-size: var(--fs-xs); font-weight: 700; }
+.mig__list { max-height: 160px; overflow-y: auto; padding-left: 18px; font-family: var(--fn); font-size: var(--fs-xs); color: var(--ts); list-style: disc; }
+.mig__confirm { display: flex; gap: 10px; align-items: flex-start; margin-top: 12px; font-size: var(--fs-sm); }
 .mig__confirm input { width: 20px; height: 20px; flex-shrink: 0; margin-top: 2px; }

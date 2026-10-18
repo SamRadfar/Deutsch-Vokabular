@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
 import { useAuth } from '../auth/AuthProvider';
 import { useProgress } from '../progress/ProgressProvider';
 import { Dialog } from '../../components/Dialog/Dialog';
+import { ChevronsUpDown, Info, LogIn, LogOut, RefreshCw, Upload } from 'lucide-react';
 import { describeSync } from './SyncStatusIndicator';
 import './account.css';
 
@@ -9,10 +10,12 @@ interface Props {
   totalEntries: number;
   learnedCount: number | null;
   onOpenMigration(): void;
+  /** `sidebar`: full-width profile row whose menu opens upwards. `compact`: avatar button (app bar). */
+  variant?: 'compact' | 'sidebar';
 }
 
 /** Header authentication control: sign-in button, or the signed-in account menu. */
-export function AccountControl({ totalEntries, learnedCount, onOpenMigration }: Props) {
+export function AccountControl({ totalEntries, learnedCount, onOpenMigration, variant = 'compact' }: Props) {
   const { state, signIn, cancelSignIn } = useAuth();
   const [infoOpen, setInfoOpen] = useState(false);
   const infoId = useId();
@@ -20,9 +23,9 @@ export function AccountControl({ totalEntries, learnedCount, onOpenMigration }: 
   switch (state.status) {
     case 'unavailable':
       return (
-        <div className="auth-unavailable">
+        <div className={`auth-unavailable auth--${variant}`}>
           <button type="button" className="auth-btn auth-btn--muted" aria-expanded={infoOpen} aria-controls={infoId} onClick={() => setInfoOpen((v) => !v)}>
-            ورود با گوگل
+            <Info aria-hidden="true" /><span className="auth-btn__label">ورود با گوگل</span>
           </button>
           {infoOpen ? (
             <div id={infoId} className="auth-popover" role="note" lang="fa" dir="rtl">
@@ -33,19 +36,23 @@ export function AccountControl({ totalEntries, learnedCount, onOpenMigration }: 
         </div>
       );
     case 'initializing':
-      return <span className="auth-skeleton" role="status" aria-label="در حال بررسی وضعیت ورود…" />;
+      return <span className={`auth-skeleton auth--${variant}`} role="status" aria-label="در حال بررسی وضعیت ورود…" />;
     case 'signed-out':
-      return <button type="button" className="auth-btn" onClick={() => void signIn()} lang="fa">ورود با گوگل</button>;
+      return (
+        <button type="button" className={`auth-btn auth-btn--signin auth--${variant}`} onClick={() => void signIn()} lang="fa">
+          <LogIn aria-hidden="true" /><span className="auth-btn__label">ورود با گوگل</span>
+        </button>
+      );
     case 'signing-in':
       return (
-        <span className="auth-signing" lang="fa" dir="rtl">
+        <span className={`auth-signing auth--${variant}`} lang="fa" dir="rtl">
           <span className="auth-btn auth-btn--busy" role="status" aria-live="polite">در حال ورود…</span>
           <button type="button" className="auth-btn auth-btn--muted" onClick={cancelSignIn}>لغو</button>
         </span>
       );
     case 'signed-in':
     case 'signing-out':
-      return <AccountMenu user={state.user} signingOut={state.status === 'signing-out'} totalEntries={totalEntries} learnedCount={learnedCount} onOpenMigration={onOpenMigration} />;
+      return <AccountMenu user={state.user} signingOut={state.status === 'signing-out'} totalEntries={totalEntries} learnedCount={learnedCount} onOpenMigration={onOpenMigration} variant={variant} />;
   }
 }
 
@@ -57,12 +64,13 @@ function Avatar({ name, photoURL }: { name: string; photoURL: string | null }) {
   return <span className="avatar avatar--initial" aria-hidden="true">{(name.trim()[0] ?? '?').toUpperCase()}</span>;
 }
 
-function AccountMenu({ user, signingOut, totalEntries, learnedCount, onOpenMigration }: {
+function AccountMenu({ user, signingOut, totalEntries, learnedCount, onOpenMigration, variant }: {
   user: { uid: string; displayName: string | null; email: string | null; photoURL: string | null };
   signingOut: boolean;
   totalEntries: number;
   learnedCount: number | null;
   onOpenMigration(): void;
+  variant: 'compact' | 'sidebar';
 }) {
   const { signOut } = useAuth();
   const progress = useProgress();
@@ -114,7 +122,7 @@ function AccountMenu({ user, signingOut, totalEntries, learnedCount, onOpenMigra
   };
 
   return (
-    <div className="account">
+    <div className={`account account--${variant}`}>
       <button
         ref={buttonRef}
         type="button"
@@ -128,6 +136,15 @@ function AccountMenu({ user, signingOut, totalEntries, learnedCount, onOpenMigra
         data-testid="account-button"
       >
         <Avatar name={name} photoURL={user.photoURL} />
+        {variant === 'sidebar' ? (
+          <>
+            <span className="account__who" aria-hidden="true">
+              <span className="account__who-name" dir="auto">{user.displayName ?? name}</span>
+              {user.email ? <span className="account__who-sub" dir="ltr">{user.email}</span> : null}
+            </span>
+            <ChevronsUpDown className="account__chevron" aria-hidden="true" />
+          </>
+        ) : null}
       </button>
       {open ? (
         <div ref={menuRef} id={menuId} className="account__menu" role="menu" aria-label="حساب کاربری" onKeyDown={onMenuKey} lang="fa" dir="rtl">
@@ -138,15 +155,15 @@ function AccountMenu({ user, signingOut, totalEntries, learnedCount, onOpenMigra
             {sync ? <div className={`account__sync account__sync--${sync.tone}`}>{sync.text}{sync.detail ? ` — ${sync.detail}` : ''}</div> : null}
           </div>
           <button type="button" role="menuitem" className="account__item" onClick={() => { setOpen(false); onOpenMigration(); }} disabled={progress.status !== 'ready'}>
-            انتقال پیشرفت از نسخهٔ قدیمی…
+            <Upload aria-hidden="true" />انتقال پیشرفت از نسخهٔ قدیمی…
           </button>
           {progress.status === 'ready' && progress.view.status.failedCount + (progress.view.status.remote === 'error' ? 1 : 0) > 0 ? (
             <button type="button" role="menuitem" className="account__item" onClick={() => { progress.engine.retryFailed(); close(); }}>
-              تلاش دوباره برای همگام‌سازی
+              <RefreshCw aria-hidden="true" />تلاش دوباره برای همگام‌سازی
             </button>
           ) : null}
           <button type="button" role="menuitem" className="account__item account__item--danger" onClick={requestSignOut}>
-            خروج از حساب
+            <LogOut aria-hidden="true" />خروج از حساب
           </button>
         </div>
       ) : null}

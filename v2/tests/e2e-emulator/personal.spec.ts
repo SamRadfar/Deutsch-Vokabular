@@ -12,7 +12,7 @@ async function openMine(page: Page) {
 }
 
 async function addWord(page: Page, lemma: string, fa: string) {
-  await page.getByRole('button', { name: '+ افزودن واژه' }).click();
+  await page.getByRole('button', { name: 'افزودن واژه' }).click();
   const dialog = page.getByRole('dialog', { name: 'افزودن واژهٔ جدید' });
   await dialog.getByLabel(/واژه یا عبارت آلمانی/).fill(lemma);
   await dialog.getByRole('textbox', { name: 'معنی فارسی', exact: true }).fill(fa);
@@ -26,7 +26,7 @@ test('create, reload, search, flashcard, delete with undo — and another accoun
   await signIn(page, uniqueEmail('mine'), 'My Words');
   await openMine(page);
   // The emulator build syncs personal words (the emulator loads v2/firestore.rules incl. customWords).
-  await expect(page.getByTestId('pw-storage')).toContainText('☁️');
+  await expect(page.getByTestId('pw-storage')).toHaveAttribute('data-mode', 'cloud');
   await addWord(page, 'die Probewortigkeit', 'واژهٔ آزمایشی');
   await addWord(page, 'testen', 'آزمودن');
   await expect(card(page, 'die Probewortigkeit')).toBeVisible();
@@ -78,7 +78,7 @@ test('legacy custom words are imported after a preview, once, without touching t
   const dialog = page.getByRole('dialog', { name: 'انتقال واژه‌های شخصی از نسخهٔ قدیمی' });
   await expect(dialog.getByTestId('pw-import-new')).toHaveText('1');
   await dialog.getByRole('button', { name: 'انتقال 1 واژه' }).click();
-  await dialog.getByRole('button', { name: 'بستن' }).click();
+  await dialog.getByRole('button', { name: 'بستن', exact: true }).click();
   await expect(card(page, 'die Probewortigkeit')).toBeVisible();
   await expect(card(page, 'die Probewortigkeit').getByRole('checkbox')).toBeChecked();
   expect(await page.evaluate(() => localStorage.getItem('dvok5_custom'))).toBe(raw);

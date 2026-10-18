@@ -1,15 +1,15 @@
 .empty-state {
-  padding: 40px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 48px 20px;
   text-align: center;
   font-family: var(--fp);
   color: var(--tm);
+  background: var(--sf);
+  border: 1px dashed var(--brs);
+  border-radius: var(--r-lg);
 }
-.empty-state__title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ts);
-}
-.empty-state__desc {
-  font-size: 12px;
-  margin-top: 6px;
-}
+.empty-state__title { font-size: var(--fs-base); font-weight: 700; color: var(--tp); }
+.empty-state__desc { font-size: var(--fs-sm); max-width: 52ch; line-height: 1.8; }

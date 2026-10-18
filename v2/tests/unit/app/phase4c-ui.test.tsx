@@ -6,6 +6,7 @@ import { getVocabularyRepository } from '../../../src/services/content/vocabular
 import { fakeSpeech, mockMatchMedia, MOBILE, waitForLearnedCheckboxes } from '../../helpers/dom';
 import { ALICE } from '../../helpers/fakeAuth';
 import { createFakeServices } from '../../helpers/fakeServices';
+import { categoryName } from '../../../src/models/vocabulary';
 
 const repo = getVocabularyRepository();
 const AUSSENWAND = repo.categories[0]!.subtabs[0]!.groups[0]!.entries[0]!; // die Außenwand
@@ -37,7 +38,7 @@ describe('navigation', () => {
   it('main sections as links with aria-current; categories are secondary tabs of "words"', async () => {
     const { user } = signedOut();
     const nav = screen.getByRole('navigation', { name: 'بخش‌های اصلی' });
-    expect(within(nav).getAllByRole('link').map((l) => l.textContent)).toEqual(['📚واژه‌ها', '⭐واژه‌های من', '🔄مرور', '🗣تلفظ', '📊پیشرفت']);
+    expect(within(nav).getAllByRole('link').map((l) => l.textContent)).toEqual(['واژه‌ها', 'واژه‌های من', 'مرور', 'تلفظ', 'پیشرفت']);
     expect(link('واژه‌ها')).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('tablist', { name: 'Kategorien' })).toBeInTheDocument();
     expect(document.title).toMatch(/^واژه‌ها · /);
@@ -59,14 +60,34 @@ describe('navigation', () => {
     expect(link('مرور')).toHaveAttribute('aria-current', 'page');
   });
 
-  it('phones get a bottom tab bar; the header keeps only the category tabs', () => {
+  it('phones and tablets get a compact app bar and a bottom tab bar; the category tabs are part of the page', () => {
     mockMatchMedia(MOBILE);
     signedOut();
     const nav = screen.getByRole('navigation', { name: 'بخش‌های اصلی' });
     expect(nav).toHaveClass('pnav--bottom');
     expect(nav.closest('header')).toBeNull();
     expect(screen.getByRole('main')).toHaveClass('mcontent--bottom-nav');
-    expect(screen.getByRole('tablist', { name: 'Kategorien' }).closest('header')).not.toBeNull();
+    expect(screen.queryByTestId('sidebar')).toBeNull();
+    expect(screen.getByRole('tablist', { name: 'Kategorien' }).closest('main')).not.toBeNull();
+  });
+
+  it('desktop (≥ 1024px): grouped sidebar navigation that collapses to an icon rail and remembers it', async () => {
+    mockMatchMedia((q) => q.includes('min-width: 1024px'));
+    const { user } = signedOut();
+    const sidebar = screen.getByTestId('sidebar');
+    const nav = within(sidebar).getByRole('navigation', { name: 'بخش‌های اصلی' });
+    expect(nav).toHaveClass('pnav--sidebar');
+    expect(within(nav).getAllByRole('list').map((l) => l.getAttribute('aria-labelledby'))).toEqual(['pnav-learn', 'pnav-personal']);
+    expect(within(nav).getByRole('link', { name: 'واژه‌ها' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.queryByRole('navigation', { name: 'بخش‌های اصلی' })?.classList.contains('pnav--bottom')).toBe(false);
+    expect(screen.getByRole('main')).not.toHaveClass('mcontent--bottom-nav');
+    await user.click(screen.getByRole('button', { name: 'جمع کردن نوار کناری' }));
+    expect(sidebar).toHaveClass('is-collapsed');
+    // Collapsed items keep their names (tooltips + accessible names).
+    expect(within(nav).getByRole('link', { name: 'مرور' }).querySelector('.tip')).toHaveTextContent('مرور');
+    expect(window.localStorage.getItem('dv2.pref.sidebar.v1')).toBe('"collapsed"');
+    await user.click(screen.getByRole('button', { name: 'باز کردن نوار کناری' }));
+    expect(sidebar).not.toHaveClass('is-collapsed');
   });
 
   it('phones fold the search filters behind a «فیلترها» button that shows the number of active filters', async () => {
@@ -174,7 +195,7 @@ describe('vocabulary search', () => {
     await waitFor(() => expect(resultIds()).toContain(fitnessWord.id));
     const card = results()!.querySelector(`article[data-entry-id="${fitnessWord.id}"]`) as HTMLElement;
     await user.click(within(card).getByRole('button', { name: 'نمایش در فهرست' }));
-    expect(screen.getByRole('tab', { name: fitness.label })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: categoryName(fitness.label) })).toHaveAttribute('aria-selected', 'true');
     expect(within(screen.getByRole('tablist', { name: /Unterbereiche/ })).getByRole('tab', { selected: true })).toHaveTextContent(fitness.subtabs[1]!.label);
     const row = document.querySelector(`tr[data-entry-id="${fitnessWord.id}"]`)!;
     expect(row).toHaveClass('is-focused');
@@ -196,7 +217,7 @@ describe('vocabulary search', () => {
   it('choosing a category tab leaves search mode', async () => {
     const { user } = signedOut();
     await user.type(searchBox(), 'wand');
-    await user.click(screen.getByRole('tab', { name: fitness.label }));
+    await user.click(screen.getByRole('tab', { name: categoryName(fitness.label) }));
     expect(searchBox()).toHaveValue('');
     expect(screen.getByRole('tablist', { name: /Unterbereiche/ })).toBeInTheDocument();
   });
@@ -227,7 +248,7 @@ describe('dashboard', () => {
 
     await user.click(archButton);
     expect(window.location.hash).toBe('#/');
-    expect(screen.getByRole('tab', { name: repo.categories[0]!.label })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: categoryName(repo.categories[0]!.label) })).toHaveAttribute('aria-selected', 'true');
   });
 
   it('local practice statistics appear once there is real flashcard data', async () => {

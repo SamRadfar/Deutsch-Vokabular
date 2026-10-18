@@ -1,0 +1,300 @@
+/* Shared UI primitives: buttons, icon buttons, cards, badges, form controls, segmented controls,
+   page headers, tooltips. Feature styles add layout only; the look of a control lives here.
+
+   Legacy class names of existing buttons (.fc-primary, .pwc__btn, …) are mapped onto the same
+   variants, so every screen uses one button system without renaming the markup. */
+
+/* ── Buttons ── */
+.btn,
+.fc-primary,
+.fc-secondary,
+.fc-tool,
+.pwc__btn,
+.vsearch__toggle,
+.vsearch__reset,
+.sres__show,
+.fc-flip,
+.auth-btn,
+.pw-retry,
+.pw-undo__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px;
+  font-family: var(--fp);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--tp);
+  background: var(--sfalt);
+  border: 1px solid var(--br);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
+}
+:is(.btn, .fc-secondary, .fc-tool, .pwc__btn, .vsearch__toggle, .vsearch__reset, .sres__show, .fc-flip, .auth-btn, .pw-retry, .pw-undo__btn):hover:not(:disabled) {
+  background: var(--sf-hover);
+  border-color: var(--brs);
+}
+:is(.btn, .fc-primary, .fc-secondary, .fc-tool, .pwc__btn, .fc-flip, .auth-btn):active:not(:disabled) { transform: translateY(1px); }
+:is(.btn, .fc-primary, .fc-secondary, .fc-tool, .pwc__btn, .vsearch__toggle, .vsearch__reset, .sres__show, .fc-flip, .auth-btn):disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Primary: inverse (light on dark, dark on light) — the NEXORA "Create" button. */
+.btn--primary,
+.fc-primary {
+  color: var(--btn-pri-fg);
+  background: var(--btn-pri-bg);
+  border-color: transparent;
+  box-shadow: var(--shadow-1);
+}
+.btn--primary:hover:not(:disabled),
+.fc-primary:hover:not(:disabled) { background: var(--btn-pri-bg-hover); border-color: transparent; }
+.fc-primary { min-height: 46px; font-size: var(--fs-md); font-weight: 700; padding: 0 20px; }
+.fc-secondary { min-height: 42px; }
+
+/* Accent (brand) and danger variants */
+.btn--accent,
+.fc-flip,
+.sres__show {
+  color: var(--ac);
+  background: var(--acl);
+  border-color: transparent;
+}
+.btn--accent:hover:not(:disabled),
+.fc-flip:hover:not(:disabled),
+.sres__show:hover:not(:disabled) { background: var(--acl); border-color: var(--ac); }
+.btn--danger,
+.pwc__btn--danger,
+.vsearch__reset { color: var(--bad); }
+.btn--danger:hover:not(:disabled),
+.pwc__btn--danger:hover:not(:disabled),
+.vsearch__reset:hover:not(:disabled) { background: var(--badl); border-color: color-mix(in srgb, var(--bad) 45%, transparent); }
+.btn--ghost { background: transparent; border-color: transparent; color: var(--ts); }
+.btn--ghost:hover:not(:disabled) { background: var(--sf-hover); color: var(--tp); border-color: transparent; }
+.btn--sm,
+.pwc__btn,
+.sres__show,
+.pw-retry,
+.pw-undo__btn { min-height: 34px; padding: 0 12px; font-size: var(--fs-xs); border-radius: var(--r-sm); }
+.btn--lg { min-height: 48px; padding: 0 22px; font-size: var(--fs-md); border-radius: var(--r-lg); }
+:is(.btn, .fc-primary, .fc-secondary, .fc-tool, .pwc__btn, .vsearch__toggle, .vsearch__reset, .sres__show, .fc-flip, .auth-btn, .pw-retry, .pw-undo__btn) svg.lucide { width: 16px; height: 16px; }
+
+/* ── Icon button ── */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  color: var(--ts);
+  background: transparent;
+  border: 1px solid var(--br);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: background-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
+}
+.icon-btn:hover { color: var(--tp); background: var(--sf-hover); border-color: var(--brs); }
+.icon-btn svg.lucide { width: 18px; height: 18px; }
+.icon-btn--ghost { border-color: transparent; }
+
+/* ── Card ── */
+.card {
+  background: var(--sf);
+  border: 1px solid var(--br);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
+}
+
+/* ── Badges / status pills (outlined, with a dot — as in NEXORA) ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  padding: 1px 10px;
+  font-family: var(--fp);
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--ts);
+  background: var(--sfalt);
+  border: 1px solid var(--br);
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+}
+.badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.9;
+}
+.badge--plain::before { display: none; }
+.badge--ok { color: var(--ok); }
+.badge--warn { color: var(--warn); }
+.badge--bad { color: var(--bad); }
+.badge--accent { color: var(--ac); }
+.badge--brand { color: var(--brand); }
+
+/* ── Form controls ── */
+.control,
+:where(.pw-field, .rv-field, .vsearch__field, .pw-filters, .sh-quick, .ai__inputs)
+  :where(input:not([type='checkbox'], [type='radio'], [type='range'], [type='file']), select, textarea) {
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 12px;
+  font-size: var(--fs-md);
+  line-height: 1.5;
+  color: var(--tp);
+  background: var(--sfalt);
+  border: 1px solid var(--br);
+  border-radius: var(--r-md);
+  transition: border-color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease), background-color var(--dur-1) var(--ease);
+}
+:where(.pw-field, .rv-field, .vsearch__field, .pw-filters, .sh-quick, .ai__inputs)
+  :where(input:not([type='checkbox'], [type='radio'], [type='range'], [type='file']), select, textarea):hover:not(:disabled),
+.control:hover:not(:disabled) { border-color: var(--brs); }
+:where(.pw-field, .rv-field, .vsearch__field, .pw-filters, .sh-quick, .ai__inputs)
+  :where(input:not([type='checkbox'], [type='radio'], [type='range'], [type='file']), select, textarea):focus-visible,
+.control:focus-visible {
+  outline: none;
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 22%, transparent);
+  background: var(--sf-solid);
+}
+:where(.pw-field, .rv-field, .vsearch__field, .pw-filters, .sh-quick, .ai__inputs) ::placeholder { color: var(--tm); opacity: 1; }
+:where(.pw-field, .rv-field, .vsearch__field, .pw-filters, .sh-quick, .ai__inputs) :where(input, select, textarea):disabled { opacity: 0.55; cursor: not-allowed; }
+/* Selects: one chevron, on the inline end (left in RTL, right in LTR). */
+select.control,
+:where(.pw-field, .rv-field, .vsearch__field, .pw-filters, .sh-quick) :where(select) {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  padding-inline-end: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23948986' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+:where(select):dir(rtl) { background-position: left 12px center; }
+select option { background: var(--sf-solid); color: var(--tp); }
+textarea { resize: vertical; }
+input[type='checkbox'],
+input[type='radio'],
+input[type='range'] { accent-color: var(--ac); }
+
+/* ── Segmented control (radio group styled as pills) ── */
+.segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--sfalt);
+  border: 1px solid var(--br);
+  border-radius: var(--r-md);
+}
+
+/* ── Page header (every section) ── */
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-4) var(--sp-6);
+  padding: var(--sp-2) 0 var(--sp-2);
+}
+.page-head__text { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.page-head__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--fp);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--ts);
+}
+.page-head__eyebrow::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-tint);
+}
+.page-head__eyebrow span + span::before { content: '·'; margin-inline-end: 8px; color: var(--tm); }
+.page-head__eyebrow span + span { color: var(--tm); font-weight: 500; }
+.page-head__title {
+  font-family: var(--fp);
+  font-size: var(--fs-display);
+  font-weight: 800;
+  line-height: var(--lh-tight);
+  letter-spacing: -0.01em;
+  color: var(--tp);
+}
+.page-head__sub { font-family: var(--fp); font-size: var(--fs-base); color: var(--ts); max-width: 62ch; }
+.page-head__actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+
+/* Section title inside a page ("Inbox highlights 5" in NEXORA) */
+.section-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--fp);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--tp);
+}
+.section-title__count { font-family: var(--fn); font-size: var(--fs-sm); font-weight: 600; color: var(--tm); }
+
+/* ── Tooltip: an aria-hidden child (.tip) of a link/button inside a .has-tooltips container (e.g. the
+   collapsed sidebar). Real elements, not CSS generated content, so names are never read twice. ── */
+.tip {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: calc(100% + 12px); /* towards the inline end: left of a right-hand sidebar */
+  translate: 0 -50%;
+  z-index: 500;
+  display: none;
+  padding: 6px 10px;
+  font-family: var(--fp);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--tp);
+  background: var(--sf-raised);
+  border: 1px solid var(--brs);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow-2);
+  pointer-events: none;
+}
+.has-tooltips :is(a, button) { position: relative; }
+.has-tooltips :is(a, button):is(:hover, :focus-visible) > .tip { display: block; }
+
+/* ── Notices ── */
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  font-family: var(--fp);
+  font-size: var(--fs-sm);
+  line-height: 1.8;
+  color: var(--ts);
+  background: var(--sf);
+  border: 1px solid var(--br);
+  border-radius: var(--r-lg);
+}
+.notice svg.lucide { width: 18px; height: 18px; margin-top: 3px; color: var(--ac); }
+
+/* ── Spinner ── */
+.spin { animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }

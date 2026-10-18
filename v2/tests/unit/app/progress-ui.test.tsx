@@ -7,6 +7,7 @@ import { buildLegacyKeyIndex } from '../../../src/services/content/idRegistry';
 import { fakeSpeech, mockMatchMedia, MOBILE, waitForLearnedCheckboxes } from '../../helpers/dom';
 import { ALICE, BOB } from '../../helpers/fakeAuth';
 import { createFakeServices } from '../../helpers/fakeServices';
+import { categoryName } from '../../../src/models/vocabulary';
 
 const repo = getVocabularyRepository();
 const first = repo.categories[0]!.subtabs[0]!.groups[0]!.entries[0]!; // die Außenwand
@@ -111,7 +112,7 @@ describe('learned progress UI', () => {
   it('entries sharing a legacy key (duplicates) have independent checkboxes', async () => {
     const user = userEvent.setup();
     await signedInApp();
-    await user.click(screen.getByRole('tab', { name: repo.getCategory('bauphysik')!.label }));
+    await user.click(screen.getByRole('tab', { name: categoryName(repo.getCategory('bauphysik')!.label) }));
     await user.click(screen.getByRole('tab', { name: /BÖ5/ }));
     const [a, b] = screen.getAllByRole('checkbox', { name: 'یادگرفتم: der Hebelarm' });
     const [idA] = buildLegacyKeyIndex().get('bauphysik::der Hebelarm')!;

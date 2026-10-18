@@ -42,12 +42,12 @@ test('generate a word with AI → review → save → it syncs and appears in se
   await page.goto('./');
   await signIn(page, uniqueEmail('ai'), 'AI Words');
   await page.getByRole('link', { name: 'واژه‌های من', exact: true }).click();
-  await expect(page.getByTestId('pw-storage')).toContainText('☁️');
+  await expect(page.getByTestId('pw-storage')).toHaveAttribute('data-mode', 'cloud');
 
-  await page.getByRole('button', { name: '✨ افزودن با هوش مصنوعی' }).click();
+  await page.getByRole('button', { name: 'افزودن با هوش مصنوعی' }).click();
   const dialog = page.getByRole('dialog', { name: 'افزودن واژهٔ جدید' });
   await dialog.getByLabel('واژهٔ آلمانی برای پیشنهاد').fill('probeplanungsmappe');
-  await dialog.getByRole('button', { name: '✨ دریافت پیشنهاد' }).click();
+  await dialog.getByRole('button', { name: 'دریافت پیشنهاد' }).click();
   const review = page.getByTestId('ai-review');
   await expect(review).toContainText('پوشهٔ آزمایشی طراحی');
   // A real Firebase ID token (emulator) was sent — never an API key.
@@ -93,7 +93,7 @@ test('«✨ تکمیل» fills only empty fields of a saved word; offline disabl
   await page.goto('./');
   await signIn(page, uniqueEmail('ai-complete'), 'AI Complete');
   await page.getByRole('link', { name: 'واژه‌های من', exact: true }).click();
-  await page.getByRole('button', { name: '+ افزودن واژه' }).click();
+  await page.getByRole('button', { name: 'افزودن واژه' }).click();
   const add = page.getByRole('dialog', { name: 'افزودن واژهٔ جدید' });
   await add.getByLabel('نوع واژه').selectOption('v');
   await add.getByLabel(/واژه یا عبارت آلمانی/).fill('probeverschrauben');
@@ -114,7 +114,7 @@ test('«✨ تکمیل» fills only empty fields of a saved word; offline disabl
 
   await context.setOffline(true);
   await card(page, 'probeverschrauben').getByRole('button', { name: 'ویرایش probeverschrauben' }).click();
-  await expect(page.getByRole('dialog', { name: 'ویرایش واژه' }).getByRole('button', { name: '✨ دریافت پیشنهاد' })).toBeDisabled();
+  await expect(page.getByRole('dialog', { name: 'ویرایش واژه' }).getByRole('button', { name: 'دریافت پیشنهاد' })).toBeDisabled();
   await expect(page.getByText('برای پیشنهاد هوش مصنوعی به اینترنت نیاز است.')).toBeVisible();
   await context.setOffline(false);
   expect(errors).toEqual([]);

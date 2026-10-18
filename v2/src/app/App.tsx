@@ -1,5 +1,10 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { Header } from '../components/Header/Header';
+import { Sidebar } from '../components/Sidebar/Sidebar';
+import { ProgressMeter } from '../components/ProgressMeter/ProgressMeter';
+import { ThemeToggle } from '../components/ThemeToggle/ThemeToggle';
+import { PageHeader } from '../components/PageHeader/PageHeader';
+import { PREFERENCE_KEYS, readJsonPreference, writeJsonPreference } from '../services/preferences';
 import { useTheme } from '../hooks/useTheme';
 import { PronunciationProvider } from '../features/pronunciation/PronunciationProvider';
 import type { SpeechService } from '../features/pronunciation/speechService';
@@ -16,7 +21,6 @@ import { isPersonalId } from '../features/personal/model';
 import { PrimaryNav } from '../components/PrimaryNav/PrimaryNav';
 import { OfflineBanner } from '../components/OfflineBanner/OfflineBanner';
 import { useMediaQuery } from '../hooks/useMediaQuery';
-import { MOBILE_QUERY } from '../features/vocabulary/components/SubtabPanel';
 import { useSection, type Section } from './sections';
 import type { EntryProgress } from '../features/vocabulary/components/LearnedCheckbox';
 import { useVocabularyNavigation } from '../features/vocabulary/useVocabularyNavigation';
@@ -29,6 +33,9 @@ import { AuthErrorBanner } from '../features/account/AuthErrorBanner';
 import { SyncStatusIndicator } from '../features/account/SyncStatusIndicator';
 import { createAppServices, type AppServices } from './services';
 import { AiProvider } from '../features/ai/AiProvider';
+
+/** Desktop layout with the sidebar. */
+export const WIDE_QUERY = '(min-width: 1024px)';
 
 interface Props {
   repository?: VocabularyRepository;
@@ -70,7 +77,13 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
   const category = nav.activeCategory;
   const progress = useProgress();
   const { section, navigate } = useSection();
-  const mobile = useMediaQuery(MOBILE_QUERY);
+  // Desktop (≥ 1024px): sidebar. Phones and tablets: app bar + bottom tab bar.
+  const wide = useMediaQuery(WIDE_QUERY);
+  const [collapsed, setCollapsed] = useState(() => readJsonPreference(PREFERENCE_KEYS.sidebar) === 'collapsed');
+  const toggleCollapsed = useCallback(() => setCollapsed((c) => {
+    writeJsonPreference(PREFERENCE_KEYS.sidebar, c ? 'open' : 'collapsed');
+    return !c;
+  }), []);
   const [migrationOpen, setMigrationOpen] = useState(false);
   const [search, setSearch] = useState<WordsSearchState>({ query: '', filters: NO_FILTERS });
   const [focusEntryId, setFocusEntryId] = useState<string | null>(null);
@@ -119,30 +132,49 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
   }, [nav.selectCategory, navigate]);
 
   const closeMigration = useCallback(() => setMigrationOpen(false), []);
-  const primaryNav = <PrimaryNav active={section} onNavigate={navigate} variant={mobile ? 'bottom' : 'top'} />;
+  const envBadge = (
+    <span className="env-badge" title="Development preview — not the production app" data-testid="env-badge" lang="en" dir="ltr">
+      v2 preview{environmentLabel ? ` · ${environmentLabel}` : ''}
+    </span>
+  );
+  const openMigration = () => setMigrationOpen(true);
 
   return (
-    <>
-      <Header
-        totalEntries={repository.totalEntries}
-        learnedCount={learnedCount}
-        environmentLabel={environmentLabel}
-        theme={theme}
-        onToggleTheme={toggle}
-        primaryNav={mobile ? null : primaryNav}
-        account={(
-          <>
-            <SyncStatusIndicator />
-            <AccountControl totalEntries={repository.totalEntries} learnedCount={learnedCount} onOpenMigration={() => setMigrationOpen(true)} />
-          </>
-        )}
-        navigation={section === 'words'
-          ? <MainNavigation categories={repository.categories} activeId={category.key} onSelect={selectCategory} />
-          : null}
-      />
-      <OfflineBanner signedIn={progress.status !== 'unavailable'} />
-      <AuthErrorBanner />
-      <main className={`mcontent${mobile ? ' mcontent--bottom-nav' : ''}`} id="main" tabIndex={-1}>
+    <div className={`shell ${wide ? 'shell--sidebar' : 'shell--compact'}${wide && collapsed ? ' is-collapsed' : ''}`}>
+      {/* Moves focus without touching the URL hash (the hash is the section route). */}
+      <a className="skip-link" href="#main" lang="fa" dir="rtl"
+        onClick={(e) => { e.preventDefault(); document.getElementById('main')?.focus(); }}>رفتن به محتوای اصلی</a>
+      <div className="frame" aria-hidden="true" />
+      {wide ? (
+        <Sidebar
+          collapsed={collapsed}
+          onToggleCollapsed={toggleCollapsed}
+          nav={<PrimaryNav active={section} onNavigate={navigate} variant="sidebar"
+            counts={{ words: repository.totalEntries, ...(personal?.words.length ? { mine: personal.words.length } : {}) }} />}
+          meter={<ProgressMeter totalEntries={repository.totalEntries} learnedCount={learnedCount} variant="card" />}
+          status={<><SyncStatusIndicator />{envBadge}</>}
+          theme={<ThemeToggle theme={theme} onToggle={toggle} variant="row" />}
+          account={<AccountControl totalEntries={repository.totalEntries} learnedCount={learnedCount} onOpenMigration={openMigration} variant="sidebar" />}
+        />
+      ) : (
+        <Header
+          meter={<ProgressMeter totalEntries={repository.totalEntries} learnedCount={learnedCount} variant="pill" />}
+          theme={<ThemeToggle theme={theme} onToggle={toggle} />}
+          account={<><SyncStatusIndicator /><AccountControl totalEntries={repository.totalEntries} learnedCount={learnedCount} onOpenMigration={openMigration} /></>}
+        />
+      )}
+      <main className={`mcontent${wide ? '' : ' mcontent--bottom-nav'}`} id="main" tabIndex={-1}>
+        <OfflineBanner signedIn={progress.status !== 'unavailable'} />
+        <AuthErrorBanner />
+        {section === 'words' ? (
+          <PageHeader
+            eyebrow={['واژه‌نامهٔ تخصصی آلمانی', 'B2 / C1']}
+            title="واژه‌ها"
+            description={`${repository.totalEntries.toLocaleString('fa-IR')} واژه در ${repository.categories.length.toLocaleString('fa-IR')} دسته — جستجو، مرور و علامت‌گذاری واژه‌های یادگرفته.`}
+            compact={!wide}
+          />
+        ) : null}
+        {section === 'words' ? <MainNavigation categories={repository.categories} activeId={category.key} onSelect={selectCategory} /> : null}
         {section === 'words' ? (
           <WordsSection
             categories={repository.categories}
@@ -189,13 +221,14 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
             onOpenPersonal={() => navigate('mine')}
           />
         ) : null}
+        {wide ? null : <footer className="app-foot">{envBadge}</footer>}
       </main>
-      {mobile ? primaryNav : null}
+      {wide ? null : <PrimaryNav active={section} onNavigate={navigate} variant="bottom" />}
       {migrationOpen && ready ? (
         <Suspense fallback={<p className="visually-hidden" role="status">در حال بارگذاری…</p>}>
           <MigrationDialog repository={repository} onClose={closeMigration} />
         </Suspense>
       ) : null}
-    </>
+    </div>
   );
 }

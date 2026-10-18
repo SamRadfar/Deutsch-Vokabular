@@ -1,3 +1,4 @@
+import { Mic, Pause, Play, SkipBack, SkipForward, Square, Volume2 } from 'lucide-react';
 import { useEffect, useId, useRef } from 'react';
 import type { WordId } from '../../../models/vocabulary';
 import { WordTypeBadge } from '../../vocabulary/components/WordTypeBadge';
@@ -122,7 +123,7 @@ export function ShadowingSession({ snap, cardsById, order, controls, active, rat
       </div>
 
       <div className={`sh-phase${yourTurn ? ' is-your-turn' : ''}${snap.status === 'paused' ? ' is-paused' : ''}`} data-testid="sh-phase">
-        <p>{yourTurn ? '🗣 ' : playing ? '🔊 ' : ''}{phaseText(snap)}</p>
+        <p>{yourTurn ? <Mic /> : playing ? <Volume2 /> : null}{phaseText(snap)}</p>
         {yourTurn ? (
           <span className="sh-countdown" aria-hidden="true">
             {/* keyed: restarts with every pause; a negative delay continues a resumed pause */}
@@ -135,12 +136,12 @@ export function ShadowingSession({ snap, cardsById, order, controls, active, rat
       {snap.notice ? <p className="rv-notice sh-notice" role="status">{NOTICE_TEXT[snap.notice]}</p> : null}
 
       <div className="sh-controls" dir="ltr">
-        <button type="button" className="sh-btn" onClick={controls.previous} aria-label="واژهٔ قبلی" title="واژهٔ قبلی"><span aria-hidden="true">⏮</span></button>
-        <button type="button" className="sh-btn" onClick={controls.stop} aria-label="توقف" title="توقف (برگشت به اول همین واژه)" disabled={snap.status === 'idle'}><span aria-hidden="true">⏹</span></button>
+        <button type="button" className="sh-btn" onClick={controls.previous} aria-label="واژهٔ قبلی" title="واژهٔ قبلی"><SkipBack /></button>
+        <button type="button" className="sh-btn" onClick={controls.stop} aria-label="توقف" title="توقف (برگشت به اول همین واژه)" disabled={snap.status === 'idle'}><Square /></button>
         <button type="button" className="sh-btn sh-main" onClick={playing ? controls.pause : controls.play} aria-label={mainLabel} title={mainLabel}>
-          <span aria-hidden="true">{playing ? '⏸' : '▶'}</span>
+          {playing ? <Pause /> : <Play />}
         </button>
-        <button type="button" className="sh-btn" onClick={controls.next} aria-label="واژهٔ بعدی" title="واژهٔ بعدی"><span aria-hidden="true">⏭</span></button>
+        <button type="button" className="sh-btn" onClick={controls.next} aria-label="واژهٔ بعدی" title="واژهٔ بعدی"><SkipForward /></button>
       </div>
 
       <div className="sh-quick">

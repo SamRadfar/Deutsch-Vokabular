@@ -147,5 +147,5 @@ test('layout: no horizontal overflow, touch-sized controls, works in dark mode',
   for (const s of sizes) expect(s).toBeGreaterThanOrEqual(40);
   if (isMobile) await expect(page.getByRole('button', { name: /توقف موقت|پخش|ادامه/ })).toBeInViewport();
   const bg = await page.getByTestId('sh-stage').evaluate((el) => getComputedStyle(el).backgroundColor);
-  expect(bg).toBe('rgb(27, 30, 41)');
+  expect(bg).toBe('rgb(26, 19, 20)'); // --sf-solid (dark)
 });

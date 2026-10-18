@@ -1,6 +1,8 @@
+import { Cloud, HardDrive, Plus, Sparkles, TriangleAlert, Upload } from 'lucide-react';
 import '../personal.css';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import type { Category, WordType } from '../../../models/vocabulary';
+import { categoryName } from '../../../models/vocabulary';
 import { Dialog } from '../../../components/Dialog/Dialog';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
 import { useProgress } from '../../progress/ProgressProvider';
@@ -31,17 +33,17 @@ type StatusFilter = 'all' | 'learned' | 'unlearned' | 'incomplete' | 'duplicates
 
 /** Where the words are and whether the cloud has them (never claims "synced" before the server confirmed). */
 function storageLine(s: PersonalSnapshot): { tone: 'ok' | 'busy' | 'warn' | 'error'; text: string; detail?: string } {
-  if (!s.saved) return { tone: 'error', text: '⚠️ ذخیره روی این دستگاه ناموفق بود؛ تغییرات فقط تا بستن صفحه می‌مانند.' };
+  if (!s.saved) return { tone: 'error', text: 'ذخیره روی این دستگاه ناموفق بود؛ تغییرات فقط تا بستن صفحه می‌مانند.' };
   const { status } = s.sync;
   if (s.sync.mode === 'local') {
     return {
       tone: 'warn',
-      text: '💾 روی همین دستگاه برای حساب شما ذخیره می‌شود — همگام‌سازی ابری هنوز فعال نیست.',
+      text: 'روی همین دستگاه برای حساب شما ذخیره می‌شود — همگام‌سازی ابری هنوز فعال نیست.',
       ...(status.pendingCount ? { detail: `${status.pendingCount} تغییر برای ارسال پس از فعال شدن همگام‌سازی نگه داشته شده است.` } : {}),
     };
   }
   const d = describeSync(status);
-  const prefix = d.tone === 'ok' ? '☁️ همگام با حساب شما: ' : '☁️ ';
+  const prefix = d.tone === 'ok' ? 'همگام با حساب شما: ' : '';
   return { tone: d.tone, text: `${prefix}${d.text}`, ...(d.detail ? { detail: d.detail } : {}) };
 }
 type Editing = { mode: 'new'; ai?: boolean } | { mode: 'edit'; word: PersonalWord; ai?: boolean } | null;
@@ -91,7 +93,7 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
     if (!w.placement) return null;
     const c = categories.find((x) => x.key === w.placement!.category);
     const s = c?.subtabs.find((x) => x.id === w.placement!.subtab);
-    return c && s ? `${c.label} › ${s.label}` : null;
+    return c && s ? `${categoryName(c.label)} › ${s.label}` : null;
   }, [categories]);
 
   const terms = useMemo(() => queryTerms(query), [query]);
@@ -114,7 +116,7 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
   if (progress.status === 'unavailable') {
     return (
       <section className="pw" aria-labelledby="pw-title" lang="fa" dir="rtl">
-        <h2 id="pw-title" className="pw__title">واژه‌های من</h2>
+        <div className="page-head"><div className="page-head__text"><p className="page-head__eyebrow"><span>شخصی</span><span>واژه‌نامهٔ خودتان</span></p><h2 id="pw-title" className="page-head__title pw__title">واژه‌های من</h2></div></div>
         <EmptyState title="برای ساختن فهرست واژه‌های خودتان وارد حساب شوید"
           description="واژه‌های شخصی برای هر حساب جداگانه نگه داشته می‌شوند. ۹۹۹ واژهٔ داخلی بدون ورود هم در دسترس‌اند." />
       </section>
@@ -134,13 +136,15 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
 
   return (
     <section className="pw" aria-labelledby="pw-title" lang="fa" dir="rtl">
-      <header className="pw__head">
-        <div>
-          <h2 id="pw-title" className="pw__title">واژه‌های من <span className="pw__count">({words.length})</span></h2>
+      <div className="pw__head page-head">
+        <div className="page-head__text">
+          <p className="page-head__eyebrow"><span>شخصی</span><span>واژه‌نامهٔ خودتان</span></p>
+          <h2 id="pw-title" className="page-head__title pw__title">واژه‌های من <span className="pw__count">({words.length})</span></h2>
           {(() => {
             const line = storageLine(snapshot);
             return (
-              <div className={`pw__storage pw__storage--${line.tone}`} data-testid="pw-storage" role="status" aria-live="polite">
+              <div className={`pw__storage pw__storage--${line.tone}`} data-testid="pw-storage" data-mode={snapshot.sync.mode} role="status" aria-live="polite">
+                {line.tone === 'error' ? <TriangleAlert /> : snapshot.sync.mode === 'local' ? <HardDrive /> : <Cloud />}
                 <span>{line.text}</span>
                 {line.detail ? <span className="pw__storage-detail"> {line.detail}</span> : null}
                 {snapshot.sync.status.failedCount > 0 ? (
@@ -151,12 +155,12 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
           })()}
           {snapshot.unreadable ? <p className="pw__storage is-error">{snapshot.unreadable} رکورد قابل خواندن نبود و دست‌نخورده باقی ماند.</p> : null}
         </div>
-        <div className="pw__actions">
-          <button type="button" className="fc-primary pw__add" onClick={() => setEditing({ mode: 'new' })}>+ افزودن واژه</button>
-          {ai ? <button type="button" className="fc-secondary" onClick={() => setEditing({ mode: 'new', ai: true })}>✨ افزودن با هوش مصنوعی</button> : null}
-          <button type="button" className="fc-secondary" onClick={() => setImportOpen(true)}>انتقال از نسخهٔ قدیمی</button>
+        <div className="page-head__actions pw__actions">
+          <button type="button" className="fc-primary pw__add" onClick={() => setEditing({ mode: 'new' })}><Plus />افزودن واژه</button>
+          {ai ? <button type="button" className="fc-secondary" onClick={() => setEditing({ mode: 'new', ai: true })}><Sparkles />افزودن با هوش مصنوعی</button> : null}
+          <button type="button" className="fc-secondary" onClick={() => setImportOpen(true)}><Upload />انتقال از نسخهٔ قدیمی</button>
         </div>
-      </header>
+      </div>
 
       <p className="visually-hidden" role="status" aria-live="polite">{notice ?? ''}</p>
       {snapshot.conflicts.map((c) => (
@@ -203,7 +207,7 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
           <div className="pw-practice">
             <button type="button" className="fc-secondary" onClick={onOpenReview}>مرور با فلش‌کارت</button>
             <button type="button" className="fc-secondary" onClick={onOpenShadowing}>تمرین تلفظ</button>
-            <span className="pw-practice__hint">در مرور و تلفظ، دستهٔ «⭐ واژه‌های من» را انتخاب کنید.</span>
+            <span className="pw-practice__hint">در مرور و تلفظ، دستهٔ «واژه‌های من» را انتخاب کنید.</span>
           </div>
           {visible.length ? (
             <ul className="pw-list" aria-label="فهرست واژه‌های من">

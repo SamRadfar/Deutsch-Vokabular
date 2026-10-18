@@ -1,50 +1,184 @@
-/* Design tokens — values copied from the legacy app (index.html :root and dark theme). */
-:root {
-  --bg: #f0f4fb; --sf: #ffffff; --sfalt: #f7f9fd;
-  --br: #e2e8f4; --brs: #c4cfdf;
-  /* --tm darkened in Phase 4C: #7889a8 had 3.2–3.5:1 on the page/surface (WCAG AA needs 4.5:1). */
-  --tp: #0d1b2e; --ts: #3a4a68; --tm: #5d6b88;
-  --row-odd: #ffffff; --row-even: #f7f9fd; --row-hov: #edf1fc;
-  --hdr-bg: rgba(255, 255, 255, 0.94);
-  --chk-bg: #f0fdf4;
-  --thead-bg: #0d1b2e;
-  --fn: 'Inter', system-ui, sans-serif;
-  --fp: 'Vazir', 'Tahoma', sans-serif;
+/* Design tokens (2.0 redesign, after the NEXORA visual language): atmospheric dark surfaces with
+   burgundy → ember → amber light, quiet translucent cards, hairline borders, inverse primary
+   buttons. Feature styles use only these variables, so both themes follow automatically.
 
-  /* Category accents */
-  --ac-arch: #3a56d4; --acl-arch: rgba(58, 86, 212, 0.10); --acg-arch: linear-gradient(135deg, #3a56d4, #6d28d9); --grp-arch: rgba(58, 86, 212, 0.06);
-  --ac-acad: #b45309; --acl-acad: rgba(180, 83, 9, 0.10); --acg-acad: linear-gradient(135deg, #d97706, #ef4444); --grp-acad: rgba(180, 83, 9, 0.06);
-  --ac-dreame: #047857; --acl-dreame: rgba(4, 120, 87, 0.10); --acg-dreame: linear-gradient(135deg, #059669, #0d9488); --grp-dreame: rgba(4, 120, 87, 0.06);
-  --ac-bautechnik: #0f766e; --acl-bautechnik: rgba(15, 118, 110, 0.10); --acg-bautechnik: linear-gradient(135deg, #0f766e, #0891b2); --grp-bautechnik: rgba(15, 118, 110, 0.06);
-  --ac-fitness: #c2410c; --acl-fitness: rgba(194, 65, 12, 0.10); --acg-fitness: linear-gradient(135deg, #ea580c, #dc2626); --grp-fitness: rgba(194, 65, 12, 0.06);
-  --ac-anatomie: #9f1239; --acl-anatomie: rgba(159, 18, 57, 0.10); --acg-anatomie: linear-gradient(135deg, #be123c, #e11d48); --grp-anatomie: rgba(159, 18, 57, 0.06);
-  --ac-review: #7c3aed; --acl-review: rgba(124, 58, 237, 0.10); --acg-review: linear-gradient(135deg, #7c3aed, #3a56d4); --grp-review: rgba(124, 58, 237, 0.06);
-  --ok: #166534; --okl: rgba(22, 163, 74, 0.10); --bad: #b91c1c; --badl: rgba(220, 38, 38, 0.10);
-  --ac-bauphysik: #2563eb; --acl-bauphysik: rgba(37, 99, 235, 0.10); --acg-bauphysik: linear-gradient(135deg, #2563eb, #06b6d4); --grp-bauphysik: rgba(37, 99, 235, 0.06);
+   Naming: the short legacy names (--bg, --sf, --tp …) stay the public API of the palette; the
+   newer scales (--fs-*, --r-*, --sp-*, --shadow-*) describe type, radius, spacing and elevation. */
+
+:root {
+  /* ── Typography (self-hosted, SIL OFL 1.1: Inter, Vazirmatn) ── */
+  --fn: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --fp: 'Vazirmatn Variable', 'Vazirmatn', 'Vazir', Tahoma, sans-serif;
+  --fs-2xs: 11px;
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-md: 14px;
+  --fs-base: 15px;
+  --fs-lg: 17px;
+  --fs-xl: 20px;
+  --fs-2xl: 26px;
+  --fs-3xl: 32px;
+  --fs-display: 38px;
+  --lh-tight: 1.25;
+  --lh-body: 1.65;
+
+  /* ── Radius, spacing, motion ── */
+  --r-xs: 6px;
+  --r-sm: 8px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 18px;
+  --r-pill: 999px;
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-1: 120ms;
+  --dur-2: 200ms;
+  --dur-3: 320ms;
+
+  /* ── Layout ── */
+  --sidebar-w: 268px;
+  --sidebar-w-collapsed: 76px;
+  --frame-gap: 10px;
+  --content-max: 1600px;
+  --appbar-h: 60px;
+  --bottomnav-h: 64px;
+
+  /* ── Light theme (default) ── */
+  --bg: #f3eeeb;
+  --panel: #fbf8f6;
+  --sf: rgba(255, 255, 255, 0.84);
+  --sf-solid: #ffffff;
+  --sf-raised: #ffffff;
+  --sfalt: rgba(72, 34, 28, 0.04);
+  --sf-hover: rgba(72, 34, 28, 0.06);
+  --sf-active: rgba(72, 34, 28, 0.09);
+  --br: rgba(72, 34, 28, 0.11);
+  --brs: rgba(72, 34, 28, 0.22);
+  --tp: #1d1517;
+  --ts: #4a3f3e;
+  --tm: #6b605e;
+  --row-odd: transparent;
+  --row-even: rgba(72, 34, 28, 0.022);
+  --row-hov: rgba(72, 34, 28, 0.05);
+  --hdr-bg: rgba(251, 248, 246, 0.86);
+  --chk-bg: rgba(22, 163, 74, 0.06);
+  --thead-bg: transparent;
+  --scrim: rgba(28, 16, 16, 0.42);
+
+  --brand: #c13b1b;
+  --brand-tint: rgba(193, 59, 27, 0.09);
+  --brand-grad: linear-gradient(135deg, #d6383f 0%, #e8601c 60%, #f19a2b 100%);
+  --btn-pri-bg: #1d1517;
+  --btn-pri-bg-hover: #000000;
+  --btn-pri-fg: #ffffff;
+  --focus: #d4561f;
+
+  --ok: #15803d; --okl: rgba(22, 163, 74, 0.10);
+  --bad: #b91c1c; --badl: rgba(220, 38, 38, 0.09);
+  --warn: #a6570a; --warnl: rgba(217, 119, 6, 0.11);
+  --info: #2457c5; --infol: rgba(37, 99, 235, 0.09);
+
+  --shadow-1: 0 1px 2px rgba(60, 25, 20, 0.06);
+  --shadow-2: 0 1px 2px rgba(60, 25, 20, 0.05), 0 8px 24px rgba(60, 25, 20, 0.07);
+  --shadow-3: 0 24px 60px rgba(40, 15, 12, 0.22), 0 2px 8px rgba(40, 15, 12, 0.08);
+
+  /* Atmosphere of the content frame (mirrored for RTL: the sidebar sits on the right). */
+  --atmo:
+    radial-gradient(1000px 560px at 8% -14%, rgba(225, 55, 70, 0.14), transparent 62%),
+    radial-gradient(900px 620px at 104% 108%, rgba(245, 140, 50, 0.18), transparent 60%),
+    radial-gradient(700px 480px at 60% 55%, rgba(236, 120, 120, 0.06), transparent 70%),
+    linear-gradient(165deg, #fdfaf8 0%, #faf4f1 50%, #f9efe8 100%);
+  --grain-opacity: 0.05;
+  --grain-blend: multiply;
+  --diagonal: rgba(72, 34, 28, 0.022);
+
+  /* Category accents (text-safe on cards: ≥ 4.5:1) */
+  --ac-arch: #3d4fc4; --acl-arch: rgba(61, 79, 196, 0.09); --acg-arch: linear-gradient(135deg, #4053d0, #7046d6); --grp-arch: rgba(61, 79, 196, 0.05);
+  --ac-acad: #a0520a; --acl-acad: rgba(180, 83, 9, 0.10); --acg-acad: linear-gradient(135deg, #d97706, #e2552a); --grp-acad: rgba(180, 83, 9, 0.05);
+  --ac-dreame: #047857; --acl-dreame: rgba(4, 120, 87, 0.09); --acg-dreame: linear-gradient(135deg, #059669, #0d9488); --grp-dreame: rgba(4, 120, 87, 0.05);
+  --ac-bautechnik: #0f766e; --acl-bautechnik: rgba(15, 118, 110, 0.09); --acg-bautechnik: linear-gradient(135deg, #0f766e, #0e88a6); --grp-bautechnik: rgba(15, 118, 110, 0.05);
+  --ac-fitness: #b93c0c; --acl-fitness: rgba(194, 65, 12, 0.09); --acg-fitness: linear-gradient(135deg, #ea580c, #d83a2e); --grp-fitness: rgba(194, 65, 12, 0.05);
+  --ac-anatomie: #b3163f; --acl-anatomie: rgba(179, 22, 63, 0.08); --acg-anatomie: linear-gradient(135deg, #be123c, #e0435f); --grp-anatomie: rgba(179, 22, 63, 0.05);
+  --ac-bauphysik: #2559c8; --acl-bauphysik: rgba(37, 89, 200, 0.09); --acg-bauphysik: linear-gradient(135deg, #2563eb, #0f97b8); --grp-bauphysik: rgba(37, 89, 200, 0.05);
+  /* "review" = the practice / brand accent (flashcards, shadowing, AI, my words) */
+  --ac-review: var(--brand); --acl-review: var(--brand-tint); --acg-review: var(--brand-grad); --grp-review: rgba(193, 59, 27, 0.05);
 
   /* Active accent (overridden per category scope below) */
   --ac: var(--ac-arch); --acl: var(--acl-arch); --acg: var(--acg-arch); --grp: var(--grp-arch);
+  color-scheme: light;
 }
 
-/* Dark theme — tonal, individually tuned (legacy values) */
+/* ── Dark theme: near-black frame, burgundy/ember light, translucent warm cards ── */
 html[data-theme='dark'] {
-  --bg: #12141c; --sf: #1b1e29; --sfalt: #181a24;
-  --br: rgba(255, 255, 255, 0.09); --brs: rgba(255, 255, 255, 0.16);
-  --tp: #eef0f6; --ts: #aab0c4; --tm: #9096ab;
-  --row-odd: #1b1e29; --row-even: #181a24; --row-hov: #222533;
-  --hdr-bg: rgba(27, 30, 41, 0.88);
-  --chk-bg: rgba(34, 197, 94, 0.08);
-  --thead-bg: #0b0d13;
-  --ok: #4ade80; --okl: rgba(74, 222, 128, 0.12); --bad: #f87171; --badl: rgba(248, 113, 113, 0.12);
-  /* Accents used as text on dark surfaces, lightened to ≥ 5:1 (the light values reach only ~3:1 here).
-     Gradients (white text on top) keep the original, darker colours. */
-  --ac-arch: #7589e1; --ac-acad: #c77e47; --ac-dreame: #4fa189; --ac-bautechnik: #579f9a;
-  --ac-fitness: #d47a55; --ac-anatomie: #ca7d92; --ac-bauphysik: #5c8af0; --ac-review: #a375f2;
-  --acl-review: rgba(163, 117, 242, 0.14);
+  --bg: #0c0a0b;
+  --panel: #130d0e;
+  --sf: rgba(26, 18, 19, 0.80);
+  --sf-solid: #1a1314;
+  --sf-raised: #1e1617;
+  --sfalt: rgba(255, 255, 255, 0.035);
+  --sf-hover: rgba(255, 255, 255, 0.06);
+  --sf-active: rgba(255, 255, 255, 0.09);
+  --br: rgba(255, 255, 255, 0.085);
+  --brs: rgba(255, 255, 255, 0.17);
+  --tp: #f5f1f0;
+  --ts: #cdc4c2;
+  --tm: #a09694;
+  --row-odd: transparent;
+  --row-even: rgba(255, 255, 255, 0.018);
+  --row-hov: rgba(255, 255, 255, 0.045);
+  --hdr-bg: rgba(12, 10, 11, 0.84);
+  --chk-bg: rgba(74, 222, 128, 0.055);
+  --thead-bg: transparent;
+  --scrim: rgba(0, 0, 0, 0.62);
+
+  --brand: #ff8a68;
+  --brand-tint: rgba(255, 122, 89, 0.13);
+  --brand-grad: linear-gradient(135deg, #c92f3c 0%, #e2571f 60%, #eb8a26 100%);
+  --btn-pri-bg: #f5f1f0;
+  --btn-pri-bg-hover: #ffffff;
+  --btn-pri-fg: #151011;
+  --focus: #ffa47e;
+
+  --ok: #5ad48a; --okl: rgba(74, 222, 128, 0.12);
+  --bad: #ff8080; --badl: rgba(248, 113, 113, 0.13);
+  --warn: #f2b45c; --warnl: rgba(242, 180, 92, 0.13);
+  --info: #8fb4ff; --infol: rgba(143, 180, 255, 0.12);
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 1px 2px rgba(0, 0, 0, 0.35), 0 10px 28px rgba(0, 0, 0, 0.32);
+  --shadow-3: 0 28px 72px rgba(0, 0, 0, 0.6), 0 2px 10px rgba(0, 0, 0, 0.4);
+
+  --atmo:
+    radial-gradient(1100px 620px at 10% -14%, rgba(196, 30, 58, 0.58), transparent 62%),
+    radial-gradient(950px 660px at 106% 110%, rgba(234, 96, 20, 0.46), transparent 60%),
+    radial-gradient(800px 520px at 55% 58%, rgba(127, 29, 29, 0.26), transparent 70%),
+    linear-gradient(165deg, #1b0e10 0%, #120b0c 46%, #170d0a 100%);
+  --grain-opacity: 0.075;
+  --grain-blend: overlay;
+  --diagonal: rgba(255, 255, 255, 0.016);
+
+  /* Accents as text on dark surfaces (≥ 5:1); gradients keep deeper colours. */
+  --ac-arch: #95a3ff; --acl-arch: rgba(149, 163, 255, 0.12);
+  --ac-acad: #f0b06a; --acl-acad: rgba(240, 176, 106, 0.12);
+  --ac-dreame: #63d0a4; --acl-dreame: rgba(99, 208, 164, 0.12);
+  --ac-bautechnik: #5fcabd; --acl-bautechnik: rgba(95, 202, 189, 0.12);
+  --ac-fitness: #ff9a6e; --acl-fitness: rgba(255, 154, 110, 0.12);
+  --ac-anatomie: #ff8fab; --acl-anatomie: rgba(255, 143, 171, 0.12);
+  --ac-bauphysik: #86acff; --acl-bauphysik: rgba(134, 172, 255, 0.12);
+  --grp-arch: rgba(149, 163, 255, 0.06); --grp-acad: rgba(240, 176, 106, 0.06); --grp-dreame: rgba(99, 208, 164, 0.06);
+  --grp-bautechnik: rgba(95, 202, 189, 0.06); --grp-fitness: rgba(255, 154, 110, 0.06); --grp-anatomie: rgba(255, 143, 171, 0.06);
+  --grp-bauphysik: rgba(134, 172, 255, 0.06); --grp-review: rgba(255, 138, 104, 0.06);
   color-scheme: dark;
 }
 
-/* One rule per category instead of repeating every component selector (legacy). */
+/* One rule per category instead of repeating every component selector. */
 [data-category='arch'] { --ac: var(--ac-arch); --acl: var(--acl-arch); --acg: var(--acg-arch); --grp: var(--grp-arch); }
 [data-category='acad'] { --ac: var(--ac-acad); --acl: var(--acl-acad); --acg: var(--acg-acad); --grp: var(--grp-acad); }
 [data-category='bautechnik'] { --ac: var(--ac-bautechnik); --acl: var(--acl-bautechnik); --acg: var(--acg-bautechnik); --grp: var(--grp-bautechnik); }

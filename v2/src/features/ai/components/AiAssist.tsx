@@ -1,3 +1,4 @@
+import { LoaderCircle, Sparkles } from 'lucide-react';
 import '../ai.css';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useOnline } from '../../../components/OfflineBanner/OfflineBanner';
@@ -103,7 +104,7 @@ export function AiAssist({ value, typeIsDefault, isEdit, autoRun = false, autoFo
   if (!client) {
     return (
       <section className="ai ai--off" aria-label="پیشنهاد با هوش مصنوعی">
-        <p>✨ پیشنهاد با هوش مصنوعی در این نسخه فعال نیست (سرویس آن راه‌اندازی نشده است). می‌توانید واژه را دستی وارد کنید.</p>
+        <Sparkles /><p>پیشنهاد با هوش مصنوعی در این نسخه فعال نیست (سرویس آن راه‌اندازی نشده است). می‌توانید واژه را دستی وارد کنید.</p>
       </section>
     );
   }
@@ -115,7 +116,7 @@ export function AiAssist({ value, typeIsDefault, isEdit, autoRun = false, autoFo
   return (
     <section className="ai" aria-labelledby={id('title')} data-testid="ai-assist">
       <div className="ai__head">
-        <h3 id={id('title')} className="ai__title">✨ پیشنهاد با هوش مصنوعی</h3>
+        <h3 id={id('title')} className="ai__title"><span className="ai__badge"><Sparkles /></span>پیشنهاد با هوش مصنوعی</h3>
         <p className="ai__hint">پیشنهادها پیش از ذخیره به شما نشان داده می‌شوند و چیزی خودکار جایگزین نمی‌شود.</p>
       </div>
 
@@ -152,7 +153,7 @@ export function AiAssist({ value, typeIsDefault, isEdit, autoRun = false, autoFo
 
       <div className="ai__bar">
         <button type="button" className="fc-secondary ai__go" disabled={!online || busy || !req} onClick={() => void run(mode)}>
-          {busy ? 'در حال دریافت پیشنهاد…' : '✨ دریافت پیشنهاد'}
+          {busy ? <><LoaderCircle className="spin" />در حال دریافت پیشنهاد…</> : <><Sparkles />دریافت پیشنهاد</>}
         </button>
         {busy ? <button type="button" className="pwc__btn" onClick={() => controller.current?.abort()}>لغو</button> : null}
         {!online ? <span className="ai__note" role="status">برای پیشنهاد هوش مصنوعی به اینترنت نیاز است.</span> : null}

@@ -1,4 +1,7 @@
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/vazirmatn';
 @import './tokens.css';
 @import './base.css';
+@import './components.css';
 @import './layout.css';
 @import './practice.css';

@@ -1,3 +1,4 @@
+import { ArrowLeft, ArrowRight, Check, X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import type { WordId } from '../../../models/vocabulary';
 import { usePronunciation } from '../../pronunciation/PronunciationProvider';
@@ -99,8 +100,8 @@ export function FlashcardSession({ state, cardsById, active, autoSpeak, onAnswer
         <span style={{ width: `${total ? (answered / total) * 100 : 0}%` }} />
       </div>
       <p className="fc-tally" aria-hidden="true">
-        <span className="fc-tally__know">✓ {known}</span>
-        <span className="fc-tally__again">✗ {answered - known}</span>
+        <span className="fc-tally__know"><Check /> {known}</span>
+        <span className="fc-tally__again"><X /> {answered - known}</span>
       </p>
 
       <Flashcard card={card} flipped={state.flipped} onFlip={() => dispatch({ type: 'flip' })} onAnswer={onAnswer} previousAnswer={state.answers[id]} />
@@ -112,21 +113,21 @@ export function FlashcardSession({ state, cardsById, active, autoSpeak, onAnswer
       {/* LTR row: "don't know" on the left and "know" on the right, matching the swipe directions. */}
       <div className="fc-answers" dir="ltr">
         <button type="button" className="fc-answer fc-answer--again" onClick={() => onAnswer('again')}>
-          <span aria-hidden="true">✗</span> <span lang="fa">بلد نیستم</span>
+          <span className="fc-answer__main"><X /> <span lang="fa">بلد نیستم</span></span>
           <small lang="fa">مرور دوباره</small>
         </button>
         <button type="button" className="fc-answer fc-answer--know" onClick={() => onAnswer('know')}>
-          <span aria-hidden="true">✓</span> <span lang="fa">بلدم</span>
+          <span className="fc-answer__main"><Check /> <span lang="fa">بلدم</span></span>
           <small lang="fa">یادگرفتم</small>
         </button>
       </div>
 
       <div className="fc-nav" dir="ltr">
         <button type="button" className="fc-tool" onClick={() => dispatch({ type: 'previous' })} disabled={state.index === 0}>
-          <span aria-hidden="true">←</span><span lang="fa">قبلی</span>
+          <ArrowLeft /><span lang="fa">قبلی</span>
         </button>
         <button type="button" className="fc-tool" onClick={() => dispatch({ type: 'next' })} disabled={state.index >= total - 1}>
-          <span lang="fa">بعدی</span><span aria-hidden="true">→</span>
+          <span lang="fa">بعدی</span><ArrowRight />
         </button>
       </div>
 

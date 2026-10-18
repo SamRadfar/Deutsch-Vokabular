@@ -45,7 +45,8 @@ describe.each([
         <List groups={groups} getTechnicalInfo={() => info} openInfoId={groups[0]!.entries[0]!.id} onToggleInfo={() => {}} caption="x" />
       </PronunciationProvider>,
     );
-    expect(container.querySelectorAll('img, script, svg, b, iframe, object')).toHaveLength(0);
+    // The app's own line icons (lucide) are the only SVGs; nothing from the payloads becomes markup.
+    expect(container.querySelectorAll('img, script, svg:not(.lucide), b, iframe, object')).toHaveLength(0);
     for (const p of PAYLOADS) expect(container.textContent).toContain(p);
     expect(window.__xss).toBeUndefined();
     // No attribute anywhere carries an event handler or javascript: URL.

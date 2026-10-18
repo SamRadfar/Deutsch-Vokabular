@@ -1,0 +1,121 @@
+/* Desktop sidebar (NEXORA-style): flat near-black column, grouped navigation, profile at the foot. */
+.sb {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 60;
+  width: var(--sb-w);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 16px 10px 12px;
+  background: var(--bg);
+  transition: width var(--dur-2) var(--ease);
+}
+.sb__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 6px 8px;
+  border-radius: var(--r-lg);
+}
+.sb__logo {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-md);
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1px var(--br), 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+.sb__brand-text { min-width: 0; }
+.sb__title {
+  font-family: var(--fn);
+  font-size: var(--fs-base);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  color: var(--tp);
+  white-space: nowrap;
+  text-align: right;
+}
+.sb__sub { font-size: var(--fs-xs); color: var(--tm); white-space: nowrap; }
+
+.sb__scroll { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; }
+
+.sb__foot { display: flex; flex-direction: column; gap: 4px; }
+.sb__meter { margin-bottom: 6px; }
+.sb__status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  min-height: 32px;
+  padding: 0 12px 4px;
+}
+.sb__account { margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--br); }
+
+/* Sidebar row button (theme, collapse) — same rhythm as the nav links */
+.sb-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  font-family: var(--fp);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  color: var(--ts);
+  background: transparent;
+  border: none;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  text-align: start;
+  transition: background-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+.sb-row:hover { background: var(--sf-hover); color: var(--tp); }
+.sb-row svg.lucide { width: 19px; height: 19px; color: var(--tm); }
+.sb-row:hover svg.lucide { color: var(--ts); }
+.sb-row__label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.env-badge {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 1px 8px;
+  font-family: var(--fn);
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  color: var(--tm);
+  border: 1px dashed var(--brs);
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Collapsed: icon rail ── */
+.sb.is-collapsed { padding-inline: 12px; }
+.sb.is-collapsed .sb__brand { justify-content: center; padding-inline: 0; }
+.sb.is-collapsed .sb__brand-text,
+.sb.is-collapsed .pnav__heading,
+.sb.is-collapsed .pnav__count,
+.sb.is-collapsed .sb-row__label,
+.sb.is-collapsed .sb__meter,
+.sb.is-collapsed .env-badge,
+.sb.is-collapsed .sync-pill__text {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+.sb.is-collapsed .pnav__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
+.sb.is-collapsed .pnav__group + .pnav__group { padding-top: 14px; border-top: 1px solid var(--br); }
+.sb.is-collapsed .pnav--sidebar .pnav__link,
+.sb.is-collapsed .sb-row { justify-content: center; padding: 0; }
+.sb.is-collapsed .sb__status { justify-content: center; padding: 0; }
+.sb.is-collapsed .sb__scroll { overflow: visible; }

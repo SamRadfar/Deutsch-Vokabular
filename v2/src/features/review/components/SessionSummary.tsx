@@ -1,3 +1,4 @@
+import { BookOpen, Hand, PartyPopper, TrendingUp, Trophy } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import type { WordId } from '../../../models/vocabulary';
 import type { DeckCard } from '../deck';
@@ -15,11 +16,11 @@ interface Props {
 }
 
 function verdict({ percent, known, total, unanswered }: Summary) {
-  if (total === unanswered) return { emoji: '👋', title: 'جلسه بدون پاسخ تمام شد' };
-  if (percent === 100 && known === total) return { emoji: '🏆', title: 'بی‌نقص!' };
-  if (percent >= 70) return { emoji: '🎉', title: 'آفرین!' };
-  if (percent >= 40) return { emoji: '💪', title: 'خوب پیش می‌روی' };
-  return { emoji: '📚', title: 'بیشتر تمرین کن' };
+  if (total === unanswered) return { Icon: Hand, title: 'جلسه بدون پاسخ تمام شد' };
+  if (percent === 100 && known === total) return { Icon: Trophy, title: 'بی‌نقص!' };
+  if (percent >= 70) return { Icon: PartyPopper, title: 'آفرین!' };
+  if (percent >= 40) return { Icon: TrendingUp, title: 'خوب پیش می‌روی' };
+  return { Icon: BookOpen, title: 'بیشتر تمرین کن' };
 }
 
 export function SessionSummary({ summary, cardsById, saving, newlyLearned, onRepeatAgain, onRestart, onNewSession }: Props) {
@@ -29,7 +30,7 @@ export function SessionSummary({ summary, cardsById, saving, newlyLearned, onRep
 
   return (
     <section className="fc-summary" aria-labelledby="fc-summary-title" lang="fa" dir="rtl">
-      <p className="fc-summary__emoji" aria-hidden="true">{v.emoji}</p>
+      <span className="fc-summary__emoji"><v.Icon /></span>
       <h2 id="fc-summary-title" ref={heading} tabIndex={-1}>{v.title}</h2>
       <dl className="fc-stats">
         <div className="fc-stat fc-stat--know"><dt>بلدم</dt><dd data-testid="summary-know">{summary.known}</dd></div>

@@ -28,7 +28,7 @@ async function openMine(user: User) {
 }
 
 async function addWord(user: User, f: { type?: string; article?: string; lemma: string; fa: string; example?: string; category?: string }) {
-  await user.click(button('+ افزودن واژه'));
+  await user.click(button('افزودن واژه'));
   const dialog = screen.getByRole('dialog', { name: 'افزودن واژهٔ جدید' });
   const q = within(dialog);
   if (f.type) await user.selectOptions(q.getByLabelText('نوع واژه'), f.type);
@@ -46,7 +46,7 @@ describe('my vocabulary — access', () => {
     render(<App services={createFakeServices().services} speechService={fakeSpeech()} />);
     await user.click(link('واژه‌های من'));
     expect(screen.getByText('برای ساختن فهرست واژه‌های خودتان وارد حساب شوید')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: '+ افزودن واژه' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'افزودن واژه' })).toBeNull();
   });
 });
 
@@ -55,7 +55,7 @@ describe('my vocabulary — create, validate, edit, delete', () => {
     const { user, env } = await signedIn();
     await openMine(user);
     expect(screen.getByText('هنوز واژه‌ای اضافه نکرده‌اید')).toBeInTheDocument();
-    await user.click(button('+ افزودن واژه'));
+    await user.click(button('افزودن واژه'));
     const dialog = screen.getByRole('dialog', { name: 'افزودن واژهٔ جدید' });
     await user.click(within(dialog).getByRole('button', { name: 'افزودن واژه' }));
     const lemma = within(dialog).getByLabelText(/واژه یا عبارت آلمانی/);
@@ -74,7 +74,7 @@ describe('my vocabulary — create, validate, edit, delete', () => {
   it('adds a noun (article from the text), warns about a duplicate, edits it, deletes with confirmation and undo', async () => {
     const { user, env } = await signedIn();
     await openMine(user);
-    await user.click(button('+ افزودن واژه'));
+    await user.click(button('افزودن واژه'));
     const dialog = screen.getByRole('dialog', { name: 'افزودن واژهٔ جدید' });
     await user.type(within(dialog).getByLabelText(/واژه یا عبارت آلمانی/), 'die Aussenwand');
     expect(within(dialog).getByRole('status')).toHaveTextContent('این واژه از قبل وجود دارد');
@@ -172,7 +172,7 @@ describe('my vocabulary — learning tools', () => {
     await user.click(link('واژه‌ها'));
     await user.type(screen.getByRole('searchbox', { name: 'جستجوی واژه' }), 'probewortigkeit');
     const result = await screen.findByRole('article', { name: 'die Probewortigkeit' });
-    expect(result).toHaveTextContent('⭐ واژه‌های من');
+    expect(result).toHaveTextContent('واژه‌های من');
     await user.click(within(result).getByRole('button', { name: 'نمایش در فهرست' }));
     expect(link('واژه‌های من')).toHaveAttribute('aria-current', 'page');
     await waitFor(() => expect(card('die Probewortigkeit')).toHaveFocus());

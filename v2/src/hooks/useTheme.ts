@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { readThemePreference, writeThemePreference, type ThemePreference } from '../services/preferences';
 import { useMediaQuery } from './useMediaQuery';
 
-const THEME_COLOR: Record<ThemePreference, string> = { light: '#f0f4fb', dark: '#12141c' };
+const THEME_COLOR: Record<ThemePreference, string> = { light: '#f3eeeb', dark: '#0c0a0b' };
 
 /**
  * Light/dark theme. Without a stored preference the system setting is followed live;

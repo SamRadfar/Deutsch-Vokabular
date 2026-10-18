@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import vocabulary from '../../src/data/vocabulary/vocabulary.v1.json' with { type: 'json' };
+import { categoryName } from '../../src/models/vocabulary';
 
 const categories = vocabulary.categories;
 
@@ -29,9 +30,9 @@ test.describe('application', () => {
     await expect(page.getByTestId('env-badge')).toHaveText('v2 preview');
     const tabs = page.getByRole('tablist', { name: 'Kategorien' }).getByRole('tab');
     await expect(tabs).toHaveCount(7); // categories; practice sections are in the main navigation
-    await expect(tabs).toHaveText(categories.map((c) => c.label));
+    await expect(tabs).toHaveText(categories.map((c) => categoryName(c.label)));
     // The legacy brand logo (extracted from index.html) loads under the relative base path.
-    await expect.poll(() => page.locator('.brand__icon').evaluate((img: HTMLImageElement) => img.naturalWidth)).toBe(300);
+    await expect.poll(() => page.locator('.sb__logo, .appbar__logo').first().evaluate((img: HTMLImageElement) => img.naturalWidth)).toBe(300);
     expect(errors).toEqual([]);
   });
 
@@ -39,8 +40,8 @@ test.describe('application', () => {
     const errors = trackErrors(page);
     await page.goto('./');
     for (const c of categories) {
-      await mainTab(page, c.label).click();
-      await expect(mainTab(page, c.label)).toHaveAttribute('aria-selected', 'true');
+      await mainTab(page, categoryName(c.label)).click();
+      await expect(mainTab(page, categoryName(c.label))).toHaveAttribute('aria-selected', 'true');
       const first = c.subtabs.flatMap((s) => s.groups.flatMap((g) => g.entries))[0];
       const firstSubtabEmpty = c.subtabs[0]!.groups.every((g) => g.entries.length === 0);
       if (firstSubtabEmpty) await expect(page.getByText('هنوز واژه‌ای در این بخش وجود ندارد')).toBeVisible();
@@ -52,7 +53,7 @@ test.describe('application', () => {
   test('switches subtabs and opens technical information', async ({ page }) => {
     await page.goto('./');
     const tech = categories.find((c) => c.key === 'bautechnik')!;
-    await mainTab(page, tech.label).click();
+    await mainTab(page, categoryName(tech.label)).click();
     await page.getByRole('tab', { name: new RegExp(tech.subtabs[0]!.label) }).click();
     const trigger = page.getByRole('button', { name: 'اطلاعات فنی' }).first();
     await trigger.click();
@@ -108,7 +109,7 @@ test.describe('layout', () => {
   test('no horizontal page overflow in any category', async ({ page }) => {
     await page.goto('./');
     for (const c of categories) {
-      await mainTab(page, c.label).click();
+      await mainTab(page, categoryName(c.label)).click();
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       expect(overflow, `${c.key} overflows horizontally by ${overflow}px`).toBeLessThanOrEqual(0);
     }

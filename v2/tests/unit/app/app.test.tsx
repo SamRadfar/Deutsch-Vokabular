@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { App } from '../../../src/app/App';
 import { getVocabularyRepository } from '../../../src/services/content/vocabularyRepository';
 import { DARK_SYSTEM, MOBILE, fakeSpeech, mockMatchMedia } from '../../helpers/dom';
+import { categoryName } from '../../../src/models/vocabulary';
 
 const repo = getVocabularyRepository();
 const mainTabs = () => within(screen.getByRole('tablist', { name: 'Kategorien' })).getAllByRole('tab');
@@ -15,17 +16,17 @@ afterEach(() => mockMatchMedia(() => false));
 describe('navigation', () => {
   it('shows all 7 categories in legacy order with labels, first one selected', () => {
     render(<App speechService={fakeSpeech()} />);
-    expect(mainTabs().map((t) => t.textContent)).toEqual(repo.categories.map((c) => c.label));
+    expect(mainTabs().map((t) => t.textContent)).toEqual(repo.categories.map((c) => categoryName(c.label)));
     expect(mainTabs()[0]).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByText('999 واژه')).toBeInTheDocument();
+    expect(screen.getByLabelText('999 واژه')).toHaveTextContent('999 واژه');
   });
 
   it('switches category on click and shows that category’s subtabs with counts', async () => {
     const user = userEvent.setup();
     render(<App speechService={fakeSpeech()} />);
     const fitness = repo.getCategory('fitness')!;
-    await user.click(screen.getByRole('tab', { name: fitness.label }));
-    expect(screen.getByRole('tab', { name: fitness.label })).toHaveAttribute('aria-selected', 'true');
+    await user.click(screen.getByRole('tab', { name: categoryName(fitness.label) }));
+    expect(screen.getByRole('tab', { name: categoryName(fitness.label) })).toHaveAttribute('aria-selected', 'true');
     const tabs = within(subTabs()).getAllByRole('tab');
     expect(tabs).toHaveLength(fitness.subtabs.length);
     expect(tabs[0]).toHaveTextContent(`${fitness.subtabs[0]!.label}`);
@@ -38,7 +39,7 @@ describe('navigation', () => {
     const user = userEvent.setup();
     render(<App speechService={fakeSpeech()} />);
     for (const category of repo.categories) {
-      await user.click(screen.getByRole('tab', { name: category.label }));
+      await user.click(screen.getByRole('tab', { name: categoryName(category.label) }));
       for (const subtab of category.subtabs) {
         await user.click(within(subTabs()).getByRole('tab', { name: new RegExp(subtab.label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) }));
         const rows = document.querySelectorAll('tr.vrow');
@@ -67,15 +68,15 @@ describe('navigation', () => {
     render(<App speechService={fakeSpeech()} />);
     const arch = repo.getCategory('arch')!;
     await user.click(within(subTabs()).getByRole('tab', { name: new RegExp(arch.subtabs[2]!.label) }));
-    await user.click(screen.getByRole('tab', { name: repo.getCategory('acad')!.label }));
-    await user.click(screen.getByRole('tab', { name: arch.label }));
+    await user.click(screen.getByRole('tab', { name: categoryName(repo.getCategory('acad')!.label) }));
+    await user.click(screen.getByRole('tab', { name: categoryName(arch.label) }));
     expect(within(subTabs()).getByRole('tab', { name: new RegExp(arch.subtabs[2]!.label) })).toHaveAttribute('aria-selected', 'true');
   });
 
   it('shows an empty state for the empty Bauphysik subtabs', async () => {
     const user = userEvent.setup();
     render(<App speechService={fakeSpeech()} />);
-    await user.click(screen.getByRole('tab', { name: repo.getCategory('bauphysik')!.label }));
+    await user.click(screen.getByRole('tab', { name: categoryName(repo.getCategory('bauphysik')!.label) }));
     expect(within(subTabs()).getAllByRole('tab')[0]).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByText('هنوز واژه‌ای در این بخش وجود ندارد').closest('[role="status"]')).not.toBeNull();
     expect(document.querySelector('table')).toBeNull();
@@ -125,7 +126,7 @@ describe('technical information', () => {
 
   async function openBautechnik(user: ReturnType<typeof userEvent.setup>) {
     render(<App speechService={fakeSpeech()} />);
-    await user.click(screen.getByRole('tab', { name: repo.getCategory('bautechnik')!.label }));
+    await user.click(screen.getByRole('tab', { name: categoryName(repo.getCategory('bautechnik')!.label) }));
     await user.click(within(subTabs()).getByRole('tab', { name: new RegExp(info.subtab.label) }));
   }
 

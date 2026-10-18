@@ -1,3 +1,4 @@
+import { Hand, PartyPopper } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import type { PlayerSnapshot } from '../player';
 import { formatDuration } from './format';
@@ -18,7 +19,7 @@ export function ShadowingSummary({ snap, saving, onNewRound, onRepeat, onSetting
 
   return (
     <section className="fc-summary sh-summary" aria-labelledby="sh-summary-title" lang="fa" dir="rtl">
-      <p className="fc-summary__emoji" aria-hidden="true">{snap.endedEarly ? '👋' : '🎉'}</p>
+      <span className="fc-summary__emoji">{snap.endedEarly ? <Hand /> : <PartyPopper />}</span>
       <h2 id="sh-summary-title" ref={heading} tabIndex={-1}>{snap.endedEarly ? 'جلسه پایان یافت' : 'دور تمرین تمام شد!'}</h2>
       <dl className="fc-stats">
         <div className="fc-stat fc-stat--know"><dt>تمرین‌شده</dt><dd data-testid="sh-summary-done">{practiced}</dd></div>

@@ -1,3 +1,4 @@
+import { Check, X } from 'lucide-react';
 import type { MouseEvent } from 'react';
 import type { DeckCard } from '../deck';
 import type { ReviewResult } from '../model';
@@ -35,8 +36,8 @@ export function Flashcard({ card, flipped, onFlip, onAnswer, previousAnswer }: P
 
   return (
     <div className="fc-scene">
-      <span className="fc-swipe-hint fc-swipe-hint--again" aria-hidden="true" style={{ opacity: swipe.offset < 0 ? progress : 0 }}>✗</span>
-      <span className="fc-swipe-hint fc-swipe-hint--know" aria-hidden="true" style={{ opacity: swipe.offset > 0 ? progress : 0 }}>✓</span>
+      <span className="fc-swipe-hint fc-swipe-hint--again" aria-hidden="true" style={{ opacity: swipe.offset < 0 ? progress : 0 }}><X /></span>
+      <span className="fc-swipe-hint fc-swipe-hint--know" aria-hidden="true" style={{ opacity: swipe.offset > 0 ? progress : 0 }}><Check /></span>
       <div
         className={`fc-drag${swipe.offset ? ' is-dragging' : ''}`}
         style={swipe.offset ? { transform: `translateX(${swipe.offset}px) rotate(${swipe.offset * 0.05}deg)` } : undefined}

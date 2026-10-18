@@ -7,7 +7,7 @@ test('my words: signed out shows a clear explanation and fits the viewport', asy
   await page.goto('./#/mine');
   await expect(page.getByRole('heading', { name: 'واژه‌های من' })).toBeVisible();
   await expect(page.getByText('برای ساختن فهرست واژه‌های خودتان وارد حساب شوید')).toBeVisible();
-  await expect(page.getByRole('button', { name: '+ افزودن واژه' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'افزودن واژه' })).toHaveCount(0);
   await expect(page.getByRole('navigation', { name: 'بخش‌های اصلی' }).getByRole('link', { name: 'واژه‌های من' })).toHaveAttribute('aria-current', 'page');
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
 });

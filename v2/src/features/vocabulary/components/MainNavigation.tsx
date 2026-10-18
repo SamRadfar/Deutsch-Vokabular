@@ -1,5 +1,7 @@
 import type { Category } from '../../../models/vocabulary';
 import { TabList } from '../../../components/TabList/TabList';
+import { categoryName } from '../../../models/vocabulary';
+import { categoryIcon } from '../categoryIcons';
 
 export const MAIN_TABS_PREFIX = 'main';
 
@@ -21,7 +23,10 @@ export function MainNavigation({ categories, activeId, onSelect }: Props) {
         tabClassName="mbtn"
         selectedId={activeId}
         onSelect={onSelect}
-        items={categories.map((c) => ({ id: c.key, content: c.label, dataCategory: c.theme }))}
+        items={categories.map((c) => {
+          const Icon = categoryIcon(c.key);
+          return { id: c.key, content: <>{Icon ? <Icon className="mbtn__icon" /> : null}{categoryName(c.label)}</>, dataCategory: c.theme };
+        })}
       />
     </nav>
   );

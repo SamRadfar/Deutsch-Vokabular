@@ -7,6 +7,7 @@ import { speechTextForWord } from '../../../src/features/pronunciation/speechSer
 import { fakeSpeech, mockMatchMedia, waitForLearnedCheckboxes } from '../../helpers/dom';
 import { ALICE } from '../../helpers/fakeAuth';
 import { createFakeServices } from '../../helpers/fakeServices';
+import { categoryName } from '../../../src/models/vocabulary';
 
 const repo = getVocabularyRepository();
 const first = repo.categories[0]!.subtabs[0]!.groups[0]!.entries[0]!;
@@ -161,8 +162,8 @@ describe('flashcards — signed out (practice without saving)', () => {
     swipe(-120);
     expect(count()).toBe('3 / 10');
     expect(card()).toHaveAttribute('data-side', 'front');
-    expect(screen.getByText('✓ 1')).toBeInTheDocument();
-    expect(screen.getByText('✗ 1')).toBeInTheDocument();
+    expect(document.querySelector('.fc-tally__know')).toHaveTextContent(/^\s*1$/);
+    expect(document.querySelector('.fc-tally__again')).toHaveTextContent(/^\s*1$/);
 
     // A swipe that starts on the 🔊 button answers and does not play audio; a tap on it does.
     const speak = within(card().firstElementChild as HTMLElement).getAllByRole('button')[0]!;
@@ -205,14 +206,14 @@ describe('flashcards — signed out (practice without saving)', () => {
     await user.click(button('شروع دوبارهٔ همین جلسه (3 کارت)'));
     expect(count()).toBe('1 / 3');
     expect(card()).toHaveAttribute('data-side', 'front');
-    expect(screen.getByText('✓ 0')).toBeInTheDocument();
+    expect(document.querySelector('.fc-tally__know')).toHaveTextContent(/^\s*0$/);
     expect(screen.queryByText(/پاسخ شما در این جلسه/)).toBeNull();
 
     // Restart in the middle of a session also starts from scratch.
     await user.click(againBtn());
     await user.click(button('شروع دوباره'));
     expect(count()).toBe('1 / 3');
-    expect(screen.getByText('✗ 0')).toBeInTheDocument();
+    expect(document.querySelector('.fc-tally__again')).toHaveTextContent(/^\s*0$/);
 
     await user.click(button('پایان جلسه'));
     await user.click(button('تنظیم جلسهٔ جدید'));
@@ -227,7 +228,7 @@ describe('flashcards — signed out (practice without saving)', () => {
     await user.click(knowBtn());
     const id = currentId();
     await user.click(screen.getByRole('link', { name: 'واژه‌ها' }));
-    await user.click(screen.getByRole('tab', { name: repo.categories[1]!.label }));
+    await user.click(screen.getByRole('tab', { name: categoryName(repo.categories[1]!.label) }));
     expect(screen.queryByTestId('flashcard')).not.toBeVisible();
     await user.keyboard('2'); // hidden session: no shortcuts
     await user.click(reviewTab());
@@ -304,7 +305,7 @@ describe('flashcards — signed in (saved through the progress system)', () => {
     await user.click(screen.getByRole('checkbox', { name: `یادگرفتم: ${first.word}` }));
     await user.click(reviewTab());
     expect(screen.getByRole('radio', { name: /یادنگرفته‌ها/ })).toBeChecked();
-    expect(screen.getByRole('option', { name: `${repo.categories[0]!.label} (${archTotal - 1})` })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: `${categoryName(repo.categories[0]!.label)} (${archTotal - 1})` })).toBeInTheDocument();
     await user.click(button(`شروع مرور (${archTotal - 1} کارت)`));
     expect(count()).toBe(`1 / ${archTotal - 1}`);
     expect(currentId()).not.toBe(first.id);

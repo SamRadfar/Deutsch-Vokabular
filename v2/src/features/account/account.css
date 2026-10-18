@@ -1,155 +1,197 @@
-/* Account control, sync status and banners — same visual language as the legacy header buttons */
-.auth-btn {
-  font-family: var(--fp);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ac-arch);
-  background: var(--sf);
-  border: 1.5px solid var(--br);
-  border-radius: 20px;
-  padding: 0 14px;
-  height: 34px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: border-color 0.2s, color 0.2s;
-}
-.auth-btn:hover:not(:disabled) { border-color: var(--ac-arch); }
-.auth-btn:disabled { opacity: 0.7; cursor: progress; }
-.auth-btn--muted { color: var(--tm); }
+/* Account control, sync status and banners. Button look: styles/components.css. */
+.auth-btn svg.lucide { width: 16px; height: 16px; }
+.auth-btn--signin { color: var(--btn-pri-fg); background: var(--btn-pri-bg); border-color: transparent; }
+.auth-btn--signin:hover:not(:disabled) { background: var(--btn-pri-bg-hover); border-color: transparent; }
+.auth-btn--muted { color: var(--ts); }
+.auth-btn:disabled { cursor: progress; }
+.auth--sidebar.auth-btn,
+.auth--sidebar .auth-btn { width: 100%; }
+.sb.is-collapsed .auth--sidebar .auth-btn,
+.sb.is-collapsed .auth--sidebar.auth-btn { padding: 0; }
+.sb.is-collapsed .auth-btn__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
+
 .auth-unavailable { position: relative; }
 .auth-popover {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 8px);
   right: 0;
-  width: min(280px, 80vw);
+  width: min(300px, 80vw);
   z-index: 300;
-  background: var(--sf);
-  border: 1px solid var(--br);
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-size: 12px;
-  line-height: 1.8;
+  padding: 12px 14px;
+  font-family: var(--fp);
+  font-size: var(--fs-xs);
+  line-height: 1.9;
   color: var(--ts);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  background: var(--sf-raised);
+  border: 1px solid var(--brs);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-3);
 }
-.auth-popover__code { display: block; margin-top: 6px; font-size: 10px; direction: ltr; text-align: left; word-break: break-all; }
+.auth--sidebar .auth-popover { top: auto; bottom: calc(100% + 8px); }
+.auth-popover__code { display: block; margin-top: 6px; font-size: 10.5px; direction: ltr; text-align: left; word-break: break-all; color: var(--tm); }
 .auth-skeleton {
   display: inline-block;
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background: var(--br);
+  background: var(--sf-active);
   animation: auth-pulse 1.2s ease-in-out infinite alternate;
 }
-@keyframes auth-pulse { from { opacity: 0.4; } to { opacity: 1; } }
+.auth-skeleton.auth--sidebar { display: block; width: 100%; height: 44px; border-radius: var(--r-md); background: var(--sfalt); }
+@keyframes auth-pulse { from { opacity: 0.45; } to { opacity: 1; } }
+.auth-signing { display: inline-flex; gap: 6px; align-items: center; }
+.auth-signing.auth--sidebar { display: flex; }
+.auth-signing.auth--sidebar > * { flex: 1; }
+.auth-btn--busy { cursor: progress; color: var(--tm); }
 
+/* ── Account button ── */
 .account { position: relative; }
 .account__button {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 1.5px solid var(--br);
-  background: var(--sf);
-  padding: 0;
-  cursor: pointer;
-  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  background: var(--sfalt);
+  border: 1px solid var(--br);
+  border-radius: 50%;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color var(--dur-1) var(--ease), background-color var(--dur-1) var(--ease);
 }
 .account__button[aria-expanded='true'],
-.account__button:hover { border-color: var(--ac-arch); }
-.avatar { width: 100%; height: 100%; object-fit: cover; display: block; }
+.account__button:hover { border-color: var(--brs); }
+.avatar { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 50%; }
 .avatar--initial {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  color: var(--ac-arch);
-  background: var(--acl-arch);
   font-family: var(--fn);
+  font-weight: 700;
+  color: var(--tp);
+  background: var(--sf-active);
 }
+
+/* Sidebar: profile row (avatar, name, e-mail, chevron) */
+.account--sidebar .account__button {
+  width: 100%;
+  height: auto;
+  min-height: 52px;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 7px 8px;
+  border-color: transparent;
+  border-radius: var(--r-lg);
+  background: transparent;
+  text-align: start;
+}
+.account--sidebar .account__button:hover,
+.account--sidebar .account__button[aria-expanded='true'] { background: var(--sf-hover); border-color: transparent; }
+.account--sidebar .avatar { width: 36px; height: 36px; flex-shrink: 0; }
+.account__who { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.account__who-name { font-family: var(--fp); font-size: var(--fs-sm); font-weight: 700; color: var(--tp); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.account__who-sub { font-family: var(--fn); font-size: var(--fs-2xs); color: var(--tm); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right; }
+.account__chevron { width: 16px; height: 16px; color: var(--tm); }
+.sb.is-collapsed .account--sidebar .account__button { justify-content: center; padding: 6px 0; }
+.sb.is-collapsed .account__who,
+.sb.is-collapsed .account__chevron { display: none; }
+
+/* ── Menu (popover) ── */
 .account__menu {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
   z-index: 300;
   width: min(300px, 90vw);
-  background: var(--sf);
-  border: 1px solid var(--br);
-  border-radius: 12px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
   padding: 6px;
   font-family: var(--fp);
+  background: var(--sf-raised);
+  border: 1px solid var(--brs);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-3);
+  animation: pop-in var(--dur-2) var(--ease);
 }
-.account__identity { padding: 10px 10px 8px; border-bottom: 1px solid var(--br); margin-bottom: 4px; }
-.account__name { font-weight: 700; font-size: 13px; color: var(--tp); }
-.account__email { font-size: 11px; color: var(--tm); text-align: right; font-family: var(--fn); }
-.account__progress { font-size: 12px; color: var(--ts); margin-top: 6px; }
-.account__sync { font-size: 11px; margin-top: 4px; color: var(--tm); line-height: 1.7; }
-.account__sync--error { color: #b42318; }
-.account__sync--warn { color: #b45309; }
+.account--sidebar .account__menu { top: auto; bottom: calc(100% + 8px); }
+@keyframes pop-in { from { opacity: 0; transform: translateY(4px) scale(0.98); } }
+.account__identity { padding: 10px 10px 10px; border-bottom: 1px solid var(--br); margin-bottom: 4px; }
+.account__name { font-weight: 700; font-size: var(--fs-sm); color: var(--tp); }
+.account__email { font-size: var(--fs-2xs); color: var(--tm); text-align: right; font-family: var(--fn); }
+.account__progress { font-size: var(--fs-xs); color: var(--ts); margin-top: 6px; }
+.account__sync { font-size: var(--fs-2xs); margin-top: 4px; color: var(--tm); line-height: 1.8; }
+.account__sync--error { color: var(--bad); }
+.account__sync--warn { color: var(--warn); }
 .account__item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  font-family: var(--fp);
+  font-size: var(--fs-sm);
   text-align: right;
+  color: var(--tp);
   background: transparent;
   border: none;
-  border-radius: 8px;
-  padding: 10px;
-  min-height: 40px;
-  font-family: var(--fp);
-  font-size: 13px;
-  color: var(--tp);
+  border-radius: var(--r-sm);
   cursor: pointer;
 }
+.account__item svg.lucide { width: 16px; height: 16px; color: var(--tm); }
 .account__item:hover:not(:disabled),
-.account__item:focus-visible { background: var(--row-hov); }
+.account__item:focus-visible { background: var(--sf-hover); outline: none; }
 .account__item:disabled { opacity: 0.5; cursor: not-allowed; }
-.account__item--danger { color: #b42318; }
+.account__item--danger,
+.account__item--danger svg.lucide { color: var(--bad); }
 
+/* ── Sync status pill ── */
 .sync-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   font-family: var(--fp);
-  font-size: 11px;
-  color: var(--tm);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--ts);
   white-space: nowrap;
 }
-.sync-pill__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--tm); flex-shrink: 0; }
-.sync-pill--ok .sync-pill__dot { background: #16a34a; }
-.sync-pill--busy .sync-pill__dot { background: #2563eb; animation: auth-pulse 0.8s ease-in-out infinite alternate; }
-.sync-pill--warn .sync-pill__dot { background: #d97706; }
-.sync-pill--error { color: #b42318; }
-.sync-pill--error .sync-pill__dot { background: #dc2626; }
+.sync-pill__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--tm); flex-shrink: 0; }
+.sync-pill--ok .sync-pill__dot { background: var(--ok); box-shadow: 0 0 0 3px var(--okl); }
+.sync-pill--busy .sync-pill__dot { background: var(--info); animation: auth-pulse 0.8s ease-in-out infinite alternate; }
+.sync-pill--warn .sync-pill__dot { background: var(--warn); }
+.sync-pill--error { color: var(--bad); }
+.sync-pill--error .sync-pill__dot { background: var(--bad); }
+.appbar .sync-pill__text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
 
+/* ── Sign-in error banner ── */
 .auth-banner {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  max-width: 1480px;
-  margin: 10px auto 0;
   padding: 10px 14px;
-  border-radius: 10px;
   font-family: var(--fp);
-  font-size: 13px;
+  font-size: var(--fs-sm);
   line-height: 1.8;
+  border-radius: var(--r-lg);
 }
-.auth-banner--error { background: #fef3f2; color: #912018; border: 1px solid #fecdca; }
-.auth-banner--info { background: var(--sfalt); color: var(--ts); border: 1px solid var(--br); }
-html[data-theme='dark'] .auth-banner--error { background: #3a1513; color: #fda29b; border-color: #7a271a; }
-.auth-banner__close { background: none; border: none; font-size: 18px; cursor: pointer; color: inherit; min-width: 32px; min-height: 32px; }
+.auth-banner--error { color: var(--bad); background: var(--badl); border: 1px solid color-mix(in srgb, var(--bad) 35%, transparent); }
+.auth-banner--info { color: var(--ts); background: var(--sf); border: 1px solid var(--br); }
+.auth-banner__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  min-height: 34px;
+  color: inherit;
+  background: none;
+  border: none;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+.auth-banner__close:hover { background: var(--sf-hover); }
+.auth-banner__close svg.lucide { width: 16px; height: 16px; }
 
 @media (prefers-reduced-motion: reduce) {
   .auth-skeleton, .sync-pill--busy .sync-pill__dot { animation: none; }
 }
-@media (max-width: 640px) {
-  .sync-pill__text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
-  .auth-btn { height: 40px; }
-  .account__button { width: 40px; height: 40px; }
-}
-
-.auth-signing { display: inline-flex; gap: 6px; align-items: center; }
-.auth-btn--busy { display: inline-flex; align-items: center; cursor: progress; color: var(--tm); }

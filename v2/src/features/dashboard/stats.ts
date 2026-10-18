@@ -3,6 +3,7 @@
 // estimated or invented (no streaks, no "minutes per day").
 
 import type { Category, CategoryKey, WordId } from '../../models/vocabulary';
+import { categoryName } from '../../models/vocabulary';
 import type { ReviewRecord } from '../review/model';
 import { countCategories, countSubtab, percent } from '../progress/stats';
 
@@ -35,7 +36,7 @@ export function learningOverview(categories: readonly Category[], learned: Reado
       let total = 0;
       let done = 0;
       for (const s of c.subtabs) { const n = countSubtab(s, learned); total += n.total; done += n.learned; }
-      return { key: c.key, label: c.label, theme: c.theme, total, learned: done, percent: percent({ total, learned: done }) };
+      return { key: c.key, label: categoryName(c.label), theme: c.theme, total, learned: done, percent: percent({ total, learned: done }) };
     }),
   };
 }

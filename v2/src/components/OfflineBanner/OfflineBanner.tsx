@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react';
+import { WifiOff } from 'lucide-react';
 
 function subscribe(onChange: () => void) {
   window.addEventListener('online', onChange);
@@ -20,7 +21,7 @@ export function OfflineBanner({ signedIn }: { signedIn: boolean }) {
   if (online) return null;
   return (
     <div className="offline-banner" role="status" lang="fa" dir="rtl" data-testid="offline-banner">
-      <span aria-hidden="true">📴</span>{' '}
+      <WifiOff aria-hidden="true" />
       {signedIn
         ? 'آفلاین هستید. واژه‌ها و تمرین‌ها در دسترس‌اند؛ تغییرات روی این دستگاه نگه داشته و پس از اتصال همگام می‌شوند.'
         : 'آفلاین هستید. واژه‌ها و تمرین‌ها در دسترس‌اند؛ ورود به حساب به اینترنت نیاز دارد.'}

@@ -2,6 +2,7 @@
 // and the review-again list — never over the DOM (the legacy app scraped rendered table rows).
 
 import type { Category, CategoryKey, VocabularyEntry, WordId } from '../../models/vocabulary';
+import { categoryName } from '../../models/vocabulary';
 import { toEntry, type PersonalWord } from '../personal/model';
 
 export type ReviewMode = 'all' | 'unlearned' | 'learned' | 'again';
@@ -9,7 +10,7 @@ export type ReviewMode = 'all' | 'unlearned' | 'learned' | 'again';
 /** Pseudo category of the user's personal words in decks, search and filters. */
 export const PERSONAL_KEY = 'mine';
 export type PracticeCategoryKey = CategoryKey | typeof PERSONAL_KEY;
-export const PERSONAL_LABEL = '⭐ واژه‌های من';
+export const PERSONAL_LABEL = 'واژه‌های من';
 export const REVIEW_MODES: readonly ReviewMode[] = ['all', 'unlearned', 'learned', 'again'];
 
 /** `all` or one category key (including the personal words). */
@@ -43,7 +44,7 @@ export function flattenCards(categories: readonly Category[]): DeckCard[] {
         for (const entry of g.entries) {
           if (seen.has(entry.id)) continue;
           seen.add(entry.id);
-          cards.push({ entry, categoryKey: c.key, categoryLabel: c.label, theme: c.theme, subtabId: s.id, subtabLabel: s.label, order: cards.length });
+          cards.push({ entry, categoryKey: c.key, categoryLabel: categoryName(c.label), theme: c.theme, subtabId: s.id, subtabLabel: s.label, order: cards.length });
         }
   return cards;
 }

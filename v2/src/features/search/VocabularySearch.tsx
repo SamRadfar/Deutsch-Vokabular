@@ -1,7 +1,9 @@
+import { Search, SlidersHorizontal } from 'lucide-react';
 import { forwardRef, useId, useState } from 'react';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { MOBILE_QUERY } from '../vocabulary/components/SubtabPanel';
 import type { Category } from '../../models/vocabulary';
+import { categoryName } from '../../models/vocabulary';
 import { filtersActive, type SearchFilters, type StatusFilter } from './searchIndex';
 import { PERSONAL_KEY, PERSONAL_LABEL } from '../review/deck';
 
@@ -43,7 +45,7 @@ export const VocabularySearch = forwardRef<HTMLInputElement, Props>(function Voc
     <search className="vsearch" lang="fa" dir="rtl" aria-label="جستجو و فیلتر واژه‌ها">
       <div className="vsearch__row">
         <label htmlFor={ids.q} className="visually-hidden">جستجوی واژه</label>
-        <span className="vsearch__icon" aria-hidden="true">🔍</span>
+        <Search className="vsearch__icon" />
         <input
           ref={inputRef}
           id={ids.q}
@@ -63,7 +65,7 @@ export const VocabularySearch = forwardRef<HTMLInputElement, Props>(function Voc
       {mobile ? (
         <div className="vsearch__bar">
           <button type="button" className="vsearch__toggle" aria-expanded={open} aria-controls={ids.filters} onClick={() => setOpen((o) => !o)}>
-            <span aria-hidden="true">⚙︎</span> فیلترها{activeFilters ? ` (${activeFilters})` : ''}
+            <SlidersHorizontal />فیلترها{activeFilters ? ` (${activeFilters})` : ''}
           </button>
           {active ? <button type="button" className="vsearch__reset" onClick={onReset}>پاک کردن</button> : null}
         </div>
@@ -74,7 +76,7 @@ export const VocabularySearch = forwardRef<HTMLInputElement, Props>(function Voc
           <select id={ids.cat} value={filters.category}
             onChange={(e) => onFilters({ ...filters, category: e.currentTarget.value as SearchFilters['category'], subtab: 'all' })}>
             <option value="all">همهٔ دسته‌ها</option>
-            {categories.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}
+            {categories.map((c) => <option key={c.key} value={c.key}>{categoryName(c.label)}</option>)}
             {personalCount > 0 || filters.category === PERSONAL_KEY ? <option value={PERSONAL_KEY}>{PERSONAL_LABEL}</option> : null}
           </select>
         </label>

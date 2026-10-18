@@ -7,33 +7,57 @@
 }
 html {
   -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 body {
   background: var(--bg);
   color: var(--tp);
   font-family: var(--fn);
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: var(--fs-md);
+  line-height: var(--lh-body);
   min-height: 100vh;
   overflow-x: hidden;
-  transition: background-color 0.25s ease, color 0.25s ease;
+  font-feature-settings: 'cv11', 'ss01';
 }
 button {
+  font: inherit;
+  color: inherit;
+}
+:where(input, select, textarea) {
   font: inherit;
   color: inherit;
 }
 ul {
   list-style: none;
 }
-img {
+img,
+svg {
   max-width: 100%;
 }
+a {
+  color: inherit;
+}
 :focus-visible {
-  outline: 2px solid var(--ac);
+  outline: 2px solid var(--focus);
   outline-offset: 2px;
+}
+::selection {
+  background: var(--brand-tint);
+  color: var(--tp);
 }
 [lang='fa'] {
   font-family: var(--fp);
+}
+[lang='de'] {
+  font-family: var(--fn);
+}
+/* Line icons (lucide): one stroke weight everywhere; size comes from the context. */
+svg.lucide {
+  flex-shrink: 0;
+  stroke-width: 1.75;
+  vertical-align: middle;
 }
 .visually-hidden {
   position: absolute !important;
@@ -47,5 +71,10 @@ img {
   border: 0;
 }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

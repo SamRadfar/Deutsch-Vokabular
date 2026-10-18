@@ -146,7 +146,7 @@ describe('my words UI with cloud sync', () => {
     return { env, user };
   }
   async function add(user: ReturnType<typeof userEvent.setup>, lemma: string) {
-    await user.click(screen.getByRole('button', { name: '+ افزودن واژه' }));
+    await user.click(screen.getByRole('button', { name: 'افزودن واژه' }));
     const d = screen.getByRole('dialog', { name: 'افزودن واژهٔ جدید' });
     await user.type(within(d).getByLabelText(/واژه یا عبارت آلمانی/), lemma);
     await user.type(within(d).getByLabelText(/معنی فارسی/), 'آزمایشی');
@@ -161,7 +161,8 @@ describe('my words UI with cloud sync', () => {
     expect(card).toHaveTextContent('در انتظار همگام‌سازی');
     act(() => env.personalRemote.setOnline(true));
     // Server-confirmed ("ذخیره شد"); the test store is in memory, which the status line also states.
-    await waitFor(() => expect(screen.getByTestId('pw-storage')).toHaveTextContent(/☁️ .*ذخیره شد/));
+    await waitFor(() => expect(screen.getByTestId('pw-storage')).toHaveTextContent(/ذخیره شد/));
+    expect(screen.getByTestId('pw-storage')).toHaveAttribute('data-mode', 'cloud');
     expect(screen.getByRole('article', { name: 'Wolkenwort' })).not.toHaveTextContent('در انتظار همگام‌سازی');
     expect(env.personalCloud.writes).toHaveLength(1);
   });
@@ -173,7 +174,7 @@ describe('my words UI with cloud sync', () => {
     await waitFor(() => expect(screen.getByRole('article', { name: 'Abgelehnt' })).toHaveTextContent('در ابر ذخیره نشد'));
     expect(screen.getByTestId('pw-storage')).toHaveTextContent('خطا در همگام‌سازی');
     await user.click(screen.getByRole('button', { name: 'تلاش دوباره' }));
-    await waitFor(() => expect(screen.getByTestId('pw-storage')).toHaveTextContent(/☁️ .*ذخیره شد/));
+    await waitFor(() => expect(screen.getByTestId('pw-storage')).toHaveTextContent(/ذخیره شد/));
     expect(screen.queryByRole('button', { name: 'تلاش دوباره' })).toBeNull();
   });
 

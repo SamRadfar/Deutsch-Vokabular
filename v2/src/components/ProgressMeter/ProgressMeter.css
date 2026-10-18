@@ -1,0 +1,41 @@
+.pmeter { font-family: var(--fp); color: var(--ts); }
+.pmeter__nums { font-family: var(--fn); font-weight: 700; color: var(--tp); white-space: nowrap; }
+.pmeter__unit { font-family: var(--fp); font-weight: 500; color: var(--tm); }
+.pmeter__bar { display: block; height: 4px; background: var(--sf-active); border-radius: 4px; overflow: hidden; }
+.pmeter__bar > span { display: block; height: 100%; background: var(--brand-grad); border-radius: 4px; transition: width 0.6s var(--ease); }
+
+/* Sidebar card */
+.pmeter--card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 6px 8px;
+  padding: 12px 14px;
+  background: var(--sfalt);
+  border: 1px solid var(--br);
+  border-radius: var(--r-lg);
+}
+.pmeter--card .pmeter__label { font-size: var(--fs-xs); font-weight: 600; color: var(--tm); }
+.pmeter--card .pmeter__nums { grid-column: 1; font-size: var(--fs-base); }
+.pmeter--card .pmeter__pct { grid-column: 2; grid-row: 2; font-size: var(--fs-xs); font-weight: 700; color: var(--brand); }
+.pmeter--card .pmeter__label { grid-column: 1 / -1; }
+.pmeter--card .pmeter__bar { grid-column: 1 / -1; }
+.pmeter--card.is-idle { grid-template-columns: 1fr; }
+
+/* App-bar pill */
+.pmeter--pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: var(--fs-xs);
+  background: var(--sfalt);
+  border: 1px solid var(--br);
+  border-radius: var(--r-pill);
+}
+.pmeter--pill .pmeter__bar { width: 44px; height: 3px; }
+@media (max-width: 480px) {
+  .pmeter--pill .pmeter__unit,
+  .pmeter--pill .pmeter__bar { display: none; }
+}
