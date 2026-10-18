@@ -4,6 +4,9 @@ import { defineConfig, devices } from '@playwright/test';
 // demo project, no real Google account). Run through `npm run test:e2e:emulator`, which starts
 // the emulators first. The Auth Emulator's sign-in popup is a stand-in: these tests do NOT
 // verify real Google OAuth.
+/** AI worker address in the emulator build; tests answer it with page.route (nothing listens there). */
+export const AI_TEST_ENDPOINT = 'http://127.0.0.1:8799';
+
 export const EMULATOR_ENV = {
   // Ignore any .env.local: the build must only see the emulator values below.
   DV2_HERMETIC: '1',
@@ -14,6 +17,7 @@ export const EMULATOR_ENV = {
   VITE_FIREBASE_APP_ID: 'demo-app',
   VITE_FIREBASE_USE_EMULATORS: 'true',
   VITE_FIREBASE_EMULATOR_HOST: process.env.E2E_EMULATOR_HOST ?? '127.0.0.1',
+  VITE_AI_ENDPOINT: AI_TEST_ENDPOINT,
 };
 
 export default defineConfig({

@@ -5,6 +5,7 @@ import { createFakeAuth } from './fakeAuth';
 import { createFakeCloud } from './fakeCloud';
 import { createFakeDocCloud } from './fakeDocCloud';
 import type { CustomWordValue } from '../../src/features/personal/syncModel';
+import type { AiClient } from '../../src/features/ai/aiClient';
 
 export function createFakeAccountRemote() {
   const records = new Map<string, MigrationRecord>();
@@ -25,7 +26,7 @@ export function createFakeAccountRemote() {
 }
 
 /** Complete fake environment for App: fake identity provider, fake cloud, memory store. */
-export function createFakeServices(options: Parameters<typeof createFakeAuth>[0] & { personalSync?: boolean } = {}) {
+export function createFakeServices(options: Parameters<typeof createFakeAuth>[0] & { personalSync?: boolean; ai?: AiClient } = {}) {
   const auth = createFakeAuth(options);
   const personalCloud = createFakeDocCloud<CustomWordValue>();
   const personalRemote = personalCloud.device();
@@ -35,6 +36,7 @@ export function createFakeServices(options: Parameters<typeof createFakeAuth>[0]
   const local: ProgressLocalStore = createMemoryStore();
   const services: AppServices = {
     auth,
+    ...(options.ai ? { ai: options.ai } : {}),
     progress: {
       createRemote: () => remote, account, createLocalStore: async () => local,
       // Personal-word cloud sync only when asked for (mirrors config.personalWordsSync).

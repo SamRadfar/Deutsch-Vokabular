@@ -28,6 +28,7 @@ import { AccountControl } from '../features/account/AccountControl';
 import { AuthErrorBanner } from '../features/account/AuthErrorBanner';
 import { SyncStatusIndicator } from '../features/account/SyncStatusIndicator';
 import { createAppServices, type AppServices } from './services';
+import { AiProvider } from '../features/ai/AiProvider';
 
 interface Props {
   repository?: VocabularyRepository;
@@ -54,7 +55,9 @@ export function App({ repository = getVocabularyRepository(), speechService, ser
     <AuthProvider service={resolved.auth} {...(resolved.authUnavailable ? { unavailable: resolved.authUnavailable } : {})}>
       <ProgressProvider services={resolved.progress} knownIds={knownIds}>
         <PronunciationProvider {...(speechService ? { service: speechService } : {})}>
-          <AppContent repository={repository} environmentLabel={resolved.environmentLabel} />
+          <AiProvider client={resolved.ai ?? null}>
+            <AppContent repository={repository} environmentLabel={resolved.environmentLabel} />
+          </AiProvider>
         </PronunciationProvider>
       </ProgressProvider>
     </AuthProvider>

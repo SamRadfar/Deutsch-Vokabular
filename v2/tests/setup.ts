@@ -14,7 +14,11 @@ configure({
   _disableExpensiveErrorDiagnostics: true,
 } as Parameters<typeof configure>[0]);
 
+// Worker tests run in the node environment (`// @vitest-environment node`) — no DOM there.
+const hasDom = typeof window !== 'undefined';
+
 afterEach(() => {
+  if (!hasDom) return;
   cleanup();
   window.localStorage.clear();
   window.history.replaceState(null, '', window.location.pathname); // the hash is the section route
@@ -22,7 +26,7 @@ afterEach(() => {
 });
 
 // jsdom implements neither matchMedia nor speechSynthesis; tests opt in per case.
-if (!window.matchMedia) {
+if (hasDom && !window.matchMedia) {
   Object.defineProperty(window, 'matchMedia', {
     configurable: true,
     writable: true,

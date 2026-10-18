@@ -4,6 +4,7 @@ import { GermanExample, WordSpeech } from '../../vocabulary/components/EntryFiel
 import type { DuplicateMatch } from '../duplicates';
 import type { WordSyncState } from '../../progress/model';
 import { displayWord, toEntry, type PersonalWord } from '../model';
+import { missingFields } from '../../ai/merge';
 
 interface Props {
   word: PersonalWord;
@@ -15,10 +16,12 @@ interface Props {
   onToggleLearned(id: string, learned: boolean): void;
   onEdit(word: PersonalWord): void;
   onDelete(word: PersonalWord): void;
+  /** «✨ تکمیل»: only when the AI service is available. */
+  onComplete?: (word: PersonalWord) => void;
 }
 
 /** One personal word. All text is rendered as React text (never as HTML). */
-export const PersonalWordCard = memo(function PersonalWordCard({ word, duplicates, placementLabel, focused, syncState, onToggleLearned, onEdit, onDelete }: Props) {
+export const PersonalWordCard = memo(function PersonalWordCard({ word, duplicates, placementLabel, focused, syncState, onToggleLearned, onEdit, onDelete, onComplete }: Props) {
   const entry = toEntry(word);
   const title = displayWord(word);
   return (
@@ -49,6 +52,10 @@ export const PersonalWordCard = memo(function PersonalWordCard({ word, duplicate
         {placementLabel ? <span className="pwc__badge" lang="de" dir="ltr">{placementLabel}</span> : null}
       </div>
       <div className="pwc__actions">
+        {onComplete && missingFields(word).length ? (
+          <button type="button" className="pwc__btn pwc__btn--ai" onClick={() => onComplete(word)} aria-label={`تکمیل ${title} با هوش مصنوعی`}
+            title="پیشنهاد برای فیلدهای خالی؛ پیش از ذخیره بررسی می‌کنید">✨ تکمیل</button>
+        ) : null}
         <button type="button" className="pwc__btn" onClick={() => onEdit(word)} aria-label={`ویرایش ${title}`}>ویرایش</button>
         <button type="button" className="pwc__btn pwc__btn--danger" onClick={() => onDelete(word)} aria-label={`حذف ${title}`}>حذف</button>
       </div>

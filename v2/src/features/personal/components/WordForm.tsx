@@ -1,6 +1,7 @@
 import { useId, useMemo, useRef, useState, type FormEvent } from 'react';
 import type { Category, WordType } from '../../../models/vocabulary';
 import { Dialog } from '../../../components/Dialog/Dialog';
+import { AiAssist } from '../../ai/components/AiAssist';
 import type { DuplicateIndex } from '../duplicates';
 import {
   ARTICLES, LIMITS, isValidInput, normalizeInput, validateInput,
@@ -26,16 +27,22 @@ interface Props {
   duplicates: DuplicateIndex;
   onSave(input: PersonalWordInput): FieldErrors | null;
   onClose(): void;
+  /** Open with an AI "complete" request (from «✨ تکمیل» on a word). */
+  aiComplete?: boolean;
+  /** Open with the focus in the AI input (from «✨ افزودن با هوش مصنوعی»). */
+  aiFocus?: boolean;
 }
 
 /** Add / edit dialog. Validation messages are shown per field; duplicates only warn. */
-export function WordForm({ word, categories, duplicates, onSave, onClose }: Props) {
+export function WordForm({ word, categories, duplicates, onSave, onClose, aiComplete = false, aiFocus = false }: Props) {
   const [v, setV] = useState<PersonalWordInput>(() => (word ? {
     article: word.article, lemma: word.lemma, type: word.type, grammar: word.grammar, fa: word.fa, example: word.example,
     exampleFa: word.exampleFa, pronunciationFa: word.pronunciationFa, placement: word.placement,
   } : EMPTY));
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitted, setSubmitted] = useState(false);
+  // A new word's type counts as "not chosen yet" until the user picks one (AI may then fill it).
+  const [typeChosen, setTypeChosen] = useState(!!word);
   const form = useRef<HTMLFormElement>(null);
   const uid = useId();
   const id = (f: string) => `${uid}-${f}`;
@@ -73,10 +80,12 @@ export function WordForm({ word, categories, duplicates, onSave, onClose }: Prop
   return (
     <Dialog title={word ? 'ویرایش واژه' : 'افزودن واژهٔ جدید'} onClose={onClose}>
       <form ref={form} className="pw-form" onSubmit={submit} noValidate>
+        <AiAssist value={v} typeIsDefault={!typeChosen} isEdit={!!word} autoRun={aiComplete} autoFocus={aiFocus}
+          onApply={(next, fields) => { if (fields.includes('type')) setTypeChosen(true); set(next); }} />
         <div className="pw-grid">
           <div className="pw-field">
             <label htmlFor={id('type')}>نوع واژه</label>
-            <select {...field('type')} value={v.type} onChange={(e) => set({ type: e.currentTarget.value as WordType })}>
+            <select {...field('type')} value={v.type} onChange={(e) => { setTypeChosen(true); set({ type: e.currentTarget.value as WordType }); }}>
               {TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
             </select>
           </div>

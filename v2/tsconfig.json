@@ -23,6 +23,7 @@
     "allowJs": false,
     "skipLibCheck": true,
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "types": [
       "vite/client",
       "node",
@@ -31,6 +32,7 @@
   },
   "include": [
     "src",
+    "ai-worker",
     "tests",
     "vite.config.ts",
     "playwright.config.ts",

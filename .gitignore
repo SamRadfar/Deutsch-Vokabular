@@ -24,3 +24,8 @@ dist-*/
 firebase-debug*.log
 firestore-debug*.log
 ui-debug*.log
+
+# Cloudflare Worker local state and secrets (never commit)
+.wrangler/
+.dev.vars
+.dev.vars.*

@@ -59,5 +59,9 @@ export function createFirebaseAuthService(authPromise: Promise<Auth>): AuthServi
       const { auth, mod } = await loaded;
       await mod.signOut(auth);
     },
+    async getIdToken() {
+      const { auth } = await loaded;
+      return auth.currentUser ? auth.currentUser.getIdToken() : null;
+    },
   };
 }

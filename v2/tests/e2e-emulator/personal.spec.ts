@@ -15,7 +15,7 @@ async function addWord(page: Page, lemma: string, fa: string) {
   await page.getByRole('button', { name: '+ افزودن واژه' }).click();
   const dialog = page.getByRole('dialog', { name: 'افزودن واژهٔ جدید' });
   await dialog.getByLabel(/واژه یا عبارت آلمانی/).fill(lemma);
-  await dialog.getByLabel(/معنی فارسی/).fill(fa);
+  await dialog.getByRole('textbox', { name: 'معنی فارسی', exact: true }).fill(fa);
   await dialog.getByRole('button', { name: 'افزودن واژه' }).click();
   await expect(dialog).toHaveCount(0);
 }
@@ -110,7 +110,7 @@ test('two browsers with the same account: create, edit offline, delete — all d
     await phoneCtx.setOffline(true);
     await card(phone, 'die Wolkenwand').getByRole('button', { name: 'ویرایش die Wolkenwand' }).click();
     const d = phone.getByRole('dialog', { name: 'ویرایش واژه' });
-    await d.getByLabel(/معنی فارسی/).fill('دیوار ابری (آفلاین)');
+    await d.getByRole('textbox', { name: 'معنی فارسی', exact: true }).fill('دیوار ابری (آفلاین)');
     await d.getByRole('button', { name: 'ذخیرهٔ تغییرات' }).click();
     await expect(card(phone, 'die Wolkenwand')).toContainText('در انتظار همگام‌سازی');
     await phoneCtx.setOffline(false);

@@ -13,6 +13,7 @@ import { describeSync } from '../../account/SyncStatusIndicator';
 import type { PersonalSnapshot } from '../personalVocabulary';
 import { PersonalWordCard } from './PersonalWordCard';
 import { WordForm } from './WordForm';
+import { useAiClient } from '../../ai/AiProvider';
 
 // The legacy import (parsers, backup handling) is only loaded when the user opens it.
 const LegacyImportDialog = lazy(() => import('./LegacyImportDialog').then((m) => ({ default: m.LegacyImportDialog })));
@@ -43,7 +44,7 @@ function storageLine(s: PersonalSnapshot): { tone: 'ok' | 'busy' | 'warn' | 'err
   const prefix = d.tone === 'ok' ? '☁️ همگام با حساب شما: ' : '☁️ ';
   return { tone: d.tone, text: `${prefix}${d.text}`, ...(d.detail ? { detail: d.detail } : {}) };
 }
-type Editing = { mode: 'new' } | { mode: 'edit'; word: PersonalWord } | null;
+type Editing = { mode: 'new'; ai?: boolean } | { mode: 'edit'; word: PersonalWord; ai?: boolean } | null;
 
 const TYPE_FILTER: Array<{ value: 'all' | WordType; label: string }> = [
   { value: 'all', label: 'همهٔ انواع' }, { value: 'n', label: 'اسم' }, { value: 'v', label: 'فعل' },
@@ -53,6 +54,7 @@ const TYPE_FILTER: Array<{ value: 'all' | WordType; label: string }> = [
 /** The "⭐ واژه‌های من" section: the signed-in user's own words (device-local storage). */
 export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, onOpenShadowing }: Props) {
   const progress = useProgress();
+  const ai = useAiClient();
   const { vocab, snapshot } = usePersonal();
   const builtIn = useMemo(() => flattenCards(categories), [categories]);
   const words = useMemo(() => snapshot?.words ?? [], [snapshot]);
@@ -107,6 +109,7 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
   const toggleLearned = useCallback((id: string, learned: boolean) => vocab?.setLearned(id, learned), [vocab]);
   const onEdit = useCallback((word: PersonalWord) => setEditing({ mode: 'edit', word }), []);
   const onDelete = useCallback((word: PersonalWord) => setConfirmDelete(word), []);
+  const onComplete = useCallback((word: PersonalWord) => setEditing({ mode: 'edit', word, ai: true }), []);
 
   if (progress.status === 'unavailable') {
     return (
@@ -150,6 +153,7 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
         </div>
         <div className="pw__actions">
           <button type="button" className="fc-primary pw__add" onClick={() => setEditing({ mode: 'new' })}>+ افزودن واژه</button>
+          {ai ? <button type="button" className="fc-secondary" onClick={() => setEditing({ mode: 'new', ai: true })}>✨ افزودن با هوش مصنوعی</button> : null}
           <button type="button" className="fc-secondary" onClick={() => setImportOpen(true)}>انتقال از نسخهٔ قدیمی</button>
         </div>
       </header>
@@ -214,6 +218,7 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
                     onToggleLearned={toggleLearned}
                     onEdit={onEdit}
                     onDelete={onDelete}
+                    {...(ai ? { onComplete } : {})}
                   />
                 </li>
               ))}
@@ -226,7 +231,7 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
 
       {editing ? (
         <WordForm
-          {...(editing.mode === 'edit' ? { word: editing.word } : {})}
+          {...(editing.mode === 'edit' ? { word: editing.word, aiComplete: !!editing.ai } : { aiFocus: !!editing.ai })}
           categories={categories}
           duplicates={duplicates}
           onSave={save}

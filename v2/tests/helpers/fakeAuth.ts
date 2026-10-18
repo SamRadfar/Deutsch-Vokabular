@@ -50,6 +50,7 @@ export function createFakeAuth(options: { restored?: AuthUser | null; restoreDel
       current = null;
       emit();
     },
+    async getIdToken() { return current ? `fake-id-token.${current.uid}.sig` : null; },
     willSignInAs(user) { nextSignIn = { user }; },
     willFailSignIn(code) { nextSignIn = { errorCode: code }; },
     holdNextSignIn() { held = true; },

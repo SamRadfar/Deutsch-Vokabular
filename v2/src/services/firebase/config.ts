@@ -14,6 +14,8 @@
  * Diagnostics name variables, never their values.
  */
 
+import { SECRET_KEY_PATTERN } from '../../features/ai/config';
+
 export type FirebaseEnvironment = 'emulator' | 'development' | 'production';
 
 export interface FirebaseClientOptions {
@@ -119,7 +121,7 @@ export function readFirebaseConfig(env: Env = import.meta.env as Env): FirebaseC
 
   // Guard against pasting privileged material into a client variable.
   for (const [k, v] of Object.entries(env)) {
-    if (k.startsWith('VITE_') && typeof v === 'string' && /-----BEGIN [A-Z ]*PRIVATE KEY-----|"private_key"|client_secret|refresh_token/i.test(v)) {
+    if (k.startsWith('VITE_') && typeof v === 'string' && (/-----BEGIN [A-Z ]*PRIVATE KEY-----|"private_key"|client_secret|refresh_token/i.test(v) || SECRET_KEY_PATTERN.test(v))) {
       problems.push(`${k} looks like a secret; secrets must never be used in the frontend`);
     }
   }

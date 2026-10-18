@@ -1,0 +1,24 @@
+# Cloudflare Worker for the V2 AI suggestions. NOT DEPLOYED — deploying needs the owner's
+# approval (see README.md). No secret belongs in this file: the Anthropic key is a Worker secret
+# (`wrangler secret put ANTHROPIC_API_KEY`).
+name = "deutsch-vokabular-ai-dev"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+[vars]
+FIREBASE_PROJECT_ID = "deutsch-vokabular-v2-dev"
+# Exact origins of the V2 app (comma-separated). Replace with the approved hosting origin.
+ALLOWED_ORIGINS = "http://localhost:5173,http://localhost:4173"
+AI_MODEL = "claude-haiku-4-5"
+LIMIT_PER_MINUTE = "6"
+LIMIT_PER_DAY = "60"
+LIMIT_GLOBAL_PER_DAY = "500"
+# Never "true" in a deployed worker: without a key the service then answers "not-configured".
+ALLOW_MOCK_PROVIDER = "false"
+
+# Usage counters (rate and daily limits). Create with `wrangler kv namespace create USAGE` and put
+# the returned id here.
+[[kv_namespaces]]
+binding = "USAGE"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"

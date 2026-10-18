@@ -31,6 +31,11 @@ export interface AuthService {
   onAuthStateChanged(listener: (user: AuthUser | null) => void): () => void;
   signInWithGoogle(): Promise<void>;
   signOut(): Promise<void>;
+  /**
+   * Short-lived Firebase ID token of the signed-in user (null when signed out). Only sent to our
+   * own AI worker, which verifies it; never logged or stored by the app.
+   */
+  getIdToken(): Promise<string | null>;
 }
 
 /** Errors thrown by an AuthService carry the provider's error code. */

@@ -119,3 +119,4 @@
   .pw__actions { width: 100%; }
   .pw__actions > * { flex: 1; }
 }
+.pwc__btn--ai { color: var(--ac-review); border-color: var(--ac-review); }
