@@ -1,9 +1,17 @@
+> Phase 5A.1: the engine described here is now the generic `v2/src/features/sync/docSyncEngine.ts`
+> (progress is a thin layer with unchanged formats); personal vocabulary uses the same engine
+> (`PERSONAL_SYNC.md`).
+
 # Personal progress: storage, synchronisation and conflict handling
 
 Implements ADR 0003 (sign-in required for cloud features) and ADR 0004.
 Code: `v2/src/features/progress/`.
 
-## 1. Who owns which state
+#> Phase 5A.1: the engine described here is now the generic `v2/src/features/sync/docSyncEngine.ts`
+> (progress is a thin layer with unchanged formats); personal vocabulary uses the same engine
+> (`PERSONAL_SYNC.md`).
+
+# 1. Who owns which state
 
 | State | Owner | Where | Lifetime |
 |---|---|---|---|
@@ -18,7 +26,11 @@ Code: `v2/src/features/progress/`.
 There is exactly **one** local source of truth for progress (the app's IndexedDB). Firestore runs
 with a memory cache, so the SDK does not keep a second persistent copy that could disagree.
 
-## 2. Identity and isolation
+#> Phase 5A.1: the engine described here is now the generic `v2/src/features/sync/docSyncEngine.ts`
+> (progress is a thin layer with unchanged formats); personal vocabulary uses the same engine
+> (`PERSONAL_SYNC.md`).
+
+# 2. Identity and isolation
 
 - Every record is keyed by the Firebase `uid`, never by email.
 - IndexedDB reads are key ranges on `[uid, …]`, filtered again by uid. One engine instance
@@ -30,7 +42,11 @@ with a memory cache, so the SDK does not keep a second persistent copy that coul
   with developer tools can read it (see §7).
 - Server side: `firestore.rules` restricts `users/{uid}/**` to `request.auth.uid == uid`.
 
-## 3. Write path
+#> Phase 5A.1: the engine described here is now the generic `v2/src/features/sync/docSyncEngine.ts`
+> (progress is a thin layer with unchanged formats); personal vocabulary uses the same engine
+> (`PERSONAL_SYNC.md`).
+
+# 3. Write path
 
 1. Click on ✓ → `engine.setLearned(wordId, learned)`: a new `PendingOp { opId, learned, … }`
    replaces any older pending op for that word, the UI updates **synchronously**, and the op
@@ -47,7 +63,11 @@ with a memory cache, so the SDK does not keep a second persistent copy that coul
 Rapid toggling coalesces: only the latest intention per word is sent, and an in-flight older op
 cannot overwrite it.
 
-## 4. Read path and conflict resolution
+#> Phase 5A.1: the engine described here is now the generic `v2/src/features/sync/docSyncEngine.ts`
+> (progress is a thin layer with unchanged formats); personal vocabulary uses the same engine
+> (`PERSONAL_SYNC.md`).
+
+# 4. Read path and conflict resolution
 
 **Read cost.** The first sync on a device (or after 7 days) reads the user's whole progress
 collection; afterwards the listener only queries documents with `updatedAt` newer than the newest
@@ -70,7 +90,11 @@ only. Latency-compensated local echoes (`hasPendingWrites`) are skipped. For eac
 document; `updatedAt` is `request.time` (enforced by the rules). Device clocks
 (`clientUpdatedAt`) are stored for diagnostics only and never decide anything.
 
-### Known limitation (documented and tested)
+##> Phase 5A.1: the engine described here is now the generic `v2/src/features/sync/docSyncEngine.ts`
+> (progress is a thin layer with unchanged formats); personal vocabulary uses the same engine
+> (`PERSONAL_SYNC.md`).
+
+# Known limitation (documented and tested)
 
 When two devices change the **same word while one or both are offline**, the change that
 **reaches the server last** wins, even if it was made earlier in real time. Example: the phone
@@ -79,7 +103,11 @@ reconnects at 10:10, its older change lands last, so the word ends up *not learn
 Fixing this would need per-word version vectors or explicit user conflict resolution. That is
 out of scope; the convergence itself is guaranteed and tested.
 
-## 5. Offline, reload, sign-out, account switching
+#> Phase 5A.1: the engine described here is now the generic `v2/src/features/sync/docSyncEngine.ts`
+> (progress is a thin layer with unchanged formats); personal vocabulary uses the same engine
+> (`PERSONAL_SYNC.md`).
+
+# 5. Offline, reload, sign-out, account switching
 
 | Situation | Behaviour |
 |---|---|
@@ -90,13 +118,21 @@ out of scope; the convergence itself is guaranteed and tested.
 | Account switch | The engine for uid A stops; a new engine for uid B starts with B's partition only. |
 | IndexedDB blocked (strict private mode) | Memory fallback; status warns that offline changes are lost on close. |
 
-## 6. Obsolete and unknown word ids
+#> Phase 5A.1: the engine described here is now the generic `v2/src/features/sync/docSyncEngine.ts`
+> (progress is a thin layer with unchanged formats); personal vocabulary uses the same engine
+> (`PERSONAL_SYNC.md`).
+
+# 6. Obsolete and unknown word ids
 
 Progress documents whose `wordId` is not in the current content (future content removals, or
 foreign writes) are **kept** (never deleted), excluded from statistics and reported in
 `view.unknownLearnedIds`. Rules only accept ids of the form `dv_` + 10 hex characters.
 
-## 7. Limitations and follow-ups
+#> Phase 5A.1: the engine described here is now the generic `v2/src/features/sync/docSyncEngine.ts`
+> (progress is a thin layer with unchanged formats); personal vocabulary uses the same engine
+> (`PERSONAL_SYNC.md`).
+
+# 7. Limitations and follow-ups
 
 - Same-word multi-device offline edits: server arrival order wins (§4).
 - Shared devices: signed-out users cannot see cached progress in the app, but the IndexedDB
@@ -107,7 +143,11 @@ foreign writes) are **kept** (never deleted), excluded from statistics and repor
 - Cross-tab coordination: two tabs of the same account each run an engine. They converge through
   the server, but two tabs offline at the same time follow the same limitation as two devices.
 
-## 8. Tests
+#> Phase 5A.1: the engine described here is now the generic `v2/src/features/sync/docSyncEngine.ts`
+> (progress is a thin layer with unchanged formats); personal vocabulary uses the same engine
+> (`PERSONAL_SYNC.md`).
+
+# 8. Tests
 
 | Area | Where |
 |---|---|

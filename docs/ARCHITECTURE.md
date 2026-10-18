@@ -108,7 +108,13 @@ Phase 5A adds `v2/src/features/personal/` (personal vocabulary: `pw_` ids, Index
 browse, flashcards, shadowing and the dashboard, plus the **proposed** (not deployed) rules
 `v2/firestore.proposed.rules`. See `docs/PERSONAL_VOCABULARY.md`.
 
-Still planned: production deployment, the server-side AI endpoint, cloud sync of personal words and
+Phase 5A.1 generalises the progress engine into `v2/src/features/sync/docSyncEngine.ts` (progress keeps
+its storage and Firestore formats) and syncs personal words through it to `users/{uid}/customWords`
+(tombstones final, deterministic legacy-import ids, conflict copies). The rules are in
+`v2/firestore.rules` but NOT deployed; the client switch is `VITE_PERSONAL_WORDS_SYNC`. See
+`docs/PERSONAL_SYNC.md`.
+
+Still planned: production deployment, the server-side AI endpoint, cloud sync of
 review/practice state (proposals in `PERSONAL_VOCABULARY.md` §5 and `REVIEW_DESIGN.md` §6) and a PWA
 service worker.
 

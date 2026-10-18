@@ -205,7 +205,7 @@ Browser 2 must **not** flip back while its change is pending.
 | Code safeguards, fixes, documentation | ✅ done |
 | Emulator validation (rules, sync, 6 browser projects) | ✅ |
 | Firebase dev project | ✅ `deutsch-vokabular-v2-dev` (Spark, Firestore `(default)` in europe-west3, Google provider enabled, `localhost` authorised) |
-| Rules deployed to the dev project | ✅ 2026-10-15 22:06 UTC, ruleset `276744ea…`, released to `cloud.firestore` of `deutsch-vokabular-v2-dev` only; live source identical to `v2/firestore.rules` |
+| Rules deployed to the dev project | ✅ 2026-10-15 22:06 UTC, ruleset `276744ea…`, released to `cloud.firestore` of `deutsch-vokabular-v2-dev` only; live source identical to `v2/firestore.rules` **as of commit 84c9af9**. Since Phase 5A.1 the file also contains `customWords` (emulator-tested, **not deployed**; `PERSONAL_SYNC.md` §7) |
 | Deployed rules on Google's Rules engine (`projects.test`, no data access) | ✅ 14/14: owner allowed, other user/anonymous denied, deletes denied, `users` listing denied, `syncCodes` denied |
 | Real Google sign-in (§7.1) | ⚠️ Partly: on 2026-10-15 22:53 UTC the product owner signed in with Google on `localhost` (dev project). A read-only check found one `google.com` user. Reload, cancel, popup-blocked and other A-steps were not reported |
 | Real Firestore (§7.2) | ⚠️ Partly: `users/<uid>` exists with `schemaVersion: 1` and `profile` only (**no email**); one progress doc (`die Außenwand`) has `learned: true`, `origin: "toggle"`, a server `updatedAt` and 8 fields. Read-only check with the owner's CLI login; no data changed |

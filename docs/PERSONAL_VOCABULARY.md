@@ -88,9 +88,14 @@ interface PersonalWord {
 - **Offline:** works the same on the same device (tested). Signed out, the section asks for sign-in
   (no guest data, ADR 0003 R2).
 - **Cloud sync is not enabled.** Personal words do not reach other devices yet, and the UI says so
-  («همگام‌سازی ابری هنوز فعال نیست»).
+  («همگام‌سازی ابری هنوز فعال نیست»). Phase 5A.1 implements it behind `VITE_PERSONAL_WORDS_SYNC`
+  (`PERSONAL_SYNC.md`).
 
 ## 5. Proposed Firestore collection (NOT deployed, needs approval)
+
+> **Superseded by Phase 5A.1:** the collection is implemented, tested and merged into
+> `v2/firestore.rules` (tombstones are final); see `docs/PERSONAL_SYNC.md`. The text below
+> records the Phase 5A proposal.
 
 `v2/firestore.proposed.rules` contains the deployed rules unchanged, plus:
 
