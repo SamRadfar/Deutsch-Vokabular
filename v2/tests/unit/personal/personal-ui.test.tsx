@@ -5,6 +5,7 @@ import { App } from '../../../src/app/App';
 import { fakeSpeech, mockMatchMedia, waitForLearnedCheckboxes } from '../../helpers/dom';
 import { ALICE, BOB } from '../../helpers/fakeAuth';
 import { createFakeServices } from '../../helpers/fakeServices';
+import { storedWords } from '../../helpers/personal';
 
 beforeEach(() => mockMatchMedia(() => false));
 
@@ -67,7 +68,7 @@ describe('my vocabulary — create, validate, edit, delete', () => {
     await user.type(lemma, 'دیوار');
     expect(lemma).toHaveAccessibleDescription(/واژهٔ آلمانی را بنویسید/);
     await user.click(within(dialog).getByRole('button', { name: 'انصراف' }));
-    expect(await env.local.loadPersonalWords(ALICE.uid)).toEqual([]);
+    expect(await storedWords(env.local, ALICE.uid)).toEqual([]);
   });
 
   it('adds a noun (article from the text), warns about a duplicate, edits it, deletes with confirmation and undo', async () => {
@@ -86,7 +87,7 @@ describe('my vocabulary — create, validate, edit, delete', () => {
     expect(card('die Aussenwand')).toHaveTextContent(/تکراری/);
     expect(screen.getByTestId('pw-storage')).toHaveTextContent('روی همین دستگاه');
     expect(screen.getByTestId('pw-storage')).toHaveTextContent('همگام‌سازی ابری هنوز فعال نیست');
-    await waitFor(async () => expect(await env.local.loadPersonalWords(ALICE.uid)).toEqual([expect.objectContaining({ article: 'die', lemma: 'Aussenwand' })]));
+    await waitFor(async () => expect(await storedWords(env.local, ALICE.uid)).toEqual([expect.objectContaining({ article: 'die', lemma: 'Aussenwand' })]));
 
     await user.click(within(card('die Aussenwand')).getByRole('button', { name: 'ویرایش die Aussenwand' }));
     const edit = screen.getByRole('dialog', { name: 'ویرایش واژه' });
@@ -105,7 +106,7 @@ describe('my vocabulary — create, validate, edit, delete', () => {
     expect(cards()).toHaveLength(0);
     await user.click(button('بازگردانی'));
     expect(card('die Aussenwand')).toHaveTextContent('دیوار خارجی');
-    await waitFor(async () => expect(await env.local.loadPersonalWords(ALICE.uid)).toHaveLength(1));
+    await waitFor(async () => expect(await storedWords(env.local, ALICE.uid)).toHaveLength(1));
   });
 
   it('filters by text, type and status', async () => {
@@ -132,7 +133,7 @@ describe('my vocabulary — persistence and isolation', () => {
     const first = await signedIn(env);
     await openMine(first.user);
     await addWord(first.user, { lemma: 'der Probebalken', fa: 'تیر آزمایشی' });
-    await waitFor(async () => expect(await env.local.loadPersonalWords(ALICE.uid)).toHaveLength(1));
+    await waitFor(async () => expect(await storedWords(env.local, ALICE.uid)).toHaveLength(1));
     first.view.unmount();
 
     const again = await signedIn(env); // same device storage: a "reload"
@@ -142,7 +143,7 @@ describe('my vocabulary — persistence and isolation', () => {
     act(() => env.auth.switchUserExternally(BOB));
     await waitFor(() => expect(screen.getByText('هنوز واژه‌ای اضافه نکرده‌اید')).toBeInTheDocument());
     expect(cards()).toHaveLength(0);
-    expect(await env.local.loadPersonalWords(BOB.uid)).toEqual([]);
+    expect(await storedWords(env.local, BOB.uid)).toEqual([]);
   });
 
   it('works offline (local-first): adding needs no network', async () => {
@@ -154,7 +155,7 @@ describe('my vocabulary — persistence and isolation', () => {
       await openMine(user);
       await addWord(user, { lemma: 'offline', type: 'a', fa: 'بدون اینترنت' });
       expect(card('offline')).toBeInTheDocument();
-      await waitFor(async () => expect(await env.local.loadPersonalWords(ALICE.uid)).toHaveLength(1));
+      await waitFor(async () => expect(await storedWords(env.local, ALICE.uid)).toHaveLength(1));
       expect(env.cloud.writeLog).toEqual([]);
     } finally {
       Object.defineProperty(Navigator.prototype, 'onLine', onLine);
@@ -187,7 +188,7 @@ describe('my vocabulary — learning tools', () => {
     const box = screen.getByRole('checkbox', { name: 'یادگرفتم: die Probewand' });
     await user.click(box);
     expect(box).toBeChecked();
-    await waitFor(async () => expect((await env.local.loadPersonalWords(ALICE.uid))[0]!.learned).toBe(true));
+    await waitFor(async () => expect((await storedWords(env.local, ALICE.uid))[0]!.learned).toBe(true));
     expect(env.cloud.writeLog).toEqual([]); // personal ids never go to Firestore progress
     expect(screen.getByTestId('header-progress')).toHaveTextContent('0/999'); // the 999 stay separate
   });
@@ -201,7 +202,7 @@ describe('my vocabulary — learning tools', () => {
     await user.click(button('شروع مرور (1 کارت)'));
     expect(screen.getByTestId('flashcard')).toHaveTextContent('die Probewortigkeit');
     await user.click(button(/بلدم/));
-    await waitFor(async () => expect((await env.local.loadPersonalWords(ALICE.uid))[0]!.learned).toBe(true));
+    await waitFor(async () => expect((await storedWords(env.local, ALICE.uid))[0]!.learned).toBe(true));
     expect(env.cloud.writeLog).toEqual([]);
     await user.click(link('پیشرفت'));
     expect(screen.getByTestId('db-personal')).toHaveTextContent('1 واژهٔ شخصی، 1 یادگرفته');
@@ -233,10 +234,10 @@ describe('my vocabulary — legacy import', () => {
     await openMine(user);
     await user.click(button('انتقال از نسخهٔ قدیمی'));
     const dialog = await screen.findByRole('dialog', { name: 'انتقال واژه‌های شخصی از نسخهٔ قدیمی' });
-    const preview = within(dialog).getByTestId('pw-import-preview');
+    const preview = await within(dialog).findByTestId('pw-import-preview'); // after the deterministic ids are hashed
     expect(within(preview).getByTestId('pw-import-new')).toHaveTextContent('2');
     expect(preview).toHaveTextContent('تکراری با واژه‌های داخلی: 1');
-    expect(await env.local.loadPersonalWords(ALICE.uid)).toEqual([]); // nothing written before confirming
+    expect(await storedWords(env.local, ALICE.uid)).toEqual([]); // nothing written before confirming
     await user.click(within(dialog).getByRole('button', { name: 'انتقال 2 واژه' }));
     expect(await within(dialog).findByText(/2 واژه به «واژه‌های من» اضافه شد/)).toBeInTheDocument();
     await user.click(within(dialog).getByRole('button', { name: 'بستن' }));
@@ -248,7 +249,7 @@ describe('my vocabulary — legacy import', () => {
 
     await user.click(button('انتقال از نسخهٔ قدیمی'));
     const again = await screen.findByRole('dialog', { name: 'انتقال واژه‌های شخصی از نسخهٔ قدیمی' });
-    expect(within(again).getByTestId('pw-import-new')).toHaveTextContent('0');
+    expect(await within(again).findByTestId('pw-import-new')).toHaveTextContent('0');
     expect(again).toHaveTextContent('قبلاً منتقل شده: 2');
     expect(within(again).getByRole('button', { name: 'واژه‌ای برای انتقال نیست' })).toBeDisabled();
   });

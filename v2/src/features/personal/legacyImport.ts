@@ -48,10 +48,14 @@ function mapType(t: string): PersonalWordInput['type'] {
   return 'x';
 }
 
-/** "cw1712345678901" → its creation time, if plausible. */
-function legacyTime(id: string, fallback: number): number {
+/**
+ * "cw1712345678901" → its creation time. Deterministic (0 when the id carries no plausible time):
+ * two devices importing the same data must produce identical documents (createdAt is immutable
+ * in the cloud).
+ */
+function legacyTime(id: string, now: number): number {
   const ms = Number(/^cw(\d{12,14})$/.exec(id)?.[1]);
-  return Number.isFinite(ms) && ms > 1_500_000_000_000 && ms <= fallback ? ms : fallback;
+  return Number.isFinite(ms) && ms > 1_500_000_000_000 && ms <= now ? ms : 0;
 }
 
 export interface ImportContext {
@@ -59,7 +63,11 @@ export interface ImportContext {
   builtIn: readonly DeckCard[];
   existing: readonly PersonalWord[];
   now: number;
-  newId?: () => string;
+  /**
+   * Id for a legacy word. Production uses a deterministic id derived from the legacy id
+   * (syncModel.legacyImportId), so importing on two devices never creates duplicates.
+   */
+  idFor?: (legacyId: string) => string;
 }
 
 export function planLegacyImport(rawCustom: string | null, ctx: ImportContext): ImportPlan {
@@ -67,6 +75,7 @@ export function planLegacyImport(rawCustom: string | null, ctx: ImportContext): 
   if (parsed.status === 'invalid') return { items: [], malformed: 0, unreadable: parsed.reason };
   if (parsed.status === 'absent') return { items: [], malformed: 0, unreadable: null };
   const importedLegacyIds = new Set(ctx.existing.map((w) => w.legacyId).filter((x): x is string => !!x));
+  const existingIds = new Set(ctx.existing.map((w) => w.id));
   const dupes = createDuplicateIndex(ctx.builtIn, ctx.existing);
   const seenInBatch = new Map<string, string>(); // duplicate key → first legacy id in this file
   const seenIds = new Set<string>();
@@ -76,7 +85,8 @@ export function planLegacyImport(rawCustom: string | null, ctx: ImportContext): 
     const base = { legacy, word: null, duplicates: [] as DuplicateMatch[], unsorted: false, reason: null };
     if (seenIds.has(legacy.id)) { items.push({ ...base, status: 'invalid', reason: 'شناسهٔ تکراری در دادهٔ قدیمی' }); continue; }
     seenIds.add(legacy.id);
-    if (importedLegacyIds.has(legacy.id)) { items.push({ ...base, status: 'already-imported' }); continue; }
+    const id = ctx.idFor ? ctx.idFor(legacy.id) : newPersonalId();
+    if (importedLegacyIds.has(legacy.id) || existingIds.has(id)) { items.push({ ...base, status: 'already-imported' }); continue; }
 
     const category = ctx.categories.find((c) => c.key === legacy.main);
     const placement = category?.subtabs.some((s) => s.id === legacy.tab) ? { category: category.key, subtab: legacy.tab } : null;
@@ -99,7 +109,7 @@ export function planLegacyImport(rawCustom: string | null, ctx: ImportContext): 
     }
     const at = legacyTime(legacy.id, ctx.now);
     const word: PersonalWord = {
-      schemaVersion: 1, id: (ctx.newId ?? newPersonalId)(), ...input, learned: legacy.checked,
+      schemaVersion: 1, id, ...input, learned: legacy.checked,
       createdAt: at, updatedAt: ctx.now, source: 'legacy-import', legacyId: legacy.id,
     };
     const duplicates = dupes.find(input.lemma);

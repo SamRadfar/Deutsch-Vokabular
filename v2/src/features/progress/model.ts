@@ -66,7 +66,8 @@ export interface ProgressWrite {
 
 export type WordSyncState = 'synced' | 'pending' | 'failed';
 
-export type RemoteConnection = 'connecting' | 'live' | 'error';
+/** `local`: cloud sync is switched off for this collection (changes stay queued on the device). */
+export type RemoteConnection = 'connecting' | 'live' | 'error' | 'local';
 
 export interface SyncStatus {
   /** loading = reading local data / first server snapshot; ready = interactive. */

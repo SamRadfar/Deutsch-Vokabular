@@ -25,7 +25,8 @@ test('create, reload, search, flashcard, delete with undo — and another accoun
   await page.goto('./');
   await signIn(page, uniqueEmail('mine'), 'My Words');
   await openMine(page);
-  await expect(page.getByTestId('pw-storage')).toContainText('همگام‌سازی ابری هنوز فعال نیست');
+  // The emulator build syncs personal words (the emulator loads v2/firestore.rules incl. customWords).
+  await expect(page.getByTestId('pw-storage')).toContainText('☁️');
   await addWord(page, 'die Probewortigkeit', 'واژهٔ آزمایشی');
   await addWord(page, 'testen', 'آزمودن');
   await expect(card(page, 'die Probewortigkeit')).toBeVisible();
@@ -86,4 +87,41 @@ test('legacy custom words are imported after a preview, once, without touching t
   await expect(card(page, 'die Probewortigkeit')).toBeVisible({ timeout: 15_000 });
   await page.getByRole('button', { name: 'انتقال از نسخهٔ قدیمی' }).click();
   await expect(page.getByRole('dialog').getByTestId('pw-import-new')).toHaveText('0');
+});
+
+test('two browsers with the same account: create, edit offline, delete — all devices converge', async ({ browser }) => {
+  const email = uniqueEmail('pwsync');
+  const laptopCtx = await browser.newContext();
+  const phoneCtx = await browser.newContext();
+  const laptop = await laptopCtx.newPage();
+  const phone = await phoneCtx.newPage();
+  try {
+    await laptop.goto('./');
+    await phone.goto('./');
+    await signIn(laptop, email, 'Sync Person');
+    await signIn(phone, email, 'Sync Person');
+    await openMine(laptop);
+    await openMine(phone);
+
+    await addWord(laptop, 'die Wolkenwand', 'دیوار ابری');
+    await expect(card(phone, 'die Wolkenwand')).toBeVisible({ timeout: 15_000 });
+
+    // Phone goes offline, edits; the change is queued and uploaded after reconnecting.
+    await phoneCtx.setOffline(true);
+    await card(phone, 'die Wolkenwand').getByRole('button', { name: 'ویرایش die Wolkenwand' }).click();
+    const d = phone.getByRole('dialog', { name: 'ویرایش واژه' });
+    await d.getByLabel(/معنی فارسی/).fill('دیوار ابری (آفلاین)');
+    await d.getByRole('button', { name: 'ذخیرهٔ تغییرات' }).click();
+    await expect(card(phone, 'die Wolkenwand')).toContainText('در انتظار همگام‌سازی');
+    await phoneCtx.setOffline(false);
+    await expect(card(laptop, 'die Wolkenwand')).toContainText('دیوار ابری (آفلاین)', { timeout: 20_000 });
+
+    // Deleting on the laptop removes it on the phone.
+    await card(laptop, 'die Wolkenwand').getByRole('button', { name: 'حذف die Wolkenwand' }).click();
+    await laptop.getByRole('dialog', { name: 'حذف واژه' }).getByRole('button', { name: 'حذف' }).click();
+    await expect(card(phone, 'die Wolkenwand')).toHaveCount(0, { timeout: 15_000 });
+  } finally {
+    await laptopCtx.close();
+    await phoneCtx.close();
+  }
 });

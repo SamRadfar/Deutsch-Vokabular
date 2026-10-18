@@ -1,18 +1,15 @@
-// Local-first progress synchronisation for ONE signed-in uid. Pure TypeScript: storage and
-// network are injected (ProgressLocalStore, ProgressRemote), so all behaviour is unit-testable.
+// Local-first progress synchronisation for ONE signed-in uid: a thin layer over the generic
+// DocSyncEngine (features/sync/docSyncEngine.ts), which personal vocabulary uses as well.
+// The adapters below keep the Phase 3 storage and Firestore formats exactly as they were
+// (IndexedDB progress-confirmed / progress-pending records, users/{uid}/progress docs).
 //
-// Conflict model (per word, last-writer-wins by SERVER commit order):
-//  - The server orders writes; its timestamp is the only clock used for ordering.
-//  - A pending local change always wins over incoming snapshots until the server has
-//    confirmed it — a remote update never silently overwrites an unsynced local action.
-//  - Once our write is confirmed (seen in a snapshot with our opId) or acknowledged and a
-//    later snapshot shows another value, the server value is adopted.
-// Full rationale and limitations: docs/SYNC_DESIGN.md.
+// Conflict model and limitations: see docSyncEngine.ts and docs/SYNC_DESIGN.md.
 
 import { WORD_ID_PATTERN, type WordId } from '../../models/vocabulary';
+import { DocSyncEngine, type DocLocalStore, type DocRemote, type DocSyncSnapshot } from '../sync/docSyncEngine';
 import type { ConfirmedProgress, PendingOp, ProgressOrigin, SyncStatus, WordSyncState } from './model';
 import type { ProgressLocalStore } from './localStore';
-import { toRemoteError, type ProgressRemote, type RemoteError, type RemoteProgressDoc } from './remote';
+import type { ProgressRemote } from './remote';
 
 export interface ProgressView {
   /** Effective learned set (pending overlay over confirmed). Includes unknown ids. */
@@ -34,17 +31,60 @@ export interface SyncEngineOptions {
   newOpId?: () => string;
   retryBaseMs?: number;
   retryMaxMs?: number;
-  /** Max time the UI waits for the first server snapshot before using local data. */
   firstSnapshotTimeoutMs?: number;
-  /**
-   * A full read of the progress collection happens at least this often (and whenever there is no
-   * local copy); otherwise only documents newer than the local copy are read. Default: 7 days.
-   */
   fullResyncIntervalMs?: number;
 }
 
-const LAST_FULL_SYNC_KEY = 'lastFullSyncAt';
-const DEFAULT_FULL_RESYNC_MS = 7 * 24 * 60 * 60 * 1000;
+/** What a progress document stores besides its id. */
+export interface ProgressValue {
+  learned: boolean;
+  origin: ProgressOrigin;
+}
+
+const isProgressValue = (v: unknown): v is ProgressValue =>
+  typeof v === 'object' && v !== null && typeof (v as ProgressValue).learned === 'boolean'
+  && ((v as ProgressValue).origin === 'toggle' || (v as ProgressValue).origin === 'migration');
+
+/** Phase 3 IndexedDB records ↔ generic records (formats unchanged on disk). */
+export function progressLocalAdapter(store: ProgressLocalStore): DocLocalStore<ProgressValue> {
+  const origin = (o: unknown): ProgressOrigin => (o === 'migration' ? 'migration' : 'toggle');
+  return {
+    get persistent() { return store.persistent; },
+    async load(uid) {
+      const { confirmed, pending } = await store.load(uid);
+      return {
+        confirmed: confirmed.map((c) => ({ id: c.wordId, value: { learned: c.learned, origin: origin(c.origin) }, serverUpdatedAt: c.serverUpdatedAt, opId: c.opId })),
+        pending: pending.map((p) => ({
+          opId: p.opId, id: p.wordId, value: { learned: p.learned, origin: origin(p.origin) }, clientUpdatedAt: p.clientUpdatedAt,
+          state: p.state, attempts: p.attempts, lastError: p.lastError,
+        })),
+      };
+    },
+    putPending: (uid, op) => store.putPending(uid, {
+      opId: op.opId, wordId: op.id, learned: op.value.learned, origin: op.value.origin, clientUpdatedAt: op.clientUpdatedAt,
+      state: op.state, attempts: op.attempts, lastError: op.lastError,
+    } satisfies PendingOp),
+    deletePending: (uid, id, opId) => store.deletePending(uid, id, opId),
+    putConfirmed: (uid, records) => store.putConfirmed(uid, records.map((r) => ({
+      wordId: r.id, learned: r.value.learned, serverUpdatedAt: r.serverUpdatedAt, opId: r.opId, origin: r.value.origin,
+    } satisfies ConfirmedProgress))),
+    getMeta: (uid, key) => store.getMeta(uid, key),
+    setMeta: (uid, key, value) => store.setMeta(uid, key, value),
+  };
+}
+
+/** Phase 3 Firestore remote ↔ generic remote. */
+export function progressRemoteAdapter(remote: ProgressRemote): DocRemote<ProgressValue> {
+  return {
+    subscribe: (uid, handlers, options) => remote.subscribe(uid, {
+      onDocs: (docs) => handlers.onDocs(docs.map((d) => ({ id: d.wordId, value: { learned: d.learned, origin: d.origin }, opId: d.opId, serverUpdatedAt: d.serverUpdatedAt }))),
+      onError: handlers.onError,
+    }, options),
+    write: (uid, w) => remote.write(uid, { wordId: w.id, learned: w.value.learned, origin: w.value.origin, opId: w.opId, deviceId: w.deviceId, clientUpdatedAt: w.clientUpdatedAt }),
+  };
+}
+
+const LAST_FULL_SYNC_KEY = 'lastFullSyncAt'; // Phase 3 key: existing devices keep their incremental cursor
 
 const ERROR_TEXT: Record<string, string> = {
   'permission-denied': 'دسترسی به داده‌های حساب رد شد (قوانین امنیتی Firestore).',
@@ -56,333 +96,71 @@ const ERROR_TEXT: Record<string, string> = {
 export const syncErrorText = (code: string) => ERROR_TEXT[code] ?? `خطای همگام‌سازی (${code})`;
 
 export class ProgressSyncEngine {
-  private readonly confirmed = new Map<string, ConfirmedProgress>();
-  private readonly pending = new Map<string, PendingOp>();
-  private readonly inflight = new Set<string>();
-  private readonly listeners = new Set<() => void>();
-  private readonly retryAt = new Map<string, number>();
-  private chain: Promise<void> = Promise.resolve();
-  private unsubscribe: (() => void) | null = null;
-  private timers = new Set<ReturnType<typeof setTimeout>>();
-  private status: SyncStatus;
+  private readonly engine: DocSyncEngine<ProgressValue>;
   private view: ProgressView;
-  private stopped = false;
-  private gotFirstSnapshot = false;
-  private resubscribeAttempts = 0;
-  /** True while the current subscription is a full read whose first snapshot is still pending. */
-  private fullReadPending = false;
-  private incremental = false;
+  private viewOf: DocSyncSnapshot<ProgressValue> | null = null;
 
   constructor(private readonly o: SyncEngineOptions) {
-    this.status = {
-      phase: 'loading',
-      online: o.online ?? true,
-      remote: 'connecting',
-      pendingCount: 0,
-      failedCount: 0,
-      writing: false,
-      localPersistence: o.local.persistent,
-      lastError: null,
-    };
+    this.engine = new DocSyncEngine<ProgressValue>({
+      uid: o.uid,
+      local: progressLocalAdapter(o.local),
+      remote: progressRemoteAdapter(o.remote),
+      deviceId: o.deviceId,
+      isValidId: (id) => WORD_ID_PATTERN.test(id),
+      isValidValue: isProgressValue,
+      fullSyncMetaKey: LAST_FULL_SYNC_KEY,
+      ...(o.online !== undefined ? { online: o.online } : {}),
+      ...(o.now ? { now: o.now } : {}),
+      ...(o.newOpId ? { newOpId: o.newOpId } : {}),
+      ...(o.retryBaseMs !== undefined ? { retryBaseMs: o.retryBaseMs } : {}),
+      ...(o.retryMaxMs !== undefined ? { retryMaxMs: o.retryMaxMs } : {}),
+      ...(o.firstSnapshotTimeoutMs !== undefined ? { firstSnapshotTimeoutMs: o.firstSnapshotTimeoutMs } : {}),
+      ...(o.fullResyncIntervalMs !== undefined ? { fullResyncIntervalMs: o.fullResyncIntervalMs } : {}),
+    });
     this.view = this.buildView();
   }
 
   get uid() { return this.o.uid; }
+  get firstSnapshotReceived() { return this.engine.firstSnapshotReceived; }
 
-  // ── lifecycle ──────────────────────────────────────────────────────────────
+  start(): Promise<void> { return this.engine.start(); }
+  stop(): void { this.engine.stop(); }
+  subscribe(listener: () => void): () => void { return this.engine.subscribe(listener); }
 
-  async start(): Promise<void> {
-    const { confirmed, pending } = await this.o.local.load(this.o.uid);
-    if (this.stopped) return;
-    for (const c of confirmed) if (isValidConfirmed(c)) this.confirmed.set(c.wordId, c);
-    for (const p of pending) if (isValidPending(p)) this.pending.set(p.wordId, { ...p, state: p.state === 'acked' ? 'acked' : 'queued' });
-    const lastFull = await this.o.local.getMeta<number>(this.o.uid, LAST_FULL_SYNC_KEY).catch(() => undefined);
-    const now = (this.o.now ?? Date.now)();
-    this.incremental = this.confirmed.size > 0 && typeof lastFull === 'number'
-      && now - lastFull < (this.o.fullResyncIntervalMs ?? DEFAULT_FULL_RESYNC_MS);
-    if (this.stopped) return;
-    this.subscribeRemote();
-    // Local data is usable immediately when offline; otherwise wait (bounded) for the server.
-    if (!this.status.online) this.status.phase = 'ready';
-    else this.later(() => this.markReady(), this.o.firstSnapshotTimeoutMs ?? 5000);
-    this.emit();
-    this.flush();
+  getView(): ProgressView {
+    if (this.viewOf !== this.engine.getSnapshot()) this.view = this.buildView();
+    return this.view;
   }
-
-  stop(): void {
-    this.stopped = true;
-    this.unsubscribe?.();
-    this.unsubscribe = null;
-    for (const t of this.timers) clearTimeout(t);
-    this.timers.clear();
-    this.status = { ...this.status, phase: 'stopped' };
-    this.emit();
-    this.listeners.clear();
-  }
-
-  subscribe(listener: () => void): () => void {
-    this.listeners.add(listener);
-    return () => this.listeners.delete(listener);
-  }
-
-  getView(): ProgressView { return this.view; }
-
-  // ── user actions ───────────────────────────────────────────────────────────
 
   /** Optimistic: the UI updates synchronously; persistence and upload follow. */
   setLearned(wordId: WordId, learned: boolean, origin: ProgressOrigin = 'toggle'): Promise<void> {
-    if (this.stopped) return Promise.resolve();
-    if (!WORD_ID_PATTERN.test(wordId)) return Promise.reject(new Error(`invalid word id ${wordId}`));
-    const op: PendingOp = {
-      opId: this.o.newOpId?.() ?? crypto.randomUUID(),
-      wordId,
-      learned,
-      origin,
-      clientUpdatedAt: (this.o.now ?? Date.now)(),
-      state: 'queued',
-      attempts: 0,
-      lastError: null,
-    };
-    this.pending.set(wordId, op);
-    this.retryAt.delete(wordId);
-    this.emit();
-    const persisted = this.serial(async () => {
-      try {
-        await this.o.local.putPending(this.o.uid, op);
-      } catch {
-        this.status = { ...this.status, lastError: 'local-write-failed' };
-      }
-    });
-    this.flush();
-    return persisted;
+    return this.engine.set(wordId, { learned, origin });
   }
 
-  /** Re-queue operations that failed permanently (e.g. after fixing rules or re-login). */
-  retryFailed(): void {
-    for (const p of this.pending.values()) if (p.lastError) { p.lastError = null; p.attempts = 0; this.retryAt.delete(p.wordId); }
-    this.status = { ...this.status, lastError: null };
-    if (this.status.remote === 'error') this.subscribeRemote();
-    this.emit();
-    this.flush();
-  }
-
-  setOnline(online: boolean): void {
-    if (this.status.online === online) return;
-    this.status = { ...this.status, online };
-    if (online) this.retryAt.clear();
-    else if (this.status.phase === 'loading') this.status.phase = 'ready';
-    this.emit();
-    if (online) this.flush();
-  }
-
-  /** Resolves true once none of `wordIds` (default: all) has a pending change, false on timeout. */
-  waitForSettled(wordIds?: Iterable<string>, timeoutMs = 30_000): Promise<boolean> {
-    const ids = wordIds ? new Set(wordIds) : null;
-    const settled = () => (ids ? ![...ids].some((id) => this.pending.has(id)) : this.pending.size === 0);
-    if (settled()) return Promise.resolve(true);
-    return new Promise((resolve) => {
-      const off = this.subscribe(() => { if (settled()) { off(); clearTimeout(t); resolve(true); } });
-      const t = setTimeout(() => { off(); resolve(false); }, timeoutMs);
-    });
-  }
-
-  /** Device-local metadata in this uid's partition (e.g. migration markers). */
-  readMeta<T>(key: string): Promise<T | undefined> { return this.o.local.getMeta<T>(this.o.uid, key); }
-  writeMeta(key: string, value: unknown): Promise<void> { return this.o.local.setMeta(this.o.uid, key, value); }
+  retryFailed(): void { this.engine.retryFailed(); }
+  setOnline(online: boolean): void { this.engine.setOnline(online); }
+  waitForSettled(wordIds?: Iterable<string>, timeoutMs = 30_000): Promise<boolean> { return this.engine.waitForSettled(wordIds, timeoutMs); }
+  readMeta<T>(key: string): Promise<T | undefined> { return this.engine.readMeta<T>(key); }
+  writeMeta(key: string, value: unknown): Promise<void> { return this.engine.writeMeta(key, value); }
+  flush(): void { this.engine.flush(); }
 
   /** Server-confirmed value of a word, if any (used by the migration conflict check). */
-  confirmedOf(wordId: string): ConfirmedProgress | undefined { return this.confirmed.get(wordId); }
-  hasPending(wordId: string): boolean { return this.pending.has(wordId); }
-
-  // ── network ────────────────────────────────────────────────────────────────
-
-  flush(): void {
-    if (this.stopped || !this.status.online) return;
-    const now = Date.now();
-    for (const op of this.pending.values()) {
-      if (op.state !== 'queued' || op.lastError?.permanent || this.inflightFor(op.wordId)) continue;
-      const wait = this.retryAt.get(op.wordId);
-      if (wait && wait > now) continue;
-      this.send(op);
-    }
+  confirmedOf(wordId: string): ConfirmedProgress | undefined {
+    const c = this.engine.confirmedOf(wordId);
+    return c ? { wordId: c.id, learned: c.value.learned, serverUpdatedAt: c.serverUpdatedAt, opId: c.opId, origin: c.value.origin } : undefined;
   }
-
-  private inflightFor(wordId: string) {
-    for (const id of this.inflight) if (id.startsWith(`${wordId}|`)) return true;
-    return false;
-  }
-
-  private send(op: PendingOp): void {
-    const key = `${op.wordId}|${op.opId}`;
-    this.inflight.add(key);
-    this.status = { ...this.status, writing: true };
-    this.emit();
-    this.o.remote
-      .write(this.o.uid, {
-        wordId: op.wordId, learned: op.learned, opId: op.opId, deviceId: this.o.deviceId,
-        clientUpdatedAt: op.clientUpdatedAt, origin: op.origin,
-      })
-      .then(() => this.serial(() => this.onAck(op)), (e: unknown) => this.serial(() => this.onWriteError(op, toRemoteError(e))))
-      .finally(() => {
-        this.inflight.delete(key);
-        this.status = { ...this.status, writing: this.inflight.size > 0 };
-        this.emit();
-        this.flush(); // a newer op for the same word may be waiting
-      });
-  }
-
-  private async onAck(op: PendingOp) {
-    const p = this.pending.get(op.wordId);
-    if (!p || p.opId !== op.opId) return; // superseded or already confirmed by a snapshot
-    p.state = 'acked';
-    p.lastError = null;
-    await this.persistPending(p);
-    this.emit();
-  }
-
-  private async onWriteError(op: PendingOp, err: RemoteError) {
-    const p = this.pending.get(op.wordId);
-    if (!p || p.opId !== op.opId) return;
-    p.attempts += 1;
-    p.lastError = { code: err.code, permanent: err.permanent };
-    this.status = { ...this.status, lastError: err.code };
-    if (!err.permanent) {
-      const delay = Math.min((this.o.retryBaseMs ?? 2000) * 2 ** (p.attempts - 1), this.o.retryMaxMs ?? 60_000);
-      this.retryAt.set(p.wordId, Date.now() + delay);
-      this.later(() => this.flush(), delay);
-    }
-    await this.persistPending(p);
-    this.emit();
-  }
-
-  /** Newest server time in the local confirmed copy (cursor for incremental reads). */
-  private newestConfirmed(): number | undefined {
-    let max: number | undefined;
-    for (const c of this.confirmed.values()) if (max === undefined || c.serverUpdatedAt > max) max = c.serverUpdatedAt;
-    return max;
-  }
-
-  private subscribeRemote() {
-    this.unsubscribe?.();
-    this.status = { ...this.status, remote: 'connecting' };
-    const since = this.incremental ? this.newestConfirmed() : undefined;
-    this.fullReadPending = since === undefined;
-    this.unsubscribe = this.o.remote.subscribe(this.o.uid, {
-      onDocs: (docs) => { void this.serial(() => this.onDocs(docs)); },
-      onError: (e) => { void this.serial(() => this.onRemoteError(e)); },
-    }, since === undefined ? {} : { since });
-  }
-
-  private async onDocs(docs: RemoteProgressDoc[]) {
-    if (this.stopped) return;
-    const toPersist: ConfirmedProgress[] = [];
-    const dropped: PendingOp[] = [];
-    for (const d of docs) {
-      if (!isValidRemote(d)) continue;
-      const current = this.confirmed.get(d.wordId);
-      const stale = !!current && (d.serverUpdatedAt < current.serverUpdatedAt
-        || (d.serverUpdatedAt === current.serverUpdatedAt && d.opId === current.opId));
-      if (!stale) {
-        const rec: ConfirmedProgress = { wordId: d.wordId, learned: d.learned, serverUpdatedAt: d.serverUpdatedAt, opId: d.opId, origin: d.origin };
-        this.confirmed.set(d.wordId, rec);
-        toPersist.push(rec);
-      }
-      const p = this.pending.get(d.wordId);
-      if (p && (d.opId === p.opId || (p.state === 'acked' && !stale))) {
-        this.pending.delete(d.wordId);
-        dropped.push(p);
-      }
-    }
-    this.gotFirstSnapshot = true;
-    this.resubscribeAttempts = 0;
-    if (this.fullReadPending) {
-      // A complete server copy is now local: later (re)subscriptions can be incremental.
-      this.fullReadPending = false;
-      this.incremental = true;
-      await this.o.local.setMeta(this.o.uid, LAST_FULL_SYNC_KEY, (this.o.now ?? Date.now)()).catch(() => {});
-    }
-    this.status = { ...this.status, remote: 'live', lastError: this.status.lastError === 'unavailable' ? null : this.status.lastError };
-    this.markReady(false);
-    try {
-      await this.o.local.putConfirmed(this.o.uid, toPersist);
-      for (const p of dropped) await this.o.local.deletePending(this.o.uid, p.wordId, p.opId);
-    } catch {
-      this.status = { ...this.status, lastError: 'local-write-failed' };
-    }
-    this.emit();
-  }
-
-  private async onRemoteError(e: RemoteError) {
-    if (this.stopped) return;
-    this.status = { ...this.status, remote: 'error', lastError: e.code };
-    this.markReady(false);
-    if (!e.permanent) {
-      const delay = Math.min((this.o.retryBaseMs ?? 2000) * 2 ** this.resubscribeAttempts++, this.o.retryMaxMs ?? 60_000);
-      this.later(() => { if (!this.stopped) this.subscribeRemote(); this.emit(); }, delay);
-    }
-    this.emit();
-  }
-
-  // ── helpers ────────────────────────────────────────────────────────────────
-
-  private markReady(emit = true) {
-    if (this.status.phase !== 'loading') return;
-    this.status = { ...this.status, phase: 'ready' };
-    if (emit) this.emit();
-  }
-
-  private async persistPending(p: PendingOp) {
-    try { await this.o.local.putPending(this.o.uid, p); } catch { this.status = { ...this.status, lastError: 'local-write-failed' }; }
-  }
-
-  private serial(task: () => Promise<void>): Promise<void> {
-    const next = this.chain.then(task, task);
-    this.chain = next.catch(() => {});
-    return next;
-  }
-
-  private later(fn: () => void, ms: number) {
-    const t = setTimeout(() => { this.timers.delete(t); fn(); }, ms);
-    this.timers.add(t);
-  }
-
-  private emit() {
-    if (this.stopped && this.status.phase !== 'stopped') return;
-    let failed = 0;
-    for (const p of this.pending.values()) if (p.lastError?.permanent) failed++;
-    this.status = { ...this.status, pendingCount: this.pending.size, failedCount: failed };
-    this.view = this.buildView();
-    for (const l of [...this.listeners]) l();
-  }
+  hasPending(wordId: string): boolean { return this.engine.hasPending(wordId); }
 
   private buildView(): ProgressView {
+    const snap = this.engine.getSnapshot();
+    this.viewOf = snap;
     const learned = new Set<string>();
-    for (const [id, c] of this.confirmed) if (!this.pending.has(id) && c.learned) learned.add(id);
-    for (const [id, p] of this.pending) if (p.learned) learned.add(id);
-    const pending = new Map(this.pending);
+    for (const [id, v] of snap.values) if (v.learned) learned.add(id);
     return {
       learned,
-      stateOf: (id) => {
-        const p = pending.get(id);
-        if (!p) return 'synced';
-        return p.lastError?.permanent ? 'failed' : 'pending';
-      },
-      status: this.status,
+      stateOf: snap.stateOf,
+      status: snap.status,
       unknownLearnedIds: [...learned].filter((id) => !this.o.knownIds.has(id)),
     };
   }
-
-  /** Test/diagnostic accessor. */
-  get firstSnapshotReceived() { return this.gotFirstSnapshot; }
-}
-
-function isValidConfirmed(c: ConfirmedProgress) {
-  return typeof c?.wordId === 'string' && typeof c.learned === 'boolean' && typeof c.serverUpdatedAt === 'number' && typeof c.opId === 'string';
-}
-function isValidPending(p: PendingOp) {
-  return typeof p?.wordId === 'string' && typeof p.learned === 'boolean' && typeof p.opId === 'string';
-}
-function isValidRemote(d: RemoteProgressDoc) {
-  return typeof d?.wordId === 'string' && WORD_ID_PATTERN.test(d.wordId) && typeof d.learned === 'boolean'
-    && typeof d.opId === 'string' && typeof d.serverUpdatedAt === 'number' && Number.isFinite(d.serverUpdatedAt);
 }

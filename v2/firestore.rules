@@ -9,7 +9,11 @@ rules_version = '2';
 //
 // Principles: deny by default; a signed-in user can read/write only users/{their uid}/…;
 // documents are schema-validated; timestamps must be server time; nothing can be deleted
-// from the client; migration records are create-only.
+// from the client; migration records are create-only; personal-word tombstones are final.
+//
+// Deployment status: the dev project runs the Phase 3 version of this file (ruleset 276744ea…,
+// without customWords). The customWords block (Phase 5A.1) is emulator-tested and awaits the
+// product owner's approval before the guarded deployment (docs/PERSONAL_SYNC.md §7).
 
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -62,6 +66,52 @@ service cloud.firestore {
           && boundedString(d.opId, 64)
           && boundedString(d.deviceId, 64)
           && d.origin in ['toggle', 'migration'];
+      }
+
+      // Personal vocabulary (Phase 5A.1). One document per personal word; ids "pw_" + 20 hex never
+      // collide with built-in ids. Deleting is a tombstone (deleted: true) so other devices learn
+      // about it; documents are never removed by clients, and a tombstone is FINAL: no update may
+      // bring it back (a stale offline edit can never resurrect a word deleted elsewhere).
+      match /customWords/{wordId} {
+        allow read: if isOwner(uid);
+        // Created alive, or directly as a tombstone (a word deleted before it was ever uploaded).
+        allow create: if isOwner(uid) && validCustomWord(wordId, request.resource.data);
+        allow update: if isOwner(uid) && validCustomWord(wordId, request.resource.data)
+          && resource.data.deleted == false
+          && request.resource.data.createdAt == resource.data.createdAt
+          && request.resource.data.source == resource.data.source
+          && request.resource.data.legacyId == resource.data.legacyId;
+        allow delete: if false;
+      }
+
+      function validCustomWord(wordId, d) {
+        let fields = ['schemaVersion', 'id', 'article', 'lemma', 'type', 'grammar', 'fa', 'example', 'exampleFa',
+          'pronunciationFa', 'placement', 'learned', 'deleted', 'source', 'legacyId', 'createdAt', 'clientUpdatedAt',
+          'updatedAt', 'opId', 'deviceId'];
+        return wordId.matches('^pw_[0-9a-f]{20}$')
+          && d.keys().hasAll(fields) && d.keys().hasOnly(fields)
+          && d.schemaVersion == 1
+          && d.id == wordId
+          && (d.article == null || d.article in ['der', 'die', 'das'])
+          && boundedString(d.lemma, 120)
+          && d.type in ['n', 'v', 'a', 'au', 'x']
+          && d.grammar is string && d.grammar.size() <= 200
+          && d.fa is string && d.fa.size() <= 200
+          && d.example is string && d.example.size() <= 400
+          && d.exampleFa is string && d.exampleFa.size() <= 400
+          && d.pronunciationFa is string && d.pronunciationFa.size() <= 200
+          && (d.placement == null || (d.placement is map
+                && d.placement.keys().hasAll(['category', 'subtab']) && d.placement.keys().hasOnly(['category', 'subtab'])
+                && boundedString(d.placement.category, 40) && boundedString(d.placement.subtab, 60)))
+          && d.learned is bool
+          && d.deleted is bool
+          && d.source in ['manual', 'legacy-import']
+          && (d.legacyId == null || boundedString(d.legacyId, 40))
+          && d.createdAt is int && d.createdAt >= 0 && d.createdAt < 10000000000000
+          && d.clientUpdatedAt is int && d.clientUpdatedAt >= 0 && d.clientUpdatedAt < 10000000000000
+          && d.updatedAt == request.time
+          && boundedString(d.opId, 64)
+          && boundedString(d.deviceId, 64);
       }
 
       // Proof that a legacy dataset was imported; id = SHA-256 of the imported input.

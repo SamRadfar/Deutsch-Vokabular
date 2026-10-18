@@ -17,7 +17,6 @@
     "test:e2e": "playwright test",
     "content:generate": "node scripts/generate-content.mjs",
     "test:emulator": "firebase emulators:exec --only auth,firestore --project demo-deutsch-vokabular \"vitest run --config vitest.emulator.config.ts\"",
-    "test:emulator:proposed": "firebase emulators:exec --only firestore --project demo-deutsch-vokabular \"node scripts/test-proposed-rules.mjs\"",
     "test:e2e:emulator": "firebase emulators:exec --only auth,firestore --project demo-deutsch-vokabular \"playwright test -c playwright.emulator.config.ts\"",
     "rules:deploy:dev": "node scripts/deploy-rules.mjs"
   },

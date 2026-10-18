@@ -1,7 +1,6 @@
-// PROPOSED rules for personal vocabulary (v2/firestore.proposed.rules), Firebase Emulator only.
-// These rules are NOT deployed. Together with `npm run test:emulator:proposed` (all existing rules
-// tests against the proposed file) this shows the proposal adds customWords without weakening
-// anything that is deployed today.
+// Security rules for personal vocabulary (users/{uid}/customWords) in v2/firestore.rules, Firebase
+// Emulator only. The same file is checked by firestore.rules.test.ts for every other path, so the
+// combined ruleset is tested as a whole. Not deployed yet (awaiting approval).
 
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -25,7 +24,7 @@ beforeAll(async () => {
   const [host, port] = (process.env.FIRESTORE_EMULATOR_HOST ?? '127.0.0.1:8080').split(':');
   env = await initializeTestEnvironment({
     projectId: PROJECT,
-    firestore: { rules: readFileSync(resolve(__dirname, '../../firestore.proposed.rules'), 'utf8'), host: host!, port: Number(port) },
+    firestore: { rules: readFileSync(resolve(__dirname, '../../firestore.rules'), 'utf8'), host: host!, port: Number(port) },
   });
 });
 afterAll(async () => { await env?.cleanup(); });
@@ -42,7 +41,7 @@ async function seed() {
   });
 }
 
-describe('customWords (proposed): isolation', () => {
+describe('customWords: isolation', () => {
   it('the owner can create, read and list their own words', async () => {
     await assertSucceeds(setDoc(doc(alice(), path()), word()));
     await assertSucceeds(getDoc(doc(alice(), path())));
@@ -63,9 +62,27 @@ describe('customWords (proposed): isolation', () => {
     await assertFails(deleteDoc(doc(alice(), path())));
     await assertSucceeds(setDoc(doc(alice(), path()), word({ deleted: true, clientUpdatedAt: 1760000000500 })));
   });
+
+  it('a tombstone is final: no update can resurrect or change a deleted word', async () => {
+    await seed();
+    await assertSucceeds(setDoc(doc(alice(), path()), word({ deleted: true })));
+    await assertFails(setDoc(doc(alice(), path()), word({ deleted: false, fa: 'stale offline edit' })));
+    await assertFails(setDoc(doc(alice(), path()), word({ deleted: true, fa: 'edit of a tombstone' })));
+    await assertFails(updateDoc(doc(alice(), path()), { deleted: false, updatedAt: serverTimestamp() }));
+  });
+
+  it('a word deleted before its first upload may be created directly as a tombstone', async () => {
+    await assertSucceeds(setDoc(doc(alice(), path()), word({ deleted: true })));
+  });
+
+  it('the same legacy word imported on two devices updates one document (deterministic id, same immutable fields)', async () => {
+    const legacy = word({ source: 'legacy-import', legacyId: 'cw1712345678901', createdAt: 1712345678901 });
+    await assertSucceeds(setDoc(doc(alice(), path()), legacy));
+    await assertSucceeds(setDoc(doc(alice(), path()), { ...legacy, opId: 'op-from-device-2', deviceId: 'device-2', updatedAt: serverTimestamp() }));
+  });
 });
 
-describe('customWords (proposed): schema', () => {
+describe('customWords: schema', () => {
   it('id must be pw_ + 20 hex and equal the document id; built-in ids are rejected', async () => {
     await assertFails(setDoc(doc(alice(), path('alice', 'dv_522b07848b')), word({ id: 'dv_522b07848b' })));
     await assertFails(setDoc(doc(alice(), path('alice', 'pw_xyz')), word({ id: 'pw_xyz' })));
@@ -102,7 +119,7 @@ describe('customWords (proposed): schema', () => {
   });
 });
 
-describe('proposed rules keep the deployed guarantees for other paths', () => {
+describe('customWords do not weaken other paths', () => {
   it('legacy syncCodes and other users stay closed; progress still requires dv_ ids', async () => {
     await assertFails(getDoc(doc(alice(), 'syncCodes/123456')));
     await assertFails(getDocs(collection(alice(), 'users')));

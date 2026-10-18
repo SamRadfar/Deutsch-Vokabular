@@ -1,4 +1,4 @@
-import { useId, useMemo, useState, type ChangeEvent } from 'react';
+import { useEffect, useId, useMemo, useState, type ChangeEvent } from 'react';
 import type { Category } from '../../../models/vocabulary';
 import { Dialog } from '../../../components/Dialog/Dialog';
 import { readLegacySnapshot } from '../../progress/migration/snapshot';
@@ -7,6 +7,8 @@ import type { DeckCard } from '../../review/deck';
 import { countImport, planLegacyImport, wordsToImport, type ImportStatus } from '../legacyImport';
 import { displayWord } from '../model';
 import type { PersonalVocabulary } from '../personalVocabulary';
+import { legacyImportId } from '../syncModel';
+import { parseCustomWords } from '../../progress/migration/parse';
 
 interface Props {
   categories: readonly Category[];
@@ -43,9 +45,22 @@ export function LegacyImportDialog({ categories, builtIn, vocab, onClose }: Prop
   const [done, setDone] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const plan = useMemo(() => (source ? planLegacyImport(source.raw, {
-    categories, builtIn, existing: vocab.getSnapshot().words, now: Date.now(),
-  }) : null), [source, categories, builtIn, vocab]);
+  // Deterministic ids (SHA-256 of the legacy id) are computed before planning.
+  const [ids, setIds] = useState<ReadonlyMap<string, string> | null>(null);
+  useEffect(() => {
+    setIds(null);
+    if (!source) return;
+    let cancelled = false;
+    const parsed = parseCustomWords(source.raw);
+    const legacyIds = parsed.status === 'ok' ? parsed.value.words.map((w) => w.id) : [];
+    void Promise.all(legacyIds.map(async (l) => [l, await legacyImportId(l)] as const)).then((pairs) => {
+      if (!cancelled) setIds(new Map(pairs));
+    });
+    return () => { cancelled = true; };
+  }, [source]);
+  const plan = useMemo(() => (source && ids ? planLegacyImport(source.raw, {
+    categories, builtIn, existing: vocab.getSnapshot().words, now: Date.now(), idFor: (l) => ids.get(l)!,
+  }) : null), [source, ids, categories, builtIn, vocab]);
   const counts = plan ? countImport(plan) : null;
   const toImport = plan ? wordsToImport(plan, { includeBuiltInDuplicates: includeBuiltIn }) : [];
 

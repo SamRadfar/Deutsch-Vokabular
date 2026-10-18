@@ -9,6 +9,8 @@ import { fold, queryTerms } from '../../search/normalize';
 import { createDuplicateIndex } from '../duplicates';
 import { displayWord, type PersonalWord, type PersonalWordInput } from '../model';
 import { usePersonal } from '../usePersonal';
+import { describeSync } from '../../account/SyncStatusIndicator';
+import type { PersonalSnapshot } from '../personalVocabulary';
 import { PersonalWordCard } from './PersonalWordCard';
 import { WordForm } from './WordForm';
 
@@ -25,6 +27,22 @@ interface Props {
 }
 
 type StatusFilter = 'all' | 'learned' | 'unlearned' | 'incomplete' | 'duplicates';
+
+/** Where the words are and whether the cloud has them (never claims "synced" before the server confirmed). */
+function storageLine(s: PersonalSnapshot): { tone: 'ok' | 'busy' | 'warn' | 'error'; text: string; detail?: string } {
+  if (!s.saved) return { tone: 'error', text: '⚠️ ذخیره روی این دستگاه ناموفق بود؛ تغییرات فقط تا بستن صفحه می‌مانند.' };
+  const { status } = s.sync;
+  if (s.sync.mode === 'local') {
+    return {
+      tone: 'warn',
+      text: '💾 روی همین دستگاه برای حساب شما ذخیره می‌شود — همگام‌سازی ابری هنوز فعال نیست.',
+      ...(status.pendingCount ? { detail: `${status.pendingCount} تغییر برای ارسال پس از فعال شدن همگام‌سازی نگه داشته شده است.` } : {}),
+    };
+  }
+  const d = describeSync(status);
+  const prefix = d.tone === 'ok' ? '☁️ همگام با حساب شما: ' : '☁️ ';
+  return { tone: d.tone, text: `${prefix}${d.text}`, ...(d.detail ? { detail: d.detail } : {}) };
+}
 type Editing = { mode: 'new' } | { mode: 'edit'; word: PersonalWord } | null;
 
 const TYPE_FILTER: Array<{ value: 'all' | WordType; label: string }> = [
@@ -116,11 +134,18 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
       <header className="pw__head">
         <div>
           <h2 id="pw-title" className="pw__title">واژه‌های من <span className="pw__count">({words.length})</span></h2>
-          <p className={`pw__storage${snapshot.saved ? '' : ' is-error'}`} data-testid="pw-storage">
-            {snapshot.saved
-              ? '💾 روی همین دستگاه برای حساب شما ذخیره می‌شود — همگام‌سازی ابری هنوز فعال نیست.'
-              : '⚠️ ذخیره روی این دستگاه ناموفق بود؛ تغییرات فقط تا بستن صفحه می‌مانند.'}
-          </p>
+          {(() => {
+            const line = storageLine(snapshot);
+            return (
+              <div className={`pw__storage pw__storage--${line.tone}`} data-testid="pw-storage" role="status" aria-live="polite">
+                <span>{line.text}</span>
+                {line.detail ? <span className="pw__storage-detail"> {line.detail}</span> : null}
+                {snapshot.sync.status.failedCount > 0 ? (
+                  <button type="button" className="pw-retry" onClick={() => vocab.retryFailed()}>تلاش دوباره</button>
+                ) : null}
+              </div>
+            );
+          })()}
           {snapshot.unreadable ? <p className="pw__storage is-error">{snapshot.unreadable} رکورد قابل خواندن نبود و دست‌نخورده باقی ماند.</p> : null}
         </div>
         <div className="pw__actions">
@@ -130,6 +155,12 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
       </header>
 
       <p className="visually-hidden" role="status" aria-live="polite">{notice ?? ''}</p>
+      {snapshot.conflicts.map((c) => (
+        <div key={c.copyId} className="pw-conflict" role="alert">
+          <span>«<bdi lang="de" dir="ltr">{c.word}</bdi>» در دستگاه دیگری حذف شده بود؛ ویرایش شما از بین نرفت و به‌صورت واژهٔ تازه نگه داشته شد.</span>
+          <button type="button" className="pw-undo__btn" onClick={() => vocab.dismissConflict(c.copyId)}>متوجه شدم</button>
+        </div>
+      ))}
       {undo ? (
         <div className="pw-undo" role="status">
           <span>«{displayWord(undo)}» حذف شد.</span>
@@ -179,6 +210,7 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
                     duplicates={duplicates.find(w.lemma, w.id)}
                     placementLabel={placementLabel(w)}
                     focused={focusId === w.id}
+                    syncState={snapshot.sync.mode === 'cloud' ? snapshot.sync.stateOf(w.id) : 'synced'}
                     onToggleLearned={toggleLearned}
                     onEdit={onEdit}
                     onDelete={onDelete}

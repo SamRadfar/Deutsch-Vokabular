@@ -6,6 +6,7 @@ import { createFirestoreProgressRemote } from '../features/progress/firestorePro
 import { createFirestoreAccountRemote } from '../features/progress/accountRemote';
 import { createDefaultLocalStore } from '../features/progress/localStore';
 import type { ProgressServices } from '../features/progress/ProgressProvider';
+import { createFirestoreCustomWordsRemote } from '../features/personal/firestoreCustomWordsRemote';
 
 export interface AppServices {
   /** Shown in the header so it is always visible which backend the app talks to. */
@@ -33,6 +34,8 @@ export function createAppServices(): AppServices {
       createRemote: () => createFirestoreProgressRemote(db),
       account: createFirestoreAccountRemote(db),
       createLocalStore: createDefaultLocalStore,
+      // Personal vocabulary sync needs the Phase 5A.1 rules on the project (config.personalWordsSync).
+      createPersonalRemote: () => (config.personalWordsSync ? createFirestoreCustomWordsRemote(db) : null),
     },
   };
 }

@@ -1,6 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { useSignedInUser } from '../auth/AuthProvider';
 import type { AccountRemote } from './accountRemote';
+import type { DocRemote } from '../sync/docSyncEngine';
+import type { CustomWordValue } from '../personal/syncModel';
 import { getDeviceId, type ProgressLocalStore } from './localStore';
 import type { ProgressRemote } from './remote';
 import { ProgressSyncEngine, type ProgressView } from './syncEngine';
@@ -13,6 +15,11 @@ export interface ProgressServices {
   account: AccountRemote;
   /** Called once per provider; IndexedDB with in-memory fallback. */
   createLocalStore(): Promise<ProgressLocalStore>;
+  /**
+   * Remote for personal vocabulary (users/{uid}/customWords). Absent or null = cloud sync of
+   * personal words is switched off (they stay on the device; see config personalWordsSync).
+   */
+  createPersonalRemote?(): DocRemote<CustomWordValue> | null;
 }
 
 export type ProgressContextValue =
@@ -47,14 +54,17 @@ export function ProgressProvider({ services, knownIds, children }: { services: P
     if (!uid || !services || !store) return;
     let cancelled = false;
     let created: ProgressSyncEngine | null = null;
+    let createdPersonal: PersonalVocabulary | null = null;
     void (async () => {
       const local = await store;
       const deviceId = await getDeviceId(local);
       const reviewLog = new ReviewLog(uid, local);
       const shadowingLog = new ShadowingLog(uid, local);
-      const personal = new PersonalVocabulary(uid, local);
+      const online = typeof navigator === 'undefined' ? true : navigator.onLine;
+      const personal = new PersonalVocabulary(uid, local, { remote: services.createPersonalRemote?.() ?? null, deviceId, online });
+      createdPersonal = personal;
       await Promise.all([reviewLog.load(), shadowingLog.load(), personal.load()]);
-      if (cancelled) return;
+      if (cancelled) { personal.stop(); return; }
       created = new ProgressSyncEngine({
         uid, local, remote: services.createRemote(), deviceId, knownIds,
         online: typeof navigator === 'undefined' ? true : navigator.onLine,
@@ -66,20 +76,21 @@ export function ProgressProvider({ services, knownIds, children }: { services: P
     return () => {
       cancelled = true;
       created?.stop();
+      createdPersonal?.stop();
     };
   }, [uid, services, store, knownIds]);
 
   useEffect(() => {
     if (!engine) return;
-    const on = () => engine.setOnline(true);
-    const off = () => engine.setOnline(false);
+    const on = () => { engine.setOnline(true); logs?.personal.setOnline(true); };
+    const off = () => { engine.setOnline(false); logs?.personal.setOnline(false); };
     window.addEventListener('online', on);
     window.addEventListener('offline', off);
     return () => {
       window.removeEventListener('online', on);
       window.removeEventListener('offline', off);
     };
-  }, [engine]);
+  }, [engine, logs]);
 
   // Minimal profile document (best effort; progress works without it). Written only when the
   // display name or photo changed since the last successful write from this device — not on

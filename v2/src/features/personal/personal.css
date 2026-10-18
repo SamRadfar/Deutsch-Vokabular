@@ -3,8 +3,15 @@
 .pw__head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 10px 16px; }
 .pw__title { font-size: 20px; font-weight: 800; color: var(--tp); }
 .pw__count { font-family: var(--fn); font-size: 15px; color: var(--tm); }
-.pw__storage { font-size: 12px; color: var(--ts); margin-top: 2px; }
-.pw__storage.is-error { color: var(--bad); }
+.pw__storage { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 12px; color: var(--ts); margin-top: 2px; }
+.pw__storage.is-error,
+.pw__storage--error { color: var(--bad); }
+.pw__storage--ok { color: var(--ok); }
+.pw__storage--warn { color: var(--ts); }
+.pw__storage-detail { color: var(--tm); }
+.pw-retry { min-height: 32px; padding: 0 12px; font: inherit; font-weight: 700; color: var(--bad); background: none; border: 1px solid currentColor; border-radius: 8px; cursor: pointer; }
+.pw-conflict { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; font-size: 13px; color: var(--tp); background: var(--sfalt); border: 1px solid var(--ac-acad); border-radius: 12px; }
+.pwc__badge--error { color: var(--bad); border-color: currentColor; }
 .pw__actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .pw__add { min-width: 150px; }
 

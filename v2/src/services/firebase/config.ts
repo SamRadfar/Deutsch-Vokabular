@@ -32,7 +32,15 @@ export interface EmulatorSettings {
 }
 
 export type FirebaseConfigResult =
-  | { status: 'configured'; environment: FirebaseEnvironment; options: FirebaseClientOptions; emulators: EmulatorSettings | null }
+  | {
+    status: 'configured'; environment: FirebaseEnvironment; options: FirebaseClientOptions; emulators: EmulatorSettings | null;
+    /**
+     * Cloud sync of personal vocabulary (users/{uid}/customWords). Needs the Phase 5A.1 security
+     * rules on the target project: always on with the emulators (which load v2/firestore.rules),
+     * otherwise only with VITE_PERSONAL_WORDS_SYNC=true after those rules were deployed.
+     */
+    personalWordsSync: boolean;
+  }
   | { status: 'missing'; missing: string[] }
   | { status: 'invalid'; problems: string[] };
 
@@ -77,6 +85,8 @@ export function readFirebaseConfig(env: Env = import.meta.env as Env): FirebaseC
   const id = options.projectId;
 
   if (!ENVIRONMENTS.includes(environment)) problems.push('VITE_FIREBASE_ENV must be one of: emulator, development, production');
+  const personalSyncFlag = str(env.VITE_PERSONAL_WORDS_SYNC);
+  if (personalSyncFlag && personalSyncFlag !== 'true' && personalSyncFlag !== 'false') problems.push('VITE_PERSONAL_WORDS_SYNC must be true or false');
   if (!/^[a-z0-9-]{4,40}$/.test(id)) problems.push('VITE_FIREBASE_PROJECT_ID has an unexpected format');
   if ((FORBIDDEN_PROJECT_IDS as readonly string[]).includes(id)) {
     problems.push('VITE_FIREBASE_PROJECT_ID is the legacy app\'s production project; v2 must use its own project');
@@ -122,5 +132,5 @@ export function readFirebaseConfig(env: Env = import.meta.env as Env): FirebaseC
         firestorePort: Number(str(env.VITE_FIREBASE_FIRESTORE_EMULATOR_PORT) || 8080),
       }
     : null;
-  return { status: 'configured', environment, options, emulators };
+  return { status: 'configured', environment, options, emulators, personalWordsSync: environment === 'emulator' || personalSyncFlag === 'true' };
 }

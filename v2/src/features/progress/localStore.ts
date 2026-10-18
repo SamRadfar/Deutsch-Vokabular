@@ -6,6 +6,7 @@ import type { ConfirmedProgress, PendingOp } from './model';
 import { mergeReview, type ReviewEvent, type ReviewRecord } from '../review/model';
 import { bumpExposure, type ExposureRecord } from '../shadowing/model';
 import type { PersonalWord } from '../personal/model';
+import type { DocLocalStore, PendingWrite, SyncedRecord } from '../sync/docSyncEngine';
 
 export interface LocalSnapshot {
   confirmed: ConfirmedProgress[];
@@ -35,16 +36,25 @@ export interface ProgressLocalStore {
   /** Writes several words in one transaction (all or nothing), e.g. a legacy import. */
   putPersonalWords(uid: string, words: PersonalWord[]): Promise<void>;
   deletePersonalWord(uid: string, id: string): Promise<void>;
+  /** Sync stores of another synced collection (confirmed copy + pending queue), same database. */
+  docStore<V>(collection: DocCollection): DocLocalStore<V>;
 }
+
+/** Synced collections besides progress (each has its own confirmed and pending stores). */
+export type DocCollection = 'customWords';
 
 export const DB_NAME = 'deutsch-vokabular-v2';
 // v1: progress + meta. v2 (Phase 4A): + review-state. v3 (Phase 4B): + shadowing-exposure.
-// v4 (Phase 5A): + personal-words. Upgrades only ever add stores.
-const DB_VERSION = 4;
+// v4 (Phase 5A): + personal-words. v5 (Phase 5A.1): + custom-confirmed, custom-pending (personal
+// vocabulary sync). Upgrades only ever add stores; the v4 personal-words store is kept as a backup.
+const DB_VERSION = 5;
 const STORES = {
   confirmed: 'progress-confirmed', pending: 'progress-pending', meta: 'meta', reviews: 'review-state', exposure: 'shadowing-exposure',
   personal: 'personal-words',
 } as const;
+const DOC_STORES: Record<DocCollection, { confirmed: string; pending: string }> = {
+  customWords: { confirmed: 'custom-confirmed', pending: 'custom-pending' },
+};
 
 const req = <T>(r: IDBRequest<T>) => new Promise<T>((resolve, reject) => {
   r.onsuccess = () => resolve(r.result);
@@ -68,6 +78,10 @@ export function openProgressDb(factory: IDBFactory = indexedDB, name = DB_NAME):
       if (!db.objectStoreNames.contains(STORES.reviews)) db.createObjectStore(STORES.reviews, { keyPath: ['uid', 'wordId'] });
       if (!db.objectStoreNames.contains(STORES.exposure)) db.createObjectStore(STORES.exposure, { keyPath: ['uid', 'wordId'] });
       if (!db.objectStoreNames.contains(STORES.personal)) db.createObjectStore(STORES.personal, { keyPath: ['uid', 'id'] });
+      for (const s of Object.values(DOC_STORES)) {
+        if (!db.objectStoreNames.contains(s.confirmed)) db.createObjectStore(s.confirmed, { keyPath: ['uid', 'id'] });
+        if (!db.objectStoreNames.contains(s.pending)) db.createObjectStore(s.pending, { keyPath: ['uid', 'id'] });
+      }
     };
     open.onsuccess = () => {
       // A newer version opened in another tab: release this connection so its upgrade is not blocked.
@@ -190,6 +204,49 @@ export function createIndexedDbStore(dbPromise: Promise<IDBDatabase>): ProgressL
       tx.objectStore(STORES.personal).delete([uid, id]);
       await done(tx);
     },
+    docStore<V>(collection: DocCollection): DocLocalStore<V> {
+      const names = DOC_STORES[collection];
+      const self = this as ProgressLocalStore;
+      return {
+        persistent: true,
+        async load(uid) {
+          const db = await dbPromise;
+          const tx = db.transaction([names.confirmed, names.pending], 'readonly');
+          const [confirmed, pending] = await Promise.all([
+            req(tx.objectStore(names.confirmed).getAll(uidRange(uid))) as Promise<Stored<SyncedRecord<V>>[]>,
+            req(tx.objectStore(names.pending).getAll(uidRange(uid))) as Promise<Stored<PendingWrite<V>>[]>,
+          ]);
+          return {
+            confirmed: confirmed.filter((r) => r.uid === uid).map((r) => strip(r)),
+            pending: pending.filter((r) => r.uid === uid).map((r) => strip(r)),
+          };
+        },
+        async putPending(uid, op) {
+          const db = await dbPromise;
+          const tx = db.transaction(names.pending, 'readwrite');
+          tx.objectStore(names.pending).put({ ...op, uid });
+          await done(tx);
+        },
+        async deletePending(uid, id, opId) {
+          const db = await dbPromise;
+          const tx = db.transaction(names.pending, 'readwrite');
+          const store = tx.objectStore(names.pending);
+          const current = (await req(store.get([uid, id]))) as Stored<PendingWrite<V>> | undefined;
+          if (current && current.opId === opId) store.delete([uid, id]);
+          await done(tx);
+        },
+        async putConfirmed(uid, records) {
+          if (!records.length) return;
+          const db = await dbPromise;
+          const tx = db.transaction(names.confirmed, 'readwrite');
+          const store = tx.objectStore(names.confirmed);
+          for (const r of records) store.put({ ...r, uid });
+          await done(tx);
+        },
+        getMeta: (uid, key) => self.getMeta(uid, `${collection}:${key}`),
+        setMeta: (uid, key, value) => self.setMeta(uid, `${collection}:${key}`, value),
+      };
+    },
   };
 }
 
@@ -201,6 +258,7 @@ export function createMemoryStore(): ProgressLocalStore {
   const reviews = new Map<string, Map<string, ReviewRecord>>();
   const exposure = new Map<string, Map<string, ExposureRecord>>();
   const personal = new Map<string, Map<string, PersonalWord>>();
+  const docs = new Map<string, { confirmed: Map<string, Map<string, unknown>>; pending: Map<string, Map<string, unknown>> }>();
   const part = <T>(m: Map<string, Map<string, T>>, uid: string) => {
     let p = m.get(uid);
     if (!p) { p = new Map(); m.set(uid, p); }
@@ -236,6 +294,22 @@ export function createMemoryStore(): ProgressLocalStore {
     async putPersonalWord(uid, word) { part(personal, uid).set(word.id, clone(word)); },
     async putPersonalWords(uid, words) { for (const w of words) part(personal, uid).set(w.id, clone(w)); },
     async deletePersonalWord(uid, id) { part(personal, uid).delete(id); },
+    docStore<V>(collection: DocCollection): DocLocalStore<V> {
+      let d = docs.get(collection);
+      if (!d) { d = { confirmed: new Map(), pending: new Map() }; docs.set(collection, d); }
+      const c = d.confirmed as Map<string, Map<string, SyncedRecord<V>>>;
+      const p = d.pending as Map<string, Map<string, PendingWrite<V>>>;
+      const self = this as ProgressLocalStore;
+      return {
+        persistent: false,
+        async load(uid) { return { confirmed: [...part(c, uid).values()].map(clone), pending: [...part(p, uid).values()].map(clone) }; },
+        async putPending(uid, op) { part(p, uid).set(op.id, clone(op)); },
+        async deletePending(uid, id, opId) { if (part(p, uid).get(id)?.opId === opId) part(p, uid).delete(id); },
+        async putConfirmed(uid, records) { for (const r of records) part(c, uid).set(r.id, clone(r)); },
+        getMeta: (uid, key) => self.getMeta(uid, `${collection}:${key}`),
+        setMeta: (uid, key, value) => self.setMeta(uid, `${collection}:${key}`, value),
+      };
+    },
   };
 }
 

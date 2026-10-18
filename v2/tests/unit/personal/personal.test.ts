@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { IDBFactory } from 'fake-indexeddb';
 import { getVocabularyRepository } from '../../../src/services/content/vocabularyRepository';
 import { createIndexedDbStore, createMemoryStore, openProgressDb, type ProgressLocalStore } from '../../../src/features/progress/localStore';
+import type { CustomWordValue } from '../../../src/features/personal/syncModel';
 import {
   cleanText, displayWord, isPersonalId, isPracticeWordId, isValidPersonalWord, newPersonalId, normalizeInput, toEntry, validateInput,
   type PersonalWord, type PersonalWordInput,
@@ -65,7 +66,7 @@ describe('personal word model', () => {
 describe('PersonalVocabulary (local persistence)', () => {
   it('add, edit, learned, delete and undo — and everything survives a reload (IndexedDB)', async () => {
     const factory = new IDBFactory();
-    const vocab = new PersonalVocabulary('alice', createIndexedDbStore(openProgressDb(factory)), () => 1000, ids);
+    const vocab = new PersonalVocabulary('alice', createIndexedDbStore(openProgressDb(factory)), { now: () => 1000, newId: ids });
     await vocab.load();
     const a = vocab.add(input({ lemma: 'die Wand', type: 'n', fa: 'دیوار' }));
     expect(a.ok).toBe(true);
@@ -76,7 +77,9 @@ describe('PersonalVocabulary (local persistence)', () => {
     const b = vocab.add(input({ lemma: 'nachhaltig', type: 'a', fa: 'پایدار' }));
     const removed = vocab.remove(b.ok ? b.word.id : '')!;
     expect(vocab.getSnapshot().words).toHaveLength(1);
-    vocab.restore(removed);
+    const restored = vocab.restore(removed); // a tombstone is final: undo brings the word back under a new id
+    expect(restored.id).not.toBe(removed.id);
+    expect(restored).toMatchObject({ lemma: removed.lemma, fa: removed.fa });
     expect(vocab.getSnapshot().words).toHaveLength(2);
     await vocab.flushed();
 
@@ -94,7 +97,7 @@ describe('PersonalVocabulary (local persistence)', () => {
     await vocab.load();
     expect(vocab.add(input({ lemma: '', fa: '' }))).toMatchObject({ ok: false, errors: { lemma: expect.any(String), fa: expect.any(String) } });
     await vocab.flushed();
-    expect(await store.loadPersonalWords('alice')).toEqual([]);
+    expect((await store.docStore<CustomWordValue>('customWords').load('alice')).pending).toEqual([]);
   });
 
   it('is isolated per account (same device, same database)', async () => {
@@ -112,10 +115,11 @@ describe('PersonalVocabulary (local persistence)', () => {
 
   it('a failing local write keeps the word for this page and reports it; unreadable records are left alone', async () => {
     const mem = createMemoryStore();
+    const docs = mem.docStore<CustomWordValue>('customWords');
     const failing: ProgressLocalStore = {
       ...mem,
-      loadPersonalWords: async () => [{ id: 'garbage' } as never],
-      putPersonalWord: async () => { throw new Error('quota'); },
+      loadPersonalWords: async () => [{ id: 'garbage' } as never], // a broken Phase 5A record
+      docStore: (() => ({ ...docs, putPending: async () => { throw new Error('quota'); } })) as ProgressLocalStore['docStore'],
     };
     const vocab = new PersonalVocabulary('alice', failing);
     await vocab.load();
@@ -128,15 +132,14 @@ describe('PersonalVocabulary (local persistence)', () => {
 
   it('addMany is one transaction and never duplicates an existing id', async () => {
     const store = createMemoryStore();
-    const vocab = new PersonalVocabulary('alice', store, () => 5, ids);
+    const vocab = new PersonalVocabulary('alice', store, { now: () => 5, newId: ids });
     await vocab.load();
     const r = vocab.add(input());
     const existing = r.ok ? r.word : null!;
     const fresh: PersonalWord = { ...existing, id: ids(), lemma: 'Neu' };
-    const spy = vi.spyOn(store, 'putPersonalWords');
-    await vocab.addMany([existing, fresh]);
-    expect(spy).toHaveBeenCalledWith('alice', [fresh]);
+    await vocab.addMany([{ ...existing, fa: 'overwritten?' }, fresh]);
     expect(vocab.getSnapshot().words).toHaveLength(2);
+    expect(vocab.getSnapshot().byId.get(existing.id)!.fa).toBe(existing.fa); // never overwritten
   });
 });
 
@@ -159,7 +162,7 @@ describe('legacy custom words import (dvok5_custom)', () => {
     id: 'cw1712345678901', main: 'arch', tab: 'bau', word: 'die Probewortigkeit', sentence: '', type: 'n', fa: 'واژهٔ آزمایشی',
     ex: 'Die Probewortigkeit zählt.', exFa: 'آزمایش مهم است.', pr: 'پروبه‌ورتیش‌کایت', status: 'ready', checked: true, ...o,
   });
-  const ctx = (existing: PersonalWord[] = []) => ({ categories: repo.categories, builtIn, existing, now: 1_800_000_000_000, newId: ids });
+  const ctx = (existing: PersonalWord[] = []) => ({ categories: repo.categories, builtIn, existing, now: 1_800_000_000_000, idFor: (l: string) => `pw_${[...l].map((c) => c.charCodeAt(0).toString(16)).join('').slice(-20).padStart(20, '0')}` });
 
   it('maps fields, keeps placement, learned flag and creation time; x means "Ausdruck"', () => {
     const raw = JSON.stringify([legacy({}), legacy({ id: 'cw1712345678902', word: 'auf jeden Fall', type: 'x', main: 'gone', tab: 'nope', checked: false })]);
@@ -216,7 +219,7 @@ describe('integration with the learning tools', () => {
     const words = [mk({ lemma: 'die Nachhaltigkeit' }, true), mk({ lemma: 'Zukunft', fa: 'آینده' })];
     const cards = [...builtIn, ...personalCards(words, 100_000)];
     expect(cards).toHaveLength(1001);
-    const learned = mergeLearned(new Set([builtIn[0]!.entry.id]), { words, byId: new Map(words.map((w) => [w.id, w])), saved: true, unreadable: 0 });
+    const learned = mergeLearned(new Set([builtIn[0]!.entry.id]), { words, byId: new Map(words.map((w) => [w.id, w])), saved: true, unreadable: 0 } as never);
     expect(selectCards(cards, 'all', 'mine', { learned, againIds: null }).map((c) => c.entry.word)).toEqual(['die Nachhaltigkeit', 'Zukunft']);
     expect(selectCards(cards, 'learned', 'all', { learned, againIds: null })).toHaveLength(2);
     expect(selectCards(cards, 'unlearned', 'mine', { learned, againIds: null }).map((c) => c.entry.word)).toEqual(['Zukunft']);

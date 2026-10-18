@@ -3,6 +3,8 @@ import type { AccountRemote, MigrationRecord } from '../../src/features/progress
 import { createMemoryStore, type ProgressLocalStore } from '../../src/features/progress/localStore';
 import { createFakeAuth } from './fakeAuth';
 import { createFakeCloud } from './fakeCloud';
+import { createFakeDocCloud } from './fakeDocCloud';
+import type { CustomWordValue } from '../../src/features/personal/syncModel';
 
 export function createFakeAccountRemote() {
   const records = new Map<string, MigrationRecord>();
@@ -23,15 +25,21 @@ export function createFakeAccountRemote() {
 }
 
 /** Complete fake environment for App: fake identity provider, fake cloud, memory store. */
-export function createFakeServices(options: Parameters<typeof createFakeAuth>[0] = {}) {
+export function createFakeServices(options: Parameters<typeof createFakeAuth>[0] & { personalSync?: boolean } = {}) {
   const auth = createFakeAuth(options);
+  const personalCloud = createFakeDocCloud<CustomWordValue>();
+  const personalRemote = personalCloud.device();
   const cloud = createFakeCloud();
   const remote = cloud.device('this-browser');
   const account = createFakeAccountRemote();
   const local: ProgressLocalStore = createMemoryStore();
   const services: AppServices = {
     auth,
-    progress: { createRemote: () => remote, account, createLocalStore: async () => local },
+    progress: {
+      createRemote: () => remote, account, createLocalStore: async () => local,
+      // Personal-word cloud sync only when asked for (mirrors config.personalWordsSync).
+      ...(options.personalSync ? { createPersonalRemote: () => personalRemote } : {}),
+    },
   };
-  return { services, auth, cloud, remote, account, local };
+  return { services, auth, cloud, remote, account, local, personalCloud, personalRemote };
 }

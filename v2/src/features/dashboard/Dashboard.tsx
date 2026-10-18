@@ -128,7 +128,7 @@ export function Dashboard({ categories, onOpenCategory, onOpenReview, onOpenShad
             <h3 className="db-card__title">واژه‌های من</h3>
             <p className="db-card__note">
               {personal.words.length
-                ? `${personal.words.length} واژهٔ شخصی، ${personalLearned} یادگرفته — روی همین دستگاه ذخیره می‌شود (همگام‌سازی ابری هنوز فعال نیست).`
+                ? `${personal.words.length} واژهٔ شخصی، ${personalLearned} یادگرفته — ${personal.sync.mode === 'cloud' ? 'همگام با حساب شما (Firestore).' : 'روی همین دستگاه ذخیره می‌شود (همگام‌سازی ابری هنوز فعال نیست).'}`
                 : 'هنوز واژهٔ شخصی‌ای اضافه نکرده‌اید.'}
             </p>
           </div>

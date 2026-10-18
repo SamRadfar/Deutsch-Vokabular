@@ -42,12 +42,13 @@ describe('rules deployment guard', () => {
     expect(interpretDatabaseProbe(500, undefined)).toMatchObject({ exists: false });
   });
 
-  it('the proposed rules (Phase 5A) can never be deployed by the tooling', () => {
+  it('one rules file only: firebase.json, the deploy script and the tests all use firestore.rules', () => {
     const root = resolve(__dirname, '../../..');
     const firebaseJson = JSON.parse(readFileSync(resolve(root, 'firebase.json'), 'utf8')) as { firestore: { rules: string } };
     expect(firebaseJson.firestore.rules).toBe('firestore.rules');
-    expect(readFileSync(resolve(root, 'scripts/deploy-rules.mjs'), 'utf8')).not.toContain('proposed');
-    expect(readFileSync(resolve(root, 'firestore.rules'), 'utf8')).not.toContain('customWords');
-    expect(readFileSync(resolve(root, 'firestore.proposed.rules'), 'utf8')).toContain('PROPOSAL ONLY');
+    const rules = readFileSync(resolve(root, 'firestore.rules'), 'utf8');
+    expect(rules).toContain('match /customWords/{wordId}');
+    expect(rules).toContain('resource.data.deleted == false'); // tombstones are final
+    expect(rules).toContain('awaits the');                     // deployment status is documented in the file
   });
 });
