@@ -1,8 +1,24 @@
 # Personal vocabulary cloud sync (Phase 5A.1)
 
-Branch: `feature/pro-v2-personal-sync`. **Status: implemented and emulator-tested. The rules are
-NOT deployed. Cloud sync is switched off for the real dev project until the steps in §7 have been
-approved and carried out.**
+Branch: `feature/pro-v2-personal-sync`. **Status (2026-10-18): rules deployed to
+`deutsch-vokabular-v2-dev` after the product owner's approval (ruleset `1defcc66…`, released
+14:25 UTC, identical to `v2/firestore.rules`); client switch enabled in the git-ignored
+`v2/.env.local`. Live tests with real accounts (§7 step 8) are pending.**
+
+Deployment record:
+- Pre-checks: live = commit `84c9af9`; the diff adds only `customWords` and comments.
+- Tests: emulator 48/48 (twice); dry run OK; CLI permissions 7/7.
+- Deploy: `released rules firestore.rules to cloud.firestore`.
+- Post-checks:
+  - Live source identical to the file (same SHA-256).
+  - Google Rules engine (`projects.test`): 25/25, i.e. 14 existing cases plus 11 customWords cases
+    (owner allowed; other user and anonymous denied; deletes denied; empty create denied; unknown
+    path denied).
+  - Unauthenticated REST reads of customWords, progress and syncCodes: all 403.
+- Data: existing user data unchanged (read-only check).
+- Note: the header comment of the deployed file still says "awaits the product owner's approval".
+  That is a cosmetic wording fix for the next reviewed rules deployment (changing it now would make
+  live ≠ file).
 
 ## 1. Risks found before implementation
 
