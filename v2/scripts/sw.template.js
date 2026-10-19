@@ -6,7 +6,9 @@
  *    offline — so a deployed release is picked up on the next load, never stuck on an old shell;
  *  - same-origin static files: cache first (they are content-hashed and immutable);
  *  - other origins (Firebase Auth, Firestore, Google APIs) and Firebase's /__/ paths: not touched.
- * A new release waits until the page asks it to activate («نسخهٔ تازه» notice) or all tabs close.
+ * A new release activates at once (skipWaiting) and removes the caches of older releases — so an old
+ * cached shell (e.g. v2.0.0, which still bundled the vocabulary) can never be served again, not even
+ * offline. Open pages of the old release are reloaded into the new one (serviceWorker.ts).
  */
 const VERSION = '__DV2_VERSION__';
 const CACHE = `dv2-${VERSION}`;
@@ -14,7 +16,7 @@ const PRECACHE = __DV2_PRECACHE__;
 const NAV_TIMEOUT_MS = 6000;
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)));
+  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (event) => {

@@ -1,6 +1,6 @@
 {
   "name": "deutsch-vokabular-v2",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": true,
   "description": "Deutsch Vokabular 2.0 — React + TypeScript; production on Firebase Hosting (https://deutsch-vokabular.web.app).",
   "type": "module",

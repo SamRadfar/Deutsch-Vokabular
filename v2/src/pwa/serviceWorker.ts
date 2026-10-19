@@ -1,6 +1,7 @@
 // Service-worker registration (production builds only) and the "new version available" state.
 // The worker (scripts/sw.template.js) loads index.html network-first, so a reload always gets the
-// newest release; this module additionally offers to switch an open page to it right away.
+// newest release. A new worker activates at once; an open page of the old release is then reloaded
+// (controllerchange), and the update notice remains as a fallback while a worker is still waiting.
 
 import { useSyncExternalStore } from 'react';
 
