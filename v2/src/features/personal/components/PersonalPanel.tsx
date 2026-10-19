@@ -118,7 +118,7 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
       <section className="pw" aria-labelledby="pw-title" lang="fa" dir="rtl">
         <div className="page-head"><div className="page-head__text"><p className="page-head__eyebrow"><span>شخصی</span><span>واژه‌نامهٔ خودتان</span></p><h2 id="pw-title" className="page-head__title pw__title">واژه‌های من</h2></div></div>
         <EmptyState title="برای ساختن فهرست واژه‌های خودتان وارد حساب شوید"
-          description="واژه‌های شخصی برای هر حساب جداگانه نگه داشته می‌شوند. ۹۹۹ واژهٔ داخلی بدون ورود هم در دسترس‌اند." />
+          description="واژه‌های شخصی برای هر حساب جداگانه نگه داشته می‌شوند." />
       </section>
     );
   }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getVocabularyRepository } from '../../../src/services/content/vocabularyRepository';
+import { getBundledRepository as getVocabularyRepository } from '../../../src/services/content/bundled';
 import { buildDeck, flattenCards, modeAvailable, selectCards, shuffle } from '../../../src/features/review/deck';
 
 const repo = getVocabularyRepository();

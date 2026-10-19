@@ -82,3 +82,30 @@ export function validateProductionDeployArgs(args) {
   if (args[c + 1] !== project) return { ok: false, reason: `--confirm must be followed by the project id ("--confirm ${project}")` };
   return { ok: true, project, confirmed: true };
 }
+
+/**
+ * Samples of the built-in content (from every category: words, Persian meanings, example
+ * sentences) plus signatures of the id registry and legacy maps. None may appear in the public
+ * bundle: the vocabulary belongs to the owner's account (Firestore library).
+ */
+export function contentMarkers(vocabulary) {
+  const markers = ['"legacyKey"', '"legacyWord"', '"checkboxCount"', '"dataSha256"'];
+  for (const c of vocabulary.categories) {
+    const entries = c.subtabs.flatMap((s) => s.groups.flatMap((g) => g.entries));
+    for (const e of entries.filter((_, i) => i % 25 === 0)) {
+      if (e.example && e.example.length > 24) markers.push(e.example);
+      if (e.exampleFa && e.exampleFa.length > 24) markers.push(e.exampleFa);
+    }
+  }
+  return markers;
+}
+
+/** @param {Array<{ file: string, text: string }>} files */
+export function findContent(files, markers) {
+  const hits = [];
+  for (const { file, text } of files) {
+    const found = markers.filter((m) => text.includes(m) || text.includes(JSON.stringify(m).slice(1, -1)));
+    if (found.length) hits.push(`${file}: ${found.length} content sample(s), e.g. ${found[0].slice(0, 40)}`);
+  }
+  return hits;
+}

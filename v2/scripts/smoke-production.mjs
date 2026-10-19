@@ -1,7 +1,8 @@
 // Smoke test of a deployed (or locally served) production build — read-only, no sign-in:
 //   node scripts/smoke-production.mjs https://deutsch-vokabular.web.app
-// Checks: HTTPS/headers, routes, assets, fonts, icons, manifest, service worker + offline reload,
-// production Firebase project in the bundle, no console errors (incl. CSP violations), mobile layout.
+// Checks: HTTPS/headers, routes (signed out: welcome only, no vocabulary), assets, fonts, icons,
+// manifest, service worker + offline shell, production project and no vocabulary in the bundle,
+// no console errors (incl. CSP violations), mobile layout.
 import { chromium, devices } from '@playwright/test';
 
 const base = (process.argv[2] ?? 'https://deutsch-vokabular.web.app').replace(/\/$/, '');
@@ -18,7 +19,8 @@ check('indexable production page', !root.text.includes('noindex') && root.text.i
 const asset = /src="(\/assets\/index-[^"]+\.js)"/.exec(root.text)?.[1];
 const js = asset ? await head(asset) : null;
 check('hashed asset immutable', !!js && /immutable/.test(js.h.get('cache-control') ?? ''), js?.h.get('cache-control') ?? 'no asset');
-check('bundle uses the production project', !!js && js.text.includes('"deutsch-vokabular"') || !!js && /deutsch-vokabular[^-]/.test(js.text));
+check('bundle uses the production project', !!js && /deutsch-vokabular[^-]/.test(js.text));
+check('no vocabulary in the bundle', !!js && !js.text.includes('Außenwand') && !js.text.includes('legacyKey'));
 check('no dev/emulator project in bundle', !!js && !js.text.includes('deutsch-vokabular-v2-dev') && !js.text.includes('demo-deutsch-vokabular'));
 const sw = await head('/sw.js');
 check('service worker served, not cached', sw.status === 200 && /no-cache/.test(sw.h.get('cache-control') ?? ''));
@@ -42,29 +44,27 @@ for (const [label, opts] of [['desktop 1440', { viewport: { width: 1440, height:
   page.on('requestfailed', (r) => failed.push(`${r.url()} ${r.failure()?.errorText}`));
   for (const route of ['#/', '#/mine', '#/review', '#/shadowing', '#/progress']) {
     await page.goto(`${base}/${route}`, { waitUntil: 'networkidle' });
-    const heading = await page.getByRole('heading', { level: 2 }).first().textContent();
-    check(`${label} ${route}`, !!heading, heading ?? 'no heading');
+    const welcome = await page.getByTestId('welcome').isVisible();
+    const signIn = await page.getByRole('button', { name: 'ورود با گوگل' }).isVisible();
+    const entries = await page.locator('[data-entry-id]').count();
+    check(`${label} ${route}: welcome + sign-in, no vocabulary`, welcome && signIn && entries === 0, `welcome ${welcome}, sign-in ${signIn}, entries ${entries}`);
   }
-  await page.reload({ waitUntil: 'networkidle' });
-  check(`${label} reload keeps the route`, page.url().endsWith('#/progress'));
   const fonts = await page.evaluate(async () => { await document.fonts.ready; return [...document.fonts].filter((f) => f.status === 'loaded').map((f) => f.family); });
   check(`${label} fonts loaded`, fonts.some((f) => f.includes('Inter')) && fonts.some((f) => f.includes('Vazirmatn')), [...new Set(fonts)].join(', '));
   const icons = await page.locator('svg.lucide').count();
-  check(`${label} line icons rendered`, icons > 5, `${icons}`);
+  check(`${label} line icons rendered`, icons >= 3, `${icons}`);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   check(`${label} no horizontal overflow`, overflow <= 0, `${overflow}px`);
-  await page.goto(`${base}/#/`, { waitUntil: 'networkidle' });
-  const words = await page.locator('[data-entry-id]').count();
-  check(`${label} vocabulary rendered`, words > 0, `${words} entries in the first subtab`);
+  const text = await page.locator('body').innerText();
+  check(`${label} no vocabulary text without an account`, !text.includes('die Außenwand') && !text.includes('دیوار خارجی'));
   const sw = await page.evaluate(async () => { const r = await navigator.serviceWorker.ready; return r.active?.scriptURL ?? null; });
   check(`${label} service worker active`, !!sw, sw ?? '');
   await page.reload({ waitUntil: 'networkidle' });
   await ctx.setOffline(true);
   await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => {});
   await page.waitForTimeout(1500);
-  const offlineOk = await page.locator('[data-entry-id]').count();
-  const banner = await page.getByTestId('offline-banner').isVisible().catch(() => false);
-  check(`${label} works offline after first visit`, offlineOk > 0 && banner, `${offlineOk} entries, offline banner ${banner}`);
+  const offlineShell = await page.getByTestId('welcome').isVisible().catch(() => false);
+  check(`${label} app shell loads offline (service worker)`, offlineShell);
   await ctx.setOffline(false);
   const relevant = errors.filter((e) => !/Failed to load resource: net::ERR_INTERNET_DISCONNECTED|net::ERR_INTERNET_DISCONNECTED|ERR_NETWORK_CHANGED/.test(e));
   check(`${label} no console errors (incl. CSP)`, relevant.length === 0, relevant.slice(0, 3).join(' | '));

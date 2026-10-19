@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from '../../../src/app/App';
-import { getVocabularyRepository } from '../../../src/services/content/vocabularyRepository';
-import { fakeSpeech, mockMatchMedia, MOBILE, waitForLearnedCheckboxes } from '../../helpers/dom';
+import { getBundledRepository as getVocabularyRepository } from '../../../src/services/content/bundled';
+import { fakeSpeech, mockMatchMedia, MOBILE, waitForApp, waitForLearnedCheckboxes } from '../../helpers/dom';
 import { ALICE } from '../../helpers/fakeAuth';
 import { createFakeServices } from '../../helpers/fakeServices';
 import { categoryName } from '../../../src/models/vocabulary';
@@ -21,10 +21,12 @@ const results = () => screen.queryByRole('list', { name: 'نتیجه‌های ج
 const resultIds = () => [...(results()?.querySelectorAll('article[data-entry-id]') ?? [])].map((a) => a.getAttribute('data-entry-id'));
 const link = (name: string) => screen.getByRole('link', { name });
 
-function signedOut() {
+async function asOwner() {
   const user = userEvent.setup();
-  render(<App services={createFakeServices().services} speechService={fakeSpeech()} />);
-  return { user };
+  const env = createFakeServices({ restored: ALICE });
+  render(<App services={env.services} speechService={fakeSpeech()} />);
+  await waitForApp();
+  return { user, env };
 }
 async function signedIn() {
   const user = userEvent.setup();
@@ -36,12 +38,12 @@ async function signedIn() {
 
 describe('navigation', () => {
   it('main sections as links with aria-current; categories are secondary tabs of "words"', async () => {
-    const { user } = signedOut();
+    const { user } = await asOwner();
     const nav = screen.getByRole('navigation', { name: 'بخش‌های اصلی' });
     expect(within(nav).getAllByRole('link').map((l) => l.textContent)).toEqual(['واژه‌ها', 'واژه‌های من', 'مرور', 'تلفظ', 'پیشرفت']);
     expect(link('واژه‌ها')).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('tablist', { name: 'Kategorien' })).toBeInTheDocument();
-    expect(document.title).toMatch(/^واژه‌ها · /);
+    await waitFor(() => expect(document.title).toMatch(/^واژه‌ها · /));
 
     await user.click(link('پیشرفت'));
     expect(window.location.hash).toBe('#/progress');
@@ -53,16 +55,16 @@ describe('navigation', () => {
 
   it('follows the URL hash (back button, deep links)', async () => {
     window.history.replaceState(null, '', '#/shadowing');
-    signedOut();
+    await asOwner();
     expect(screen.getByRole('heading', { name: 'تمرین تلفظ (Shadowing)' })).toBeInTheDocument();
     act(() => { window.location.hash = '#/review'; window.dispatchEvent(new HashChangeEvent('hashchange')); });
     expect(await screen.findByRole('heading', { name: 'مرور با فلش‌کارت' })).toBeInTheDocument();
     expect(link('مرور')).toHaveAttribute('aria-current', 'page');
   });
 
-  it('phones and tablets get a compact app bar and a bottom tab bar; the category tabs are part of the page', () => {
+  it('phones and tablets get a compact app bar and a bottom tab bar; the category tabs are part of the page', async () => {
     mockMatchMedia(MOBILE);
-    signedOut();
+    await asOwner();
     const nav = screen.getByRole('navigation', { name: 'بخش‌های اصلی' });
     expect(nav).toHaveClass('pnav--bottom');
     expect(nav.closest('header')).toBeNull();
@@ -73,7 +75,7 @@ describe('navigation', () => {
 
   it('desktop (≥ 1024px): grouped sidebar navigation that collapses to an icon rail and remembers it', async () => {
     mockMatchMedia((q) => q.includes('min-width: 1024px'));
-    const { user } = signedOut();
+    const { user } = await asOwner();
     const sidebar = screen.getByTestId('sidebar');
     const nav = within(sidebar).getByRole('navigation', { name: 'بخش‌های اصلی' });
     expect(nav).toHaveClass('pnav--sidebar');
@@ -92,7 +94,7 @@ describe('navigation', () => {
 
   it('phones fold the search filters behind a «فیلترها» button that shows the number of active filters', async () => {
     mockMatchMedia(MOBILE);
-    const { user } = signedOut();
+    const { user } = await asOwner();
     expect(searchBox()).toBeVisible();
     const toggle = screen.getByRole('button', { name: /فیلترها/ });
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
@@ -106,7 +108,7 @@ describe('navigation', () => {
   });
 
   it('a skip link moves focus to the main content without changing the section', async () => {
-    const { user } = signedOut();
+    const { user } = await asOwner();
     await user.click(link('مرور'));
     await user.click(screen.getByRole('link', { name: 'رفتن به محتوای اصلی' }));
     expect(screen.getByRole('main')).toHaveFocus();
@@ -116,7 +118,7 @@ describe('navigation', () => {
 
 describe('vocabulary search', () => {
   it('German search with ß/ss and umlaut folding, highlighted safely, with a result count', async () => {
-    const { user } = signedOut();
+    const { user } = await asOwner();
     await user.type(searchBox(), 'aussenwand');
     await waitFor(() => expect(resultIds()[0]).toBe(AUSSENWAND.id));
     expect(count()).toMatch(/^\d+ واژه پیدا شد$/);
@@ -126,7 +128,7 @@ describe('vocabulary search', () => {
   });
 
   it('Persian search (Arabic letter variants) and example sentences', async () => {
-    const { user } = signedOut();
+    const { user } = await asOwner();
     await user.type(searchBox(), 'ديوار خارجي');
     await waitFor(() => expect(resultIds()).toContain(AUSSENWAND.id));
     await user.clear(searchBox());
@@ -135,7 +137,7 @@ describe('vocabulary search', () => {
   });
 
   it('never injects HTML: markup typed into the search is plain text', async () => {
-    const { user } = signedOut();
+    const { user } = await asOwner();
     await user.type(searchBox(), '<img src=x onerror=alert(1)>');
     await waitFor(() => expect(count()).toBe('نتیجه‌ای پیدا نشد'));
     expect(document.querySelector('img[src="x"]')).toBeNull();
@@ -143,7 +145,7 @@ describe('vocabulary search', () => {
   });
 
   it('category and subcategory filters combine with the query; reset restores browsing', async () => {
-    const { user } = signedOut();
+    const { user } = await asOwner();
     await user.selectOptions(screen.getByRole('combobox', { name: 'دسته' }), 'fitness');
     const sub = screen.getByRole('combobox', { name: 'زیرمجموعه' });
     expect(sub).toBeEnabled();
@@ -159,16 +161,10 @@ describe('vocabulary search', () => {
   });
 
   it('meaningful empty state', async () => {
-    const { user } = signedOut();
+    const { user } = await asOwner();
     await user.type(searchBox(), 'qqqzzz');
     await waitFor(() => expect(screen.getByText('برای «qqqzzz» واژه‌ای پیدا نشد')).toBeInTheDocument());
     expect(screen.getByText(/بدون حرف تعریف یا با ss به‌جای ß/)).toBeInTheDocument();
-  });
-
-  it('signed out: the learned/unlearned filter is disabled with an explanation', () => {
-    signedOut();
-    expect(screen.getByRole('radio', { name: 'یادگرفته' })).toBeDisabled();
-    expect(screen.getByText(/پس از ورود به حساب فعال می‌شود/)).toBeInTheDocument();
   });
 
   it('learned/unlearned filters follow progress changes; a just-toggled word stays visible', async () => {
@@ -190,7 +186,7 @@ describe('vocabulary search', () => {
   });
 
   it('"show in list" opens the category and subcategory and focuses the entry', async () => {
-    const { user } = signedOut();
+    const { user } = await asOwner();
     await user.type(searchBox(), fitnessWord.word);
     await waitFor(() => expect(resultIds()).toContain(fitnessWord.id));
     const card = results()!.querySelector(`article[data-entry-id="${fitnessWord.id}"]`) as HTMLElement;
@@ -204,7 +200,7 @@ describe('vocabulary search', () => {
   });
 
   it('keyboard: "/" focuses the search, Escape clears it', async () => {
-    const { user } = signedOut();
+    const { user } = await asOwner();
     (document.activeElement as HTMLElement | null)?.blur();
     await user.keyboard('/');
     expect(searchBox()).toHaveFocus();
@@ -215,7 +211,7 @@ describe('vocabulary search', () => {
   });
 
   it('choosing a category tab leaves search mode', async () => {
-    const { user } = signedOut();
+    const { user } = await asOwner();
     await user.type(searchBox(), 'wand');
     await user.click(screen.getByRole('tab', { name: categoryName(fitness.label) }));
     expect(searchBox()).toHaveValue('');
@@ -224,15 +220,6 @@ describe('vocabulary search', () => {
 });
 
 describe('dashboard', () => {
-  it('signed out: totals and categories only, with a sign-in explanation (no invented numbers)', async () => {
-    const { user } = signedOut();
-    await user.click(link('پیشرفت'));
-    expect(screen.getByRole('note')).toHaveTextContent('برای ثبت پیشرفت');
-    expect(screen.getByTestId('db-total')).toHaveTextContent('999');
-    expect(screen.queryByTestId('db-learned')).toBeNull();
-    expect(screen.queryByTestId('db-local')).toBeNull();
-  });
-
   it('signed in: learned / remaining / percent and per-category progress from real data', async () => {
     const { user } = await signedIn();
     await user.click(screen.getByRole('checkbox', { name: `یادگرفتم: ${AUSSENWAND.word}` }));
@@ -263,7 +250,7 @@ describe('dashboard', () => {
   });
 
   it('quick access opens flashcards and shadowing', async () => {
-    const { user } = signedOut();
+    const { user } = await asOwner();
     await user.click(link('پیشرفت'));
     await user.click(screen.getByRole('button', { name: /مرور با فلش‌کارت/ }));
     expect(window.location.hash).toBe('#/review');
@@ -275,14 +262,14 @@ describe('dashboard', () => {
 
 describe('offline state', () => {
   it('shows an offline banner while the browser has no network', async () => {
-    signedOut();
+    await asOwner();
     expect(screen.queryByTestId('offline-banner')).toBeNull();
     const onLine = Object.getOwnPropertyDescriptor(Navigator.prototype, 'onLine')!;
     Object.defineProperty(Navigator.prototype, 'onLine', { configurable: true, get: () => false });
     try {
       act(() => { window.dispatchEvent(new Event('offline')); });
       expect(screen.getByTestId('offline-banner')).toHaveTextContent('آفلاین هستید');
-      expect(screen.getByTestId('offline-banner')).toHaveTextContent('ورود به حساب به اینترنت نیاز دارد');
+      expect(screen.getByTestId('offline-banner')).toHaveTextContent('پس از اتصال همگام می‌شوند');
     } finally {
       Object.defineProperty(Navigator.prototype, 'onLine', onLine);
       act(() => { window.dispatchEvent(new Event('online')); });
@@ -293,7 +280,7 @@ describe('offline state', () => {
 
 describe('regression: practice sections keep working inside the new navigation', () => {
   it('a flashcard session survives switching to search and back', async () => {
-    const { user } = signedOut();
+    const { user } = await asOwner();
     await user.click(link('مرور'));
     await user.selectOptions(screen.getByLabelText('تعداد کارت در جلسه'), '10');
     await user.click(screen.getByRole('button', { name: 'شروع مرور (10 کارت)' }));

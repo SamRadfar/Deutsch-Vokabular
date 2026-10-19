@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { expect, test } from './fixtures';
 import vocabulary from '../../src/data/vocabulary/vocabulary.v1.json' with { type: 'json' };
 import { categoryName } from '../../src/models/vocabulary';
 
@@ -26,8 +27,8 @@ test.describe('application', () => {
     await page.goto('./');
     await expect(page.getByRole('heading', { name: 'Deutsch Vokabular' })).toBeVisible();
     await expect(page.getByText('999 واژه')).toBeVisible();
-    // Hermetic build: no developer .env.local may leak in (badge would show "dev: …").
-    await expect(page.getByTestId('env-badge')).toHaveText('v2 preview');
+    // Hermetic emulator build: no developer .env.local may leak in (badge would show "dev: …").
+    await expect(page.getByTestId('env-badge')).toHaveText('v2 preview · emulator');
     const tabs = page.getByRole('tablist', { name: 'Kategorien' }).getByRole('tab');
     await expect(tabs).toHaveCount(7); // categories; practice sections are in the main navigation
     await expect(tabs).toHaveText(categories.map((c) => categoryName(c.label)));

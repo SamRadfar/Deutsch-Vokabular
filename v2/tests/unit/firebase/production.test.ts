@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { parseEnv, scanBundle, validateProductionDeployArgs, validateProductionEnv } from '../../../scripts/lib/production.mjs';
+import { contentMarkers, findContent, parseEnv, scanBundle, validateProductionDeployArgs, validateProductionEnv } from '../../../scripts/lib/production.mjs';
 
 const good = {
   VITE_FIREBASE_ENV: 'production',
@@ -54,5 +54,14 @@ describe('production build configuration', () => {
     expect(validateProductionDeployArgs(['--project', 'deutsch-wortschatz-c7a11', '--confirm', 'deutsch-wortschatz-c7a11'])).toMatchObject({ ok: false, reason: expect.stringContaining('not the production project') });
     expect(validateProductionDeployArgs(['--project', 'deutsch-vokabular-v2-dev'])).toMatchObject({ ok: false });
     expect(validateProductionDeployArgs([])).toMatchObject({ ok: false });
+  });
+
+  it('the vocabulary guard finds library content in a bundle (and nothing in app-only code)', () => {
+    const vocabulary = JSON.parse(readFileSync('src/data/vocabulary/vocabulary.v1.json', 'utf8'));
+    const markers = contentMarkers(vocabulary);
+    expect(markers.length).toBeGreaterThan(40);
+    expect(findContent([{ file: 'leak.js', text: `const v=${JSON.stringify(vocabulary)}` }], markers)).toHaveLength(1);
+    expect(findContent([{ file: 'registry.js', text: JSON.stringify({ entries: [{ legacyKey: 'arch::x' }] }) }], markers)).toHaveLength(1);
+    expect(findContent([{ file: 'app.js', text: readFileSync('src/app/App.tsx', 'utf8') }], markers)).toEqual([]);
   });
 });

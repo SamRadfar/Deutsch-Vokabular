@@ -9,6 +9,9 @@ import type { ProgressServices } from '../features/progress/ProgressProvider';
 import { createFirestoreCustomWordsRemote } from '../features/personal/firestoreCustomWordsRemote';
 import { createAiClient, type AiClient } from '../features/ai/aiClient';
 import { readAiEndpoint } from '../features/ai/config';
+import { createLibraryService, type LibraryService } from '../features/library/libraryService';
+import { createFirestoreLibraryRemote } from '../features/library/firestoreLibraryRemote';
+import { createIndexedDbLibraryCache } from '../features/library/libraryCache';
 
 export interface AppServices {
   /** Shown in the header so it is always visible which backend the app talks to. */
@@ -18,6 +21,8 @@ export interface AppServices {
   progress: ProgressServices | null;
   /** AI suggestions through our worker (VITE_AI_ENDPOINT); null = not configured for this build. */
   ai?: AiClient | null;
+  /** The signed-in account's vocabulary library (owner-protected Firestore documents). */
+  library?: LibraryService | null;
 }
 
 /** Real services from the public Firebase configuration; browse-only when it is missing. */
@@ -37,6 +42,7 @@ export function createAppServices(): AppServices {
   return {
     environmentLabel: config.environment === 'emulator' ? 'emulator' : `${config.environment === 'development' ? 'dev' : 'production'}: ${config.options.projectId}`,
     auth,
+    library: createLibraryService({ remote: createFirestoreLibraryRemote(db), cache: createIndexedDbLibraryCache() }),
     ai: aiConfig.status === 'configured' ? createAiClient({ endpoint: aiConfig.endpoint, getIdToken: () => auth.getIdToken() }) : null,
     progress: {
       createRemote: () => createFirestoreProgressRemote(db),

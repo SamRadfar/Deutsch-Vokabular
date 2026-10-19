@@ -2,9 +2,10 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { ProgressSyncEngine } from '../../../src/features/progress/syncEngine';
 import { createMemoryStore, type ProgressLocalStore } from '../../../src/features/progress/localStore';
 import type { ProgressRemote } from '../../../src/features/progress/remote';
-import { getVocabularyRepository } from '../../../src/services/content/vocabularyRepository';
+import { getBundledRepository as getVocabularyRepository } from '../../../src/services/content/bundled';
 import { buildLegacyKeyIndex } from '../../../src/services/content/idRegistry';
 import { createFakeCloud, until } from '../../helpers/fakeCloud';
+import { bundledIdRegistry as idRegistry } from '../../../src/services/content/bundled';
 
 const repo = getVocabularyRepository();
 const ids = repo.categories.flatMap((c) => c.subtabs.flatMap((s) => s.groups.flatMap((g) => g.entries.map((e) => e.id))));
@@ -55,7 +56,7 @@ describe('single device', () => {
   });
 
   it('keeps entries that share a legacy key independent', async () => {
-    const [a, b] = buildLegacyKeyIndex().get('bauphysik::der Hebelarm')!;
+    const [a, b] = buildLegacyKeyIndex(idRegistry).get('bauphysik::der Hebelarm')!;
     const cloud = createFakeCloud();
     const e = engine('alice', createMemoryStore(), cloud.device('laptop'));
     await e.start();

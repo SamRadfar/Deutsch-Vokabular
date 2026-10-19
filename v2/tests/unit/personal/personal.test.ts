@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { describe, expect, it, vi } from 'vitest';
 import { IDBFactory } from 'fake-indexeddb';
-import { getVocabularyRepository } from '../../../src/services/content/vocabularyRepository';
+import { getBundledRepository as getVocabularyRepository } from '../../../src/services/content/bundled';
 import { createIndexedDbStore, createMemoryStore, openProgressDb, type ProgressLocalStore } from '../../../src/features/progress/localStore';
 import type { CustomWordValue } from '../../../src/features/personal/syncModel';
 import {

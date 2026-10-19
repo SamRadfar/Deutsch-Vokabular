@@ -62,3 +62,8 @@ export function fakeSpeech(supported = true, voice: GermanVoiceStatus = 'availab
 export async function waitForLearnedCheckboxes(): Promise<void> {
   await waitFor(() => { if (!document.querySelector('input.vchk')) throw new Error('learned checkboxes are not rendered yet'); });
 }
+
+/** Waits until the signed-in app (library loaded) replaced the welcome screen, in any section. */
+export async function waitForApp(): Promise<void> {
+  await waitFor(() => { if (!document.querySelector('.shell')) throw new Error('the app is not shown yet (welcome / library loading)'); });
+}

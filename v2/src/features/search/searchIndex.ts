@@ -1,4 +1,4 @@
-// Vocabulary search over the bundled content (999 entries). Folding is done once per entry when the
+// Vocabulary search over the account's library and personal words. Folding is done once per entry when the
 // index is built; a search is a linear scan of pre-folded strings (well under a millisecond-range
 // cost per keystroke for this dataset), so no worker or external index is needed.
 

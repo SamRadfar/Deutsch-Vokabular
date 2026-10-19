@@ -43,7 +43,7 @@ export function routeLearned(
 /** Offset of personal cards in content order (after all built-in cards). */
 export const PERSONAL_ORDER_OFFSET = 100_000;
 
-/** All practice cards: the 999 built-in entries, then the user's personal words. */
+/** All practice cards: the library's built-in entries, then the user's personal words. */
 export function usePracticeCards(categories: readonly Category[]): DeckCard[] {
   const { snapshot } = usePersonal();
   const builtIn = useMemo(() => flattenCards(categories), [categories]);

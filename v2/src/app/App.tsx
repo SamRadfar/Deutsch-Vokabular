@@ -6,6 +6,7 @@ import { ThemeToggle } from '../components/ThemeToggle/ThemeToggle';
 import { PageHeader } from '../components/PageHeader/PageHeader';
 import { PREFERENCE_KEYS, readJsonPreference, writeJsonPreference } from '../services/preferences';
 import { useTheme } from '../hooks/useTheme';
+import type { ThemePreference } from '../services/preferences';
 import { PronunciationProvider } from '../features/pronunciation/PronunciationProvider';
 import type { SpeechService } from '../features/pronunciation/speechService';
 import type { CategoryKey } from '../models/vocabulary';
@@ -24,7 +25,9 @@ import { useMediaQuery } from '../hooks/useMediaQuery';
 import { useSection, type Section } from './sections';
 import type { EntryProgress } from '../features/vocabulary/components/LearnedCheckbox';
 import { useVocabularyNavigation } from '../features/vocabulary/useVocabularyNavigation';
-import { getVocabularyRepository, type VocabularyRepository } from '../services/content/vocabularyRepository';
+import type { VocabularyRepository } from '../services/content/vocabularyRepository';
+import { LibraryGate, useLibrary } from '../features/library/LibraryGate';
+import { EmptyState } from '../components/EmptyState/EmptyState';
 import { AuthProvider } from '../features/auth/AuthProvider';
 import { ProgressProvider, useProgress } from '../features/progress/ProgressProvider';
 import { countCategories } from '../features/progress/stats';
@@ -44,9 +47,8 @@ const RELEASE = import.meta.env.VITE_FIREBASE_ENV === 'production' && import.met
 export const WIDE_QUERY = '(min-width: 1024px)';
 
 interface Props {
-  repository?: VocabularyRepository;
   speechService?: SpeechService;
-  /** Injected in tests; defaults to Firebase (or browse-only when unconfigured). */
+  /** Injected in tests; defaults to Firebase (or the welcome screen only when unconfigured). */
   services?: AppServices;
 }
 
@@ -55,30 +57,50 @@ const MigrationDialog = lazy(() => import('../features/progress/migration/Migrat
 
 let defaultServices: AppServices | undefined;
 
-/** Composition root: content, identity, personal progress and speech providers. */
-export function App({ repository = getVocabularyRepository(), speechService, services }: Props) {
+/**
+ * Composition root: identity → the account's own library → personal progress → the app. Without
+ * an account only the welcome screen is shown; the vocabulary is never part of the public bundle.
+ */
+export function App({ speechService, services }: Props) {
   const resolved = services ?? (defaultServices ??= createAppServices());
+  const { theme, toggle } = useTheme();
+  return (
+    <AuthProvider service={resolved.auth} {...(resolved.authUnavailable ? { unavailable: resolved.authUnavailable } : {})}>
+      <PronunciationProvider {...(speechService ? { service: speechService } : {})}>
+        <AiProvider client={resolved.ai ?? null}>
+          <LibraryGate service={resolved.library ?? null} welcomeExtras={<ThemeToggle theme={theme} onToggle={toggle} />}>
+            {(repository) => (
+              <LibraryApp repository={repository} services={resolved} theme={theme} onToggleTheme={toggle} />
+            )}
+          </LibraryGate>
+        </AiProvider>
+      </PronunciationProvider>
+    </AuthProvider>
+  );
+}
+
+function LibraryApp({ repository, services, theme, onToggleTheme }: {
+  repository: VocabularyRepository; services: AppServices; theme: ThemePreference; onToggleTheme(): void;
+}) {
   const knownIds = useMemo(() => {
     const ids = new Set<string>();
     for (const c of repository.categories) for (const s of c.subtabs) for (const g of s.groups) for (const e of g.entries) ids.add(e.id);
     return ids;
   }, [repository]);
-
   return (
-    <AuthProvider service={resolved.auth} {...(resolved.authUnavailable ? { unavailable: resolved.authUnavailable } : {})}>
-      <ProgressProvider services={resolved.progress} knownIds={knownIds}>
-        <PronunciationProvider {...(speechService ? { service: speechService } : {})}>
-          <AiProvider client={resolved.ai ?? null}>
-            <AppContent repository={repository} environmentLabel={resolved.environmentLabel} />
-          </AiProvider>
-        </PronunciationProvider>
-      </ProgressProvider>
-    </AuthProvider>
+    <ProgressProvider services={services.progress} knownIds={knownIds}>
+      <AppContent repository={repository} environmentLabel={services.environmentLabel} theme={theme} onToggleTheme={onToggleTheme} />
+    </ProgressProvider>
   );
 }
 
-function AppContent({ repository, environmentLabel }: { repository: VocabularyRepository; environmentLabel: string | undefined }) {
-  const { theme, toggle } = useTheme();
+function AppContent({ repository, environmentLabel, theme, onToggleTheme: toggle }: {
+  repository: VocabularyRepository; environmentLabel: string | undefined; theme: ThemePreference; onToggleTheme(): void;
+}) {
+  const library = useLibrary();
+  const hasLibrary = repository.categories.length > 0;
+  // Legacy progress import needs the owner library's id registry (library/id-registry).
+  const migration = hasLibrary && library ? () => setMigrationOpen(true) : undefined;
   const nav = useVocabularyNavigation(repository.categories);
   const category = nav.activeCategory;
   const progress = useProgress();
@@ -147,7 +169,6 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
       v2 preview{environmentLabel ? ` · ${environmentLabel}` : ''}
     </span>
   );
-  const openMigration = () => setMigrationOpen(true);
 
   return (
     <div className={`shell ${wide ? 'shell--sidebar' : 'shell--compact'}${wide && collapsed ? ' is-collapsed' : ''}`}>
@@ -160,17 +181,17 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
           collapsed={collapsed}
           onToggleCollapsed={toggleCollapsed}
           nav={<PrimaryNav active={section} onNavigate={navigate} variant="sidebar"
-            counts={{ words: repository.totalEntries, ...(personal?.words.length ? { mine: personal.words.length } : {}) }} />}
-          meter={<ProgressMeter totalEntries={repository.totalEntries} learnedCount={learnedCount} variant="card" />}
+            counts={{ ...(hasLibrary ? { words: repository.totalEntries } : {}), ...(personal?.words.length ? { mine: personal.words.length } : {}) }} />}
+          meter={hasLibrary ? <ProgressMeter totalEntries={repository.totalEntries} learnedCount={learnedCount} variant="card" /> : null}
           status={<><SyncStatusIndicator />{envBadge}</>}
           theme={<ThemeToggle theme={theme} onToggle={toggle} variant="row" />}
-          account={<AccountControl totalEntries={repository.totalEntries} learnedCount={learnedCount} onOpenMigration={openMigration} variant="sidebar" />}
+          account={<AccountControl totalEntries={repository.totalEntries} learnedCount={hasLibrary ? learnedCount : null} {...(migration ? { onOpenMigration: migration } : {})} variant="sidebar" />}
         />
       ) : (
         <Header
-          meter={<ProgressMeter totalEntries={repository.totalEntries} learnedCount={learnedCount} variant="pill" />}
+          meter={hasLibrary ? <ProgressMeter totalEntries={repository.totalEntries} learnedCount={learnedCount} variant="pill" /> : null}
           theme={<ThemeToggle theme={theme} onToggle={toggle} />}
-          account={<><SyncStatusIndicator /><AccountControl totalEntries={repository.totalEntries} learnedCount={learnedCount} onOpenMigration={openMigration} /></>}
+          account={<><SyncStatusIndicator /><AccountControl totalEntries={repository.totalEntries} learnedCount={hasLibrary ? learnedCount : null} {...(migration ? { onOpenMigration: migration } : {})} /></>}
         />
       )}
       <main className={`mcontent${wide ? '' : ' mcontent--bottom-nav'}`} id="main" tabIndex={-1}>
@@ -181,12 +202,21 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
           <PageHeader
             eyebrow={['واژه‌نامهٔ تخصصی آلمانی', 'B2 / C1']}
             title="واژه‌ها"
-            description={`${repository.totalEntries.toLocaleString('fa-IR')} واژه در ${repository.categories.length.toLocaleString('fa-IR')} دسته — جستجو، مرور و علامت‌گذاری واژه‌های یادگرفته.`}
+            description={hasLibrary
+              ? `${repository.totalEntries.toLocaleString('fa-IR')} واژه در ${repository.categories.length.toLocaleString('fa-IR')} دسته — جستجو، مرور و علامت‌گذاری واژه‌های یادگرفته.`
+              : 'کتابخانهٔ این حساب هنوز دسته‌ای ندارد.'}
             compact={!wide}
           />
         ) : null}
-        {section === 'words' ? <MainNavigation categories={repository.categories} activeId={category.key} onSelect={selectCategory} /> : null}
-        {section === 'words' ? (
+        {section === 'words' && !category ? (
+          <div className="empty-library" data-testid="empty-library">
+            <EmptyState title="کتابخانهٔ شما خالی است"
+              description="این حساب واژه‌های داخلی ندارد. واژه‌های خودتان را در «واژه‌های من» بسازید؛ در جستجو، فلش‌کارت و تمرین تلفظ هم ظاهر می‌شوند." />
+            <button type="button" className="btn btn--primary" onClick={() => navigate('mine')}>رفتن به «واژه‌های من»</button>
+          </div>
+        ) : null}
+        {section === 'words' && category ? <MainNavigation categories={repository.categories} activeId={category.key} onSelect={selectCategory} /> : null}
+        {section === 'words' && category ? (
           <WordsSection
             categories={repository.categories}
             category={category}
@@ -235,9 +265,9 @@ function AppContent({ repository, environmentLabel }: { repository: VocabularyRe
         {wide ? null : <footer className="app-foot">{envBadge}</footer>}
       </main>
       {wide ? null : <PrimaryNav active={section} onNavigate={navigate} variant="bottom" />}
-      {migrationOpen && ready ? (
+      {migrationOpen && ready && library ? (
         <Suspense fallback={<p className="visually-hidden" role="status">در حال بارگذاری…</p>}>
-          <MigrationDialog repository={repository} onClose={closeMigration} />
+          <MigrationDialog repository={repository} loadExtras={() => library!.service.loadExtras(library!.uid)} onClose={closeMigration} />
         </Suspense>
       ) : null}
     </div>

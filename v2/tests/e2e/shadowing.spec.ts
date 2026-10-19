@@ -1,7 +1,8 @@
 // Shadowing workflow in the production build, with the deterministic speech mock of
 // tests/helpers/speechMock.ts (headless browsers have no dependable voices).
 
-import { expect, test, type Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { expect, test } from './fixtures';
 import { installSpeechMock } from '../helpers/speechMock';
 
 function trackErrors(page: Page) {

@@ -4,19 +4,19 @@ import type { Category, CategoryKey } from '../../models/vocabulary';
 /**
  * Navigation state held in React (not read from the DOM): the active category and the
  * remembered subtab per category. Starts on the first category/subtab like the legacy app.
+ * An empty library (an account without built-in categories) has no active category.
  */
 export function useVocabularyNavigation(categories: readonly Category[]) {
   const first = categories[0];
-  if (!first) throw new Error('No categories');
-  const [activeKey, setActiveKey] = useState<CategoryKey>(first.key);
+  const [activeKey, setActiveKey] = useState<CategoryKey | undefined>(first?.key);
   const [subtabByCategory, setSubtabByCategory] = useState<Partial<Record<CategoryKey, string>>>({});
 
-  const activeCategory = categories.find((c) => c.key === activeKey) ?? first;
-  const activeSubtabId = subtabByCategory[activeCategory.key] ?? activeCategory.subtabs[0]?.id ?? '';
+  const activeCategory: Category | undefined = categories.find((c) => c.key === activeKey) ?? first;
+  const activeSubtabId = activeCategory ? subtabByCategory[activeCategory.key] ?? activeCategory.subtabs[0]?.id ?? '' : '';
 
   const selectSubtab = useCallback(
-    (id: string) => setSubtabByCategory((prev) => ({ ...prev, [activeKey]: id })),
-    [activeKey],
+    (id: string) => { if (activeCategory) setSubtabByCategory((prev) => ({ ...prev, [activeCategory.key]: id })); },
+    [activeCategory],
   );
 
   /** Opens a category on a given subtab (e.g. "show in list" from search). */
@@ -25,5 +25,6 @@ export function useVocabularyNavigation(categories: readonly Category[]) {
     setSubtabByCategory((prev) => ({ ...prev, [key]: subtabId }));
   }, []);
 
-  return { activeCategory, activeSubtabId, selectCategory: setActiveKey, selectSubtab, show };
+  const selectCategory = useCallback((key: CategoryKey) => setActiveKey(key), []);
+  return { activeCategory, activeSubtabId, selectCategory, selectSubtab, show };
 }

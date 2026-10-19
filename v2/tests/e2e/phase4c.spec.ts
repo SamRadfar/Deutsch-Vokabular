@@ -1,7 +1,8 @@
 // Phase 4C in the production build (browse-only; signed-in dashboard numbers are covered in the
 // emulator suite): navigation, search, filters, dashboard, mobile layout, keyboard, dark mode.
 
-import { expect, test, type Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { expect, test } from './fixtures';
 import vocabulary from '../../src/data/vocabulary/vocabulary.v1.json' with { type: 'json' };
 import { categoryName } from '../../src/models/vocabulary';
 
@@ -85,9 +86,9 @@ test('filters: category + subcategory + query, empty state, reset', async ({ pag
   await page.getByRole('button', { name: /^پاک کردن/ }).click();
   await expect(searchBox(page)).toHaveValue('');
   await expect(page.locator('.mcontent [data-entry-id]').first()).toBeVisible();
-  // Signed out: learned/unlearned filters need an account.
+  // Signed in: the learned/unlearned filters are available.
   await openFilters(page);
-  await expect(page.getByRole('radio', { name: 'یادگرفته' })).toBeDisabled();
+  await expect(page.getByRole('radio', { name: 'یادگرفته' })).toBeEnabled();
 });
 
 test('search stays fast on the full dataset', async ({ page }) => {
@@ -105,6 +106,7 @@ test('search stays fast on the full dataset', async ({ page }) => {
 test('keyboard: skip link, "/" to search, Escape clears, tab order reaches the main nav', async ({ page, isMobile }) => {
   test.skip(isMobile, 'desktop keyboard');
   await page.goto('./');
+  await expect(page.getByTestId('header-progress')).toBeVisible(); // the library is shown
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: 'رفتن به محتوای اصلی' })).toBeFocused();
   await page.keyboard.press('Enter');
@@ -120,10 +122,10 @@ test('keyboard: skip link, "/" to search, Escape clears, tab order reaches the m
   await expect(page).toHaveURL(/#\/progress$/);
 });
 
-test('dashboard (signed out): totals, categories, quick access', async ({ page }) => {
+test('dashboard: totals, categories, quick access', async ({ page }) => {
   await page.goto('./#/progress');
   await expect(page.getByTestId('db-total')).toHaveText('999');
-  await expect(page.getByRole('note')).toContainText('برای ثبت پیشرفت');
+  await expect(page.getByTestId('db-learned')).toHaveText('0');
   await expect(page.locator('.db-cat')).toHaveCount(7);
   await page.locator('.db-cat').filter({ hasText: categoryName(fitness.label) }).click();
   await expect(page.getByRole('tab', { name: categoryName(fitness.label), exact: true })).toHaveAttribute('aria-selected', 'true');

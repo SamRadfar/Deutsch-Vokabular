@@ -13,7 +13,7 @@ import { ProgressSyncEngine } from '../../src/features/progress/syncEngine';
 import { createMemoryStore } from '../../src/features/progress/localStore';
 import { createFirestoreProgressRemote } from '../../src/features/progress/firestoreProgressRemote';
 import { createFirestoreAccountRemote, type MigrationRecord } from '../../src/features/progress/accountRemote';
-import { getVocabularyRepository } from '../../src/services/content/vocabularyRepository';
+import { getBundledRepository as getVocabularyRepository } from '../../src/services/content/bundled';
 import { until } from '../helpers/fakeCloud';
 
 const PROJECT = 'demo-deutsch-vokabular';

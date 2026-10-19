@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { createHash } from 'node:crypto';
-import { getVocabularyRepository } from '../../../src/services/content/vocabularyRepository';
-import { buildLegacyKeyIndex, buildWordTextIndex, idRegistry } from '../../../src/services/content/idRegistry';
+import { getBundledRepository as getVocabularyRepository } from '../../../src/services/content/bundled';
+import { buildLegacyKeyIndex, buildWordTextIndex } from '../../../src/services/content/idRegistry';
+import { bundledIdRegistry as idRegistry } from '../../../src/services/content/bundled';
 import { WORD_ID_PATTERN } from '../../../src/models/vocabulary';
 import { phase1Fixture, type Phase1Meta, type Phase1ProgressKey } from '../../helpers/phase1';
 
@@ -49,7 +50,7 @@ describe('stable word ids', () => {
 });
 
 describe('legacy key mapping', () => {
-  const index = buildLegacyKeyIndex();
+  const index = buildLegacyKeyIndex(idRegistry);
 
   it('covers all 994 legacy progress keys and all 999 ids', () => {
     expect(index.size).toBe(994);
@@ -77,7 +78,7 @@ describe('legacy key mapping', () => {
   });
 
   it('word-text index spans categories (37 words appear in more than one category)', () => {
-    const text = buildWordTextIndex();
+    const text = buildWordTextIndex(idRegistry);
     const crossCategory = [...text].filter(([, ids]) =>
       new Set(ids.map((id) => idRegistry.entries.find((e) => e.id === id)!.baselineLocation.category)).size > 1);
     expect(crossCategory).toHaveLength(37);

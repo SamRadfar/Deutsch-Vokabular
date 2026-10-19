@@ -2,11 +2,22 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from '../../../src/app/App';
-import { getVocabularyRepository } from '../../../src/services/content/vocabularyRepository';
-import { DARK_SYSTEM, MOBILE, fakeSpeech, mockMatchMedia } from '../../helpers/dom';
+import { getBundledRepository as getVocabularyRepository } from '../../../src/services/content/bundled';
+import { DARK_SYSTEM, MOBILE, fakeSpeech, mockMatchMedia, waitForApp } from '../../helpers/dom';
+import { ALICE } from '../../helpers/fakeAuth';
+import { createFakeServices } from '../../helpers/fakeServices';
+import type { SpeechService } from '../../../src/features/pronunciation/speechService';
 import { categoryName } from '../../../src/models/vocabulary';
 
 const repo = getVocabularyRepository();
+
+/** The library owner signed in; resolves when the library and progress are shown. */
+async function renderApp(speechService: SpeechService = fakeSpeech()) {
+  const env = createFakeServices({ restored: ALICE });
+  const view = render(<App services={env.services} speechService={speechService} />);
+  await waitForApp();
+  return { ...env, ...view };
+}
 const mainTabs = () => within(screen.getByRole('tablist', { name: 'Kategorien' })).getAllByRole('tab');
 const subTabs = () => screen.getAllByRole('tablist').find((t) => t.getAttribute('aria-label') !== 'Kategorien')!;
 
@@ -14,16 +25,16 @@ beforeEach(() => mockMatchMedia(() => false));
 afterEach(() => mockMatchMedia(() => false));
 
 describe('navigation', () => {
-  it('shows all 7 categories in legacy order with labels, first one selected', () => {
-    render(<App speechService={fakeSpeech()} />);
+  it('shows all 7 categories in legacy order with labels, first one selected', async () => {
+    await renderApp(fakeSpeech());
     expect(mainTabs().map((t) => t.textContent)).toEqual(repo.categories.map((c) => categoryName(c.label)));
     expect(mainTabs()[0]).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByLabelText('999 واژه')).toHaveTextContent('999 واژه');
+    expect(await screen.findByTestId('header-progress')).toHaveTextContent('0/999');
   });
 
   it('switches category on click and shows that category’s subtabs with counts', async () => {
     const user = userEvent.setup();
-    render(<App speechService={fakeSpeech()} />);
+    await renderApp(fakeSpeech());
     const fitness = repo.getCategory('fitness')!;
     await user.click(screen.getByRole('tab', { name: categoryName(fitness.label) }));
     expect(screen.getByRole('tab', { name: categoryName(fitness.label) })).toHaveAttribute('aria-selected', 'true');
@@ -37,7 +48,7 @@ describe('navigation', () => {
   // Exhaustive: renders all 33 subtabs (999 rows) in jsdom, hence the longer timeout.
   it('every subtab of every category renders exactly its own entries', async () => {
     const user = userEvent.setup();
-    render(<App speechService={fakeSpeech()} />);
+    await renderApp(fakeSpeech());
     for (const category of repo.categories) {
       await user.click(screen.getByRole('tab', { name: categoryName(category.label) }));
       for (const subtab of category.subtabs) {
@@ -51,7 +62,7 @@ describe('navigation', () => {
 
   it('supports keyboard navigation (arrow keys, Home, End) with roving tabindex', async () => {
     const user = userEvent.setup();
-    render(<App speechService={fakeSpeech()} />);
+    await renderApp(fakeSpeech());
     mainTabs()[0]!.focus();
     await user.keyboard('{ArrowRight}');
     expect(mainTabs()[1]).toHaveAttribute('aria-selected', 'true');
@@ -65,7 +76,7 @@ describe('navigation', () => {
 
   it('remembers the selected subtab per category', async () => {
     const user = userEvent.setup();
-    render(<App speechService={fakeSpeech()} />);
+    await renderApp(fakeSpeech());
     const arch = repo.getCategory('arch')!;
     await user.click(within(subTabs()).getByRole('tab', { name: new RegExp(arch.subtabs[2]!.label) }));
     await user.click(screen.getByRole('tab', { name: categoryName(repo.getCategory('acad')!.label) }));
@@ -75,7 +86,7 @@ describe('navigation', () => {
 
   it('shows an empty state for the empty Bauphysik subtabs', async () => {
     const user = userEvent.setup();
-    render(<App speechService={fakeSpeech()} />);
+    await renderApp(fakeSpeech());
     await user.click(screen.getByRole('tab', { name: categoryName(repo.getCategory('bauphysik')!.label) }));
     expect(within(subTabs()).getAllByRole('tab')[0]).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByText('هنوز واژه‌ای در این بخش وجود ندارد').closest('[role="status"]')).not.toBeNull();
@@ -84,8 +95,8 @@ describe('navigation', () => {
 });
 
 describe('vocabulary fields', () => {
-  it('renders German word, type, Persian meaning, example, translation and pronunciation with correct language/direction', () => {
-    render(<App speechService={fakeSpeech()} />);
+  it('renders German word, type, Persian meaning, example, translation and pronunciation with correct language/direction', async () => {
+    await renderApp(fakeSpeech());
     const entry = repo.categories[0]!.subtabs[0]!.groups[0]!.entries[0]!;
     const row = document.querySelector(`tr[data-entry-id="${entry.id}"]`) as HTMLElement;
     expect(within(row).getByText(entry.word)).toHaveAttribute('lang', 'de');
@@ -97,16 +108,16 @@ describe('vocabulary fields', () => {
     expect(screen.getByRole('rowheader', { name: entry.word })).toBeInTheDocument();
   });
 
-  it('renders group labels as group header rows', () => {
-    render(<App speechService={fakeSpeech()} />);
+  it('renders group labels as group header rows', async () => {
+    await renderApp(fakeSpeech());
     const subtab = repo.categories[0]!.subtabs[0]!;
     const groupHeaders = screen.getAllByRole('columnheader').filter((h) => h.getAttribute('scope') === 'colgroup');
     expect(groupHeaders.map((h) => h.textContent)).toEqual(subtab.groups.map((g) => g.label));
   });
 
-  it('renders cards instead of a table on mobile widths', () => {
+  it('renders cards instead of a table on mobile widths', async () => {
     mockMatchMedia(MOBILE);
-    render(<App speechService={fakeSpeech()} />);
+    await renderApp(fakeSpeech());
     const subtab = repo.categories[0]!.subtabs[0]!;
     expect(document.querySelector('table')).toBeNull();
     expect(document.querySelectorAll('article.vcard')).toHaveLength(subtab.groups.reduce((n, g) => n + g.entries.length, 0));
@@ -125,7 +136,7 @@ describe('technical information', () => {
   })();
 
   async function openBautechnik(user: ReturnType<typeof userEvent.setup>) {
-    render(<App speechService={fakeSpeech()} />);
+    await renderApp(fakeSpeech());
     await user.click(screen.getByRole('tab', { name: categoryName(repo.getCategory('bautechnik')!.label) }));
     await user.click(within(subTabs()).getByRole('tab', { name: new RegExp(info.subtab.label) }));
   }
@@ -148,7 +159,7 @@ describe('technical information', () => {
     expect(screen.queryByRole('region', { name: 'اطلاعات فنی' })).toBeNull();
   });
 
-  it('shows the trigger only for entries that the legacy app linked (17 in total)', () => {
+  it('shows the trigger only for entries that the legacy app linked (17 in total)', async () => {
     const linked = repo.categories.flatMap((c) => c.subtabs.flatMap((s) => s.groups.flatMap((g) => g.entries)))
       .filter((e) => repo.getTechnicalInfo(e.id));
     expect(linked).toHaveLength(17);
@@ -156,16 +167,16 @@ describe('technical information', () => {
 });
 
 describe('theme', () => {
-  it('follows the system preference when nothing is stored', () => {
+  it('follows the system preference when nothing is stored', async () => {
     mockMatchMedia(DARK_SYSTEM);
-    render(<App speechService={fakeSpeech()} />);
+    await renderApp(fakeSpeech());
     expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
   });
 
   it('toggles, persists under dv2.pref.theme.v1 and never touches the legacy dvok_theme key', async () => {
     const user = userEvent.setup();
     localStorage.setItem('dvok_theme', 'dark');
-    render(<App speechService={fakeSpeech()} />);
+    await renderApp(fakeSpeech());
     expect(document.documentElement).toHaveAttribute('data-theme', 'light'); // legacy key is not read
     await user.click(screen.getByTestId('theme-toggle'));
     expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
@@ -176,9 +187,9 @@ describe('theme', () => {
     expect(Object.keys(localStorage).sort()).toEqual(['dv2.pref.theme.v1', 'dvok_theme']);
   });
 
-  it('restores a stored preference', () => {
+  it('restores a stored preference', async () => {
     localStorage.setItem('dv2.pref.theme.v1', 'dark');
-    render(<App speechService={fakeSpeech()} />);
+    await renderApp(fakeSpeech());
     expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
   });
 });
@@ -187,7 +198,7 @@ describe('pronunciation buttons', () => {
   it('speaks the word without its article and stops on a second click', async () => {
     const user = userEvent.setup();
     const speech = fakeSpeech();
-    render(<App speechService={speech} />);
+    await renderApp(speech);
     const entry = repo.categories[0]!.subtabs[0]!.groups[0]!.entries[0]!; // die Außenwand
     const btn = screen.getByRole('button', { name: `Aussprache anhören: ${entry.word}` });
     await user.click(btn);
@@ -201,7 +212,7 @@ describe('pronunciation buttons', () => {
   it('speaks the full example sentence and resets when playback ends', async () => {
     const user = userEvent.setup();
     const speech = fakeSpeech();
-    render(<App speechService={speech} />);
+    await renderApp(speech);
     const entry = repo.categories[0]!.subtabs[0]!.groups[0]!.entries[0]!;
     const btn = screen.getByRole('button', { name: `Beispiel anhören: ${entry.word}` });
     await user.click(btn);
@@ -210,8 +221,8 @@ describe('pronunciation buttons', () => {
     expect(btn).toHaveAttribute('aria-pressed', 'false');
   });
 
-  it('disables buttons with an explanation when speech is unsupported', () => {
-    render(<App speechService={fakeSpeech(false)} />);
+  it('disables buttons with an explanation when speech is unsupported', async () => {
+    await renderApp(fakeSpeech(false));
     const buttons = screen.getAllByRole('button', { name: 'پخش صدا در این مرورگر پشتیبانی نمی‌شود' });
     expect(buttons.length).toBeGreaterThan(0);
     for (const b of buttons) expect(b).toBeDisabled();

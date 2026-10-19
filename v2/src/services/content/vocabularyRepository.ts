@@ -1,11 +1,9 @@
-import rawVocabulary from '../../data/vocabulary/vocabulary.v1.json';
-import rawTechnicalInfo from '../../data/vocabulary/technical-info.v1.json';
 import type {
   Category, CategoryKey, TechnicalInfo, TechnicalInfoDataset, VocabularyDataset, VocabularyEntry, WordId,
 } from '../../models/vocabulary';
 import { validateTechnicalInfoDataset, validateVocabularyDataset } from './validate';
 
-/** Read-only access to the bundled, versioned vocabulary content. */
+/** Read-only access to the vocabulary content of the signed-in account (its library). */
 export interface VocabularyRepository {
   readonly dataset: VocabularyDataset;
   readonly categories: readonly Category[];
@@ -38,15 +36,16 @@ export function createVocabularyRepository(
   };
 }
 
-let defaultRepository: VocabularyRepository | undefined;
-
-/** The bundled content, validated once on first use. */
-export function getVocabularyRepository(): VocabularyRepository {
-  if (!defaultRepository) {
-    const dataset = validateVocabularyDataset(rawVocabulary);
-    const ids = new Set<string>();
-    for (const c of dataset.categories) for (const s of c.subtabs) for (const g of s.groups) for (const e of g.entries) ids.add(e.id);
-    defaultRepository = createVocabularyRepository(dataset, validateTechnicalInfoDataset(rawTechnicalInfo, ids));
-  }
-  return defaultRepository;
+/** Validates raw library content (vocabulary + technical info) and builds the repository. */
+export function createRepositoryFromRaw(rawVocabulary: unknown, rawTechnicalInfo: unknown): VocabularyRepository {
+  const dataset = validateVocabularyDataset(rawVocabulary);
+  const ids = new Set<string>();
+  for (const c of dataset.categories) for (const s of c.subtabs) for (const g of s.groups) for (const e of g.entries) ids.add(e.id);
+  return createVocabularyRepository(dataset, validateTechnicalInfoDataset(rawTechnicalInfo, ids));
 }
+
+/** An account without a library: no built-in categories (personal words only). */
+export const EMPTY_REPOSITORY: VocabularyRepository = createVocabularyRepository(
+  { schemaVersion: 1, contentVersion: '', source: '', categories: [] } as unknown as VocabularyDataset,
+  { schemaVersion: 1, entries: [] } as unknown as TechnicalInfoDataset,
+);

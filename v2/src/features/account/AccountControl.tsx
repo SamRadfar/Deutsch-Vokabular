@@ -9,7 +9,8 @@ import './account.css';
 interface Props {
   totalEntries: number;
   learnedCount: number | null;
-  onOpenMigration(): void;
+  /** Legacy progress import — only for an account with the built-in library. */
+  onOpenMigration?: (() => void) | undefined;
   /** `sidebar`: full-width profile row whose menu opens upwards. `compact`: avatar button (app bar). */
   variant?: 'compact' | 'sidebar';
 }
@@ -29,7 +30,7 @@ export function AccountControl({ totalEntries, learnedCount, onOpenMigration, va
           </button>
           {infoOpen ? (
             <div id={infoId} className="auth-popover" role="note" lang="fa" dir="rtl">
-              ورود در این نسخه هنوز پیکربندی نشده است (Firebase). مرور واژه‌ها بدون ورود ممکن است؛ ذخیرهٔ پیشرفت پس از پیکربندی فعال می‌شود.
+              ورود در این نسخه هنوز پیکربندی نشده است (Firebase).
               {import.meta.env.DEV && state.details.length ? <code className="auth-popover__code">{state.details.join(', ')}</code> : null}
             </div>
           ) : null}
@@ -69,7 +70,7 @@ function AccountMenu({ user, signingOut, totalEntries, learnedCount, onOpenMigra
   signingOut: boolean;
   totalEntries: number;
   learnedCount: number | null;
-  onOpenMigration(): void;
+  onOpenMigration?: (() => void) | undefined;
   variant: 'compact' | 'sidebar';
 }) {
   const { signOut } = useAuth();
@@ -154,9 +155,11 @@ function AccountMenu({ user, signingOut, totalEntries, learnedCount, onOpenMigra
             {learnedCount !== null ? <div className="account__progress">{learnedCount} از {totalEntries} واژه یادگرفته</div> : null}
             {sync ? <div className={`account__sync account__sync--${sync.tone}`}>{sync.text}{sync.detail ? ` — ${sync.detail}` : ''}</div> : null}
           </div>
-          <button type="button" role="menuitem" className="account__item" onClick={() => { setOpen(false); onOpenMigration(); }} disabled={progress.status !== 'ready'}>
-            <Upload aria-hidden="true" />انتقال پیشرفت از نسخهٔ قدیمی…
-          </button>
+          {onOpenMigration ? (
+            <button type="button" role="menuitem" className="account__item" onClick={() => { setOpen(false); onOpenMigration(); }} disabled={progress.status !== 'ready'}>
+              <Upload aria-hidden="true" />انتقال پیشرفت از نسخهٔ قدیمی…
+            </button>
+          ) : null}
           {progress.status === 'ready' && progress.view.status.failedCount + (progress.view.status.remote === 'error' ? 1 : 0) > 0 ? (
             <button type="button" role="menuitem" className="account__item" onClick={() => { progress.engine.retryFailed(); close(); }}>
               <RefreshCw aria-hidden="true" />تلاش دوباره برای همگام‌سازی

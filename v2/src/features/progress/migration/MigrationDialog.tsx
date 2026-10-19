@@ -3,7 +3,8 @@ import { Dialog } from '../../../components/Dialog/Dialog';
 import type { LegacyStorageSnapshot } from '../../../models/legacy';
 import type { VocabularyRepository } from '../../../services/content/vocabularyRepository';
 import { useProgress } from '../ProgressProvider';
-import { planMigration, previewMigration } from './plan';
+import { createMigrationContext, planMigration, previewMigration } from './plan';
+import type { LibraryExtras } from '../../library/libraryService';
 import { readLegacySnapshot } from './snapshot';
 import { backupToSnapshot, createBackup, hasLegacyProgress, hashSnapshot, parseBackup } from './backup';
 import { analyzeImport, engineLookup, findPreviousImport, runImport, type ImportOutcome } from './importer';
@@ -20,7 +21,12 @@ type Step =
 const MAX_LISTED = 15;
 
 /** Explicit, previewed, non-destructive import of legacy progress into the signed-in account. */
-export function MigrationDialog({ repository, onClose }: { repository: VocabularyRepository; onClose(): void }) {
+export function MigrationDialog({ repository, loadExtras, onClose }: {
+  repository: VocabularyRepository;
+  /** The library's id registry and legacy maps (loaded only for this dialog). */
+  loadExtras(): Promise<LibraryExtras | null>;
+  onClose(): void;
+}) {
   const progress = useProgress();
   const [state, setState] = useState<Step>({ step: 'source', error: null });
   const [confirmed, setConfirmed] = useState(false);
@@ -35,8 +41,11 @@ export function MigrationDialog({ repository, onClose }: { repository: Vocabular
 
   async function analyse(source: Source) {
     if (progress.status !== 'ready') return;
-    const plan = planMigration(source.snapshot);
-    const preview = previewMigration(plan);
+    const extras = await loadExtras().catch(() => null);
+    if (!extras) { setState({ step: 'source', error: 'داده‌های لازم برای انتقال از کتابخانهٔ شما بارگذاری نشد (اینترنت را بررسی کنید).' }); return; }
+    const ctx = createMigrationContext(repository, extras.idRegistry, extras.dvok5Maps);
+    const plan = planMigration(source.snapshot, ctx);
+    const preview = previewMigration(plan, ctx);
     const hash = await hashSnapshot(source.snapshot);
     const previous = await findPreviousImport({ uid: progress.uid, engine: progress.engine, account: progress.account, inputHash: hash });
     setConfirmed(false);

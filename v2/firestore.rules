@@ -8,7 +8,8 @@ rules_version = '2';
 // file to the legacy project (deutsch-wortschatz-c7a11): a rules deploy replaces ALL rules of a
 // project and would break the legacy app's syncCodes sync.
 //
-// Principles: deny by default; a signed-in user can read/write only users/{their uid}/…;
+// Principles: deny by default; a signed-in user can read/write only users/{their uid}/… (the
+// library there is read-only);
 // documents are schema-validated; timestamps must be server time; nothing can be deleted
 // from the client; migration records are create-only; personal-word tombstones are final.
 //
@@ -111,6 +112,15 @@ service cloud.firestore {
           && d.updatedAt == request.time
           && boundedString(d.opId, 64)
           && boundedString(d.deviceId, 64);
+      }
+
+      // The account's vocabulary library (built-in categories; features/library/format.ts). Only the
+      // owner can read it; NO client can write it — it is imported once by the product owner with
+      // scripts/library-import.mjs (IAM-authorized, verified uid, create-only). Other accounts have
+      // no library and manage only their personal words (customWords).
+      match /library/{docId} {
+        allow read: if isOwner(uid);
+        allow write: if false;
       }
 
       // Proof that a legacy dataset was imported; id = SHA-256 of the imported input.

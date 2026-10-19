@@ -8,14 +8,12 @@ import { signIn, signOut, trackErrors, uniqueEmail } from './helpers';
 const first = vocabulary.categories[0]!.subtabs[0]!.groups[0]!.entries[0]!;
 const second = vocabulary.categories[0]!.subtabs[0]!.groups[0]!.entries[1]!;
 const checkbox = (page: Page, word: string) => page.getByRole('checkbox', { name: `یادگرفتم: ${word}` });
-test('signed out: browsing works and no progress checkboxes are offered', async ({ page }) => {
+test('signed out: welcome only — no vocabulary and no progress checkboxes', async ({ page }) => {
   const errors = trackErrors(page);
   await page.goto('./');
   await expect(page.getByRole('button', { name: 'ورود با گوگل' })).toBeVisible();
-  await expect(page.locator(`[data-entry-id="${first.id}"]`)).toBeVisible();
+  await expect(page.locator(`[data-entry-id="${first.id}"]`)).toHaveCount(0);
   await expect(page.getByRole('checkbox')).toHaveCount(0);
-  // The active backend is always visible (never confuse emulator, dev and production).
-  await expect(page.getByTestId('env-badge')).toContainText('emulator');
   expect(errors).toEqual([]);
 });
 
@@ -24,6 +22,8 @@ test('sign in, mark learned, persist across reload, sign out', async ({ page }) 
   await page.goto('./');
   await signIn(page, uniqueEmail('alice'), 'Alice Emulator');
   await expect(checkbox(page, first.word)).toBeVisible();
+  // The active backend is always visible (never confuse emulator, dev and production).
+  await expect(page.getByTestId('env-badge')).toContainText('emulator');
   await expect(page.getByTestId('header-progress')).toContainText(`0/999`);
 
   await checkbox(page, first.word).check();

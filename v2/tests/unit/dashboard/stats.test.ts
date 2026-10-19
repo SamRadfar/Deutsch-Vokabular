@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getVocabularyRepository } from '../../../src/services/content/vocabularyRepository';
+import { getBundledRepository as getVocabularyRepository } from '../../../src/services/content/bundled';
 import { learningOverview, reviewActivity } from '../../../src/features/dashboard/stats';
 import { parseSection, sectionHref } from '../../../src/app/sections';
 import type { ReviewRecord } from '../../../src/features/review/model';

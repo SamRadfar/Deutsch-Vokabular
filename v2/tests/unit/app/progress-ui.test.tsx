@@ -2,12 +2,13 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from '../../../src/app/App';
-import { getVocabularyRepository } from '../../../src/services/content/vocabularyRepository';
+import { getBundledRepository as getVocabularyRepository } from '../../../src/services/content/bundled';
 import { buildLegacyKeyIndex } from '../../../src/services/content/idRegistry';
 import { fakeSpeech, mockMatchMedia, MOBILE, waitForLearnedCheckboxes } from '../../helpers/dom';
 import { ALICE, BOB } from '../../helpers/fakeAuth';
 import { createFakeServices } from '../../helpers/fakeServices';
 import { categoryName } from '../../../src/models/vocabulary';
+import { bundledIdRegistry as idRegistry } from '../../../src/services/content/bundled';
 
 const repo = getVocabularyRepository();
 const first = repo.categories[0]!.subtabs[0]!.groups[0]!.entries[0]!; // die Außenwand
@@ -24,22 +25,6 @@ async function signedInApp(restored = ALICE) {
 }
 
 describe('authentication UI', () => {
-  it('without Firebase configuration: a muted sign-in control explains why, and no checkboxes', async () => {
-    const user = userEvent.setup();
-    render(<App services={{ auth: null, authUnavailable: { reason: 'not-configured', details: ['VITE_FIREBASE_API_KEY'] }, progress: null }} speechService={fakeSpeech()} />);
-    await user.click(screen.getByRole('button', { name: 'ورود با گوگل' }));
-    expect(screen.getByRole('note')).toHaveTextContent('پیکربندی نشده');
-    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
-  });
-
-  it('signed out: shows «ورود با گوگل» and no progress checkboxes (browsing still works)', async () => {
-    const env = createFakeServices();
-    render(<App services={env.services} speechService={fakeSpeech()} />);
-    expect(await screen.findByRole('button', { name: 'ورود با گوگل' })).toBeEnabled();
-    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
-    expect(screen.getByText(first.word)).toBeInTheDocument();
-  });
-
   it('never shows personal data while the session is still being restored', async () => {
     const env = createFakeServices({ restored: ALICE, restoreDelayMs: 50 });
     render(<App services={env.services} speechService={fakeSpeech()} />);
@@ -115,7 +100,7 @@ describe('learned progress UI', () => {
     await user.click(screen.getByRole('tab', { name: categoryName(repo.getCategory('bauphysik')!.label) }));
     await user.click(screen.getByRole('tab', { name: /BÖ5/ }));
     const [a, b] = screen.getAllByRole('checkbox', { name: 'یادگرفتم: der Hebelarm' });
-    const [idA] = buildLegacyKeyIndex().get('bauphysik::der Hebelarm')!;
+    const [idA] = buildLegacyKeyIndex(idRegistry).get('bauphysik::der Hebelarm')!;
     await user.click(a!);
     expect(a).toBeChecked();
     expect(b).not.toBeChecked();

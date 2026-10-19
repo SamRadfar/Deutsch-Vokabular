@@ -8,8 +8,11 @@ import { buildLegacyKeyIndex } from '../../../src/services/content/idRegistry';
 import { createFakeCloud, until } from '../../helpers/fakeCloud';
 import { createFakeAccountRemote } from '../../helpers/fakeServices';
 import { FAKE_API_KEY, dvok5, dvok6, snapshot } from './legacy-snapshots';
+import { bundledIdRegistry as idRegistry, bundledMigrationContext } from '../../../src/services/content/bundled';
 
-const keyIndex = buildLegacyKeyIndex();
+const migrationCtx = bundledMigrationContext();
+
+const keyIndex = buildLegacyKeyIndex(idRegistry);
 const idOf = (k: string) => keyIndex.get(k)![0]!;
 const engines: ProgressSyncEngine[] = [];
 afterEach(() => { for (const e of engines.splice(0)) e.stop(); });
@@ -24,7 +27,7 @@ async function setup() {
 }
 const ctx = async (env: Awaited<ReturnType<typeof setup>>, s = snapshot({ dvok6: dvok6('arch::die Außenwand', 'acad::rendern', 'bautechnik::der Wärmeschutz') })) => ({
   uid: 'alice', engine: env.engine, account: env.account, source: 'backup-file' as const, contentVersion: '1.0.0',
-  plan: planMigration(s), inputHash: await hashSnapshot(s), settleTimeoutMs: 3000,
+  plan: planMigration(s, migrationCtx), inputHash: await hashSnapshot(s), settleTimeoutMs: 3000,
 });
 
 describe('backup format', () => {

@@ -3,9 +3,10 @@
 
 import type { LegacyProgressKey, LegacyStorageSnapshot } from '../../../models/legacy';
 import { CATEGORY_KEYS, type CategoryKey, type WordId } from '../../../models/vocabulary';
+import type { IdRegistry } from '../../../models/legacy';
 import { buildLegacyKeyIndex, buildWordTextIndex } from '../../../services/content/idRegistry';
-import { getVocabularyRepository, type VocabularyRepository } from '../../../services/content/vocabularyRepository';
-import { dvok5Maps, findDvok5Map, verifyDvok5MapsUnambiguous, type Dvok5MapSet } from './dvok5Maps';
+import type { VocabularyRepository } from '../../../services/content/vocabularyRepository';
+import { findDvok5Map, verifyDvok5MapsUnambiguous, type Dvok5MapSet } from './dvok5Maps';
 import {
   parseCustomWords, parseDvok5, parseDvok6, parseExposure, parsePronSettings, parseStringArray,
 } from './parse';
@@ -21,18 +22,19 @@ export interface MigrationContext {
   dvok5Maps: Dvok5MapSet;
 }
 
-export function defaultMigrationContext(): MigrationContext {
+/** Context from the account's library (repository) and its legacy-migration chunks. */
+export function createMigrationContext(repository: VocabularyRepository, idRegistry: IdRegistry, dvok5Maps: Dvok5MapSet): MigrationContext {
   return {
-    repository: getVocabularyRepository(),
-    legacyKeyIndex: buildLegacyKeyIndex(),
-    wordTextIndex: buildWordTextIndex(),
+    repository,
+    legacyKeyIndex: buildLegacyKeyIndex(idRegistry),
+    wordTextIndex: buildWordTextIndex(idRegistry),
     dvok5Maps,
   };
 }
 
 const wordOf = (key: LegacyProgressKey) => key.slice(key.indexOf('::') + 2);
 
-export function planMigration(snapshot: LegacyStorageSnapshot, ctx: MigrationContext = defaultMigrationContext()): MigrationPlan {
+export function planMigration(snapshot: LegacyStorageSnapshot, ctx: MigrationContext): MigrationPlan {
   const issues: MigrationIssue[] = [];
   const learned = new Map<WordId, LearnedMark>();
   const ambiguous: AmbiguousMapping[] = [];
@@ -195,7 +197,7 @@ function planDvok5(
 }
 
 /** Summarise a plan for review before migrating. */
-export function previewMigration(plan: MigrationPlan, ctx: Pick<MigrationContext, 'wordTextIndex'> = defaultMigrationContext()): MigrationPreview {
+export function previewMigration(plan: MigrationPlan, ctx: Pick<MigrationContext, 'wordTextIndex'>): MigrationPreview {
   const from: Record<LegacySource, number> = { dvok6: 0, dvok5: 0 };
   for (const m of plan.learned) for (const s of m.sources) from[s]++;
   const exposureWords = Object.keys(plan.exposureByText);

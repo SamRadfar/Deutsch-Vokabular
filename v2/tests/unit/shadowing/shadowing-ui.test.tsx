@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from '../../../src/app/App';
-import { getVocabularyRepository } from '../../../src/services/content/vocabularyRepository';
+import { getBundledRepository as getVocabularyRepository } from '../../../src/services/content/bundled';
 import { DEFAULT_PREFERENCES, type ShadowingPreferences } from '../../../src/features/shadowing/settings';
 import { STATS_META_KEY } from '../../../src/features/shadowing/model';
 import { fakeSpeech, mockMatchMedia, waitForLearnedCheckboxes } from '../../helpers/dom';
@@ -22,26 +22,32 @@ afterEach(() => vi.useRealTimers());
 const storePrefs = (p: Partial<ShadowingPreferences>) =>
   localStorage.setItem('dv2.pref.shadowing.v1', JSON.stringify({ ...DEFAULT_PREFERENCES, ...p }));
 const tab = () => screen.getByRole('link', { name: 'تلفظ' });
+/** The shadowing section, once shown. */
+const shadowingShown = () => vi.waitFor(() => screen.queryByTestId('sh-stage') ?? screen.getByRole('heading', { name: 'تمرین تلفظ (Shadowing)' }));
 const button = (name: string | RegExp) => screen.getByRole('button', { name });
+/** The start button, once the account's practice history has loaded. */
+const startButton = () => vi.waitFor(() => button('شروع تمرین (5 واژه)'), { timeout: 5000 });
 const phase = () => screen.getByTestId('sh-phase').textContent;
 const count = () => screen.getByTestId('sh-count').textContent;
 const currentEntry = () => repo.getEntry(screen.getByTestId('sh-stage').getAttribute('data-entry-id')!)!;
 
-function setup(speech = fakeSpeech(), restored: typeof ALICE | null = null) {
+/** The library owner signed in (the vocabulary exists only inside an account). */
+async function setup(speech = fakeSpeech(), restored: typeof ALICE = ALICE) {
   const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
   const env = createFakeServices({ restored });
   const view = render(<App services={env.services} speechService={speech} />);
+  await vi.waitFor(() => { if (!document.querySelector('.shell')) throw new Error('library not shown yet'); }, { timeout: 10_000 });
   return { user, speech, env, view };
 }
 
 describe('shadowing — setup and preferences', () => {
   it('offers the tab, explains that nothing is recorded or scored, and remembers settings', async () => {
-    const { user, view } = setup();
+    const { user, view } = await setup();
     await user.click(tab());
+    await shadowingShown();
     expect(screen.getByRole('heading', { name: 'تمرین تلفظ (Shadowing)' })).toBeInTheDocument();
     expect(screen.getByText(/صدای شما ضبط یا ارزیابی نمی‌شود/)).toBeInTheDocument();
-    expect(screen.getByRole('note')).toHaveTextContent('سابقهٔ تمرین ذخیره نمی‌شود');
-    expect(screen.getByRole('radio', { name: /یادنگرفته‌ها/ })).toBeDisabled();
+    await vi.waitFor(() => expect(screen.getByRole('radio', { name: /یادنگرفته‌ها/ })).toBeEnabled()); // signed in: all modes
 
     const slider = screen.getByRole('slider', { name: /مکث برای تکرار شما/ });
     expect(slider).toHaveAttribute('min', '1');
@@ -59,8 +65,9 @@ describe('shadowing — setup and preferences', () => {
     });
 
     view.unmount();
-    setup();
+    await setup();
     await userEvent.setup({ advanceTimers: vi.advanceTimersByTime }).click(tab());
+    await shadowingShown();
     expect(screen.getByLabelText('سرعت گفتار')).toHaveValue('0.55');
     expect(screen.getByLabelText('تکرار هر واژه')).toHaveValue('3');
     expect(screen.getByText('6.5 ثانیه')).toBeInTheDocument();
@@ -69,15 +76,17 @@ describe('shadowing — setup and preferences', () => {
   });
 
   it('without speech synthesis the session cannot start and says why', async () => {
-    const { user } = setup(fakeSpeech(false));
+    const { user } = await setup(fakeSpeech(false));
     await user.click(tab());
+    await shadowingShown();
     expect(screen.getByRole('alert')).toHaveTextContent('پشتیبانی نمی‌کند');
     expect(button(/شروع تمرین/)).toBeDisabled();
   });
 
   it('warns when no German voice is installed', async () => {
-    const { user } = setup(fakeSpeech(true, 'missing'));
+    const { user } = await setup(fakeSpeech(true, 'missing'));
     await user.click(tab());
+    await shadowingShown();
     expect(screen.getByText(/صدای آلمانی روی این دستگاه پیدا نشد/)).toBeInTheDocument();
     expect(button(/شروع تمرین/)).toBeEnabled();
   });
@@ -86,9 +95,10 @@ describe('shadowing — setup and preferences', () => {
 describe('shadowing — playback workflow', () => {
   it('word → your turn → word → example → your turn, with the spoken line highlighted', async () => {
     storePrefs({ wordRepeats: 2, exampleRepeats: 1, pauseSec: 2, size: 5 });
-    const { user, speech } = setup();
+    const { user, speech } = await setup();
     await user.click(tab());
-    await user.click(button('شروع تمرین (5 واژه)'));
+    await shadowingShown();
+    await user.click(await startButton());
     const entry = currentEntry();
     expect(count()).toBe('1 / 5');
     expect(speech.speak).toHaveBeenLastCalledWith(entry.word, expect.objectContaining({ rate: 0.85 }));
@@ -96,7 +106,7 @@ describe('shadowing — playback workflow', () => {
     expect(screen.getByTestId('sh-word')).toHaveClass('is-speaking');
     expect(screen.getByTestId('sh-word')).toHaveAttribute('aria-current', 'true');
     expect(screen.getByTestId('sh-fa')).toHaveTextContent(entry.fa);
-    expect(screen.getByText(entry.pronunciationFa)).toBeInTheDocument();
+    expect(screen.getByTestId('sh-stage')).toHaveTextContent(entry.pronunciationFa);
 
     act(() => speech.finish());
     expect(phase()).toContain('حالا تو واژه را بلند تکرار کن (1 از 2)');
@@ -113,9 +123,10 @@ describe('shadowing — playback workflow', () => {
 
   it('pause / resume / stop / next / previous from buttons', async () => {
     storePrefs({ wordRepeats: 1, exampleRepeats: 0, pauseSec: 2, size: 5 });
-    const { user, speech } = setup();
+    const { user, speech } = await setup();
     await user.click(tab());
-    await user.click(button('شروع تمرین (5 واژه)'));
+    await shadowingShown();
+    await user.click(await startButton());
     await user.click(button('توقف موقت'));
     expect(speech.cancel).toHaveBeenCalled();
     expect(phase()).toContain('متوقف شده');
@@ -139,9 +150,10 @@ describe('shadowing — playback workflow', () => {
 
   it('keyboard: Space plays/pauses, arrows switch words, T toggles the translation, Esc stops', async () => {
     storePrefs({ wordRepeats: 1, exampleRepeats: 0, pauseSec: 2, size: 5 });
-    const { user } = setup();
+    const { user } = await setup();
     await user.click(tab());
-    await user.click(button('شروع تمرین (5 واژه)'));
+    await shadowingShown();
+    await user.click(await startButton());
     (document.activeElement as HTMLElement).blur();
     await user.keyboard(' ');
     expect(phase()).toContain('متوقف شده');
@@ -161,11 +173,12 @@ describe('shadowing — playback workflow', () => {
 
   it('completes the session and records the practice for the signed-in user (device-local)', async () => {
     storePrefs({ wordRepeats: 1, exampleRepeats: 0, pauseSec: 1, size: 5 });
-    const { user, speech, env } = setup(fakeSpeech(), ALICE);
+    const { user, speech, env } = await setup(fakeSpeech(), ALICE);
     await waitForLearnedCheckboxes();
     await user.click(tab());
+    await shadowingShown();
     expect(screen.getByRole('radio', { name: /یادنگرفته‌ها/ })).toBeEnabled();
-    await user.click(button('شروع تمرین (5 واژه)'));
+    await user.click(await startButton());
     const practised: string[] = [];
     for (let i = 0; i < 5; i++) {
       practised.push(currentEntry().id);
@@ -187,9 +200,10 @@ describe('shadowing — playback workflow', () => {
 
   it('ending early counts only fully played words; repeat and new round start fresh sessions', async () => {
     storePrefs({ wordRepeats: 1, exampleRepeats: 0, pauseSec: 1, size: 5 });
-    const { user, speech } = setup();
+    const { user, speech } = await setup();
     await user.click(tab());
-    await user.click(button('شروع تمرین (5 واژه)'));
+    await shadowingShown();
+    await user.click(await startButton());
     act(() => speech.finish());
     act(() => { vi.advanceTimersByTime(1000); });
     await user.click(button('واژهٔ بعدی')); // skip word 2
@@ -197,7 +211,7 @@ describe('shadowing — playback workflow', () => {
     expect(screen.getByRole('heading', { name: 'جلسه پایان یافت' })).toBeInTheDocument();
     expect(screen.getByTestId('sh-summary-done')).toHaveTextContent('1');
     expect(screen.getByTestId('sh-summary-skipped')).toHaveTextContent('4');
-    expect(screen.getByText(/سابقهٔ این تمرین ذخیره نشد/)).toBeInTheDocument();
+    expect(screen.getByText(/سابقهٔ تمرین روی همین دستگاه ذخیره شد/)).toBeInTheDocument();
     await user.click(button('تکرار همین واژه‌ها (5)'));
     expect(count()).toBe('1 / 5');
     expect(phase()).toContain('گوش کن');
@@ -210,9 +224,10 @@ describe('shadowing — playback workflow', () => {
 describe('shadowing — cleanup', () => {
   it('leaving the tab pauses with a notice; the session is kept', async () => {
     storePrefs({ wordRepeats: 1, exampleRepeats: 0, pauseSec: 2, size: 5 });
-    const { user, speech } = setup();
+    const { user, speech } = await setup();
     await user.click(tab());
-    await user.click(button('شروع تمرین (5 واژه)'));
+    await shadowingShown();
+    await user.click(await startButton());
     await user.click(button('واژهٔ بعدی'));
     await user.click(screen.getByRole('link', { name: 'واژه‌ها' }));
     expect(speech.speaking).toBe(false);
@@ -220,15 +235,17 @@ describe('shadowing — cleanup', () => {
     act(() => { vi.advanceTimersByTime(30_000); });
     expect(vi.mocked(speech.speak).mock.calls.length).toBe(calls);
     await user.click(tab());
+    await shadowingShown();
     expect(count()).toBe('2 / 5');
     expect(screen.getByText(/از تب تمرین خارج شدید/)).toBeInTheDocument();
   });
 
   it('a hidden page pauses playback (background)', async () => {
     storePrefs({ wordRepeats: 1, exampleRepeats: 0, pauseSec: 2, size: 5 });
-    const { user } = setup();
+    const { user } = await setup();
     await user.click(tab());
-    await user.click(button('شروع تمرین (5 واژه)'));
+    await shadowingShown();
+    await user.click(await startButton());
     Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'hidden' });
     act(() => { document.dispatchEvent(new Event('visibilitychange')); });
     Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'visible' });
@@ -238,9 +255,10 @@ describe('shadowing — cleanup', () => {
 
   it('unmounting the app mid-session cancels speech and leaves no timers', async () => {
     storePrefs({ wordRepeats: 2, exampleRepeats: 1, pauseSec: 2, size: 5 });
-    const { user, speech, view } = setup();
+    const { user, speech, view } = await setup();
     await user.click(tab());
-    await user.click(button('شروع تمرین (5 واژه)'));
+    await shadowingShown();
+    await user.click(await startButton());
     act(() => speech.finish()); // now in a learner pause (a timer is pending)
     view.unmount();
     expect(speech.speaking).toBe(false);

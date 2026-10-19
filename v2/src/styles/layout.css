@@ -247,3 +247,7 @@ html[data-theme='dark'] .tb--x { color: #b8bfca; }
   .sinfo { padding: 12px 14px; }
   .lgnd { padding: 8px 14px; }
 }
+
+/* Account without built-in categories */
+.empty-library { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.empty-library .empty-state { width: 100%; }

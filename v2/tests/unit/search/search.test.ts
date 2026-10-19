@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getVocabularyRepository } from '../../../src/services/content/vocabularyRepository';
+import { getBundledRepository as getVocabularyRepository } from '../../../src/services/content/bundled';
 import { flattenCards } from '../../../src/features/review/deck';
 import { fold, originalRange, queryTerms } from '../../../src/features/search/normalize';
 import { createSearchIndex, mergeRanges, NO_FILTERS, type SearchHit } from '../../../src/features/search/searchIndex';

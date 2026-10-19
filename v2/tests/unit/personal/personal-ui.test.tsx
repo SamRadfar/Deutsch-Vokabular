@@ -40,16 +40,6 @@ async function addWord(user: User, f: { type?: string; article?: string; lemma: 
   await user.click(q.getByRole('button', { name: 'افزودن واژه' }));
 }
 
-describe('my vocabulary — access', () => {
-  it('signed out: explains that personal words need an account', async () => {
-    const user = userEvent.setup();
-    render(<App services={createFakeServices().services} speechService={fakeSpeech()} />);
-    await user.click(link('واژه‌های من'));
-    expect(screen.getByText('برای ساختن فهرست واژه‌های خودتان وارد حساب شوید')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'افزودن واژه' })).toBeNull();
-  });
-});
-
 describe('my vocabulary — create, validate, edit, delete', () => {
   it('validation messages per field, focus on the first error, nothing saved', async () => {
     const { user, env } = await signedIn();

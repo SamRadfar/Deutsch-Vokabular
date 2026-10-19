@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from '../../../src/app/App';
-import { getVocabularyRepository } from '../../../src/services/content/vocabularyRepository';
+import { getBundledRepository as getVocabularyRepository } from '../../../src/services/content/bundled';
 import { speechTextForWord } from '../../../src/features/pronunciation/speechService';
 import { fakeSpeech, mockMatchMedia, waitForLearnedCheckboxes } from '../../helpers/dom';
 import { ALICE } from '../../helpers/fakeAuth';
@@ -29,10 +29,11 @@ async function openReview(user: User, size: '10' | '20' | '30' | '50' | 'all' = 
   await user.selectOptions(screen.getByLabelText('تعداد کارت در جلسه'), size);
 }
 
-function signedOut() {
+async function asOwner() {
   const speech = fakeSpeech();
-  const env = createFakeServices();
+  const env = createFakeServices({ restored: ALICE });
   render(<App services={env.services} speechService={speech} />);
+  await waitForLearnedCheckboxes();
   return { ...env, speech };
 }
 
@@ -44,22 +45,10 @@ async function signedIn() {
   return { ...env, speech };
 }
 
-describe('flashcards — signed out (practice without saving)', () => {
-  it('explains that results are not saved; personal modes need sign-in', async () => {
-    const user = userEvent.setup();
-    signedOut();
-    await user.click(reviewTab());
-    expect(reviewTab()).toHaveAttribute('aria-current', 'page');
-    expect(window.location.hash).toBe('#/review');
-    expect(screen.getByRole('note')).toHaveTextContent('نتیجه‌ها ذخیره نمی‌شوند');
-    expect(screen.getByRole('radio', { name: /همهٔ واژه‌ها/ })).toBeChecked();
-    for (const name of [/یادنگرفته‌ها/, /یادگرفته‌ها/, /مرور دوباره/]) expect(screen.getByRole('radio', { name })).toBeDisabled();
-    expect(button('شروع مرور (30 کارت)')).toBeEnabled();
-  });
-
+describe('flashcards — practice sessions', () => {
   it('front shows the German word, flipping shows the Persian side and speaks the word', async () => {
     const user = userEvent.setup();
-    const { speech } = signedOut();
+    const { speech } = await asOwner();
     await openReview(user);
     await user.click(button('شروع مرور (10 کارت)'));
     const entry = currentEntry();
@@ -83,7 +72,7 @@ describe('flashcards — signed out (practice without saving)', () => {
 
   it('next / previous navigation keeps answers and shows the earlier answer', async () => {
     const user = userEvent.setup();
-    signedOut();
+    await asOwner();
     await openReview(user);
     await user.click(button('شروع مرور (10 کارت)'));
     expect(button(/قبلی/)).toBeDisabled();
@@ -100,7 +89,7 @@ describe('flashcards — signed out (practice without saving)', () => {
 
   it('keyboard: Space flips, arrows navigate, 1/2 answer, S speaks, Esc ends', async () => {
     const user = userEvent.setup();
-    const { speech } = signedOut();
+    const { speech } = await asOwner();
     await openReview(user);
     await user.click(button('شروع مرور (10 کارت)'));
     expect(button('نمایش معنی')).toHaveFocus(); // the session starts with focus on the flip control
@@ -124,12 +113,12 @@ describe('flashcards — signed out (practice without saving)', () => {
     expect(screen.getByTestId('summary-know')).toHaveTextContent('1');
     expect(screen.getByTestId('summary-again')).toHaveTextContent('1');
     expect(screen.getByTestId('summary-unanswered')).toHaveTextContent('8');
-    expect(screen.getByText(/نتیجه‌های این جلسه ذخیره نشد/)).toBeInTheDocument();
+    expect(screen.getByTestId('summary-know').closest('section')).toHaveTextContent(/ذخیره شد/);
   });
 
   it('keys do not fire while typing in a form field', async () => {
     const user = userEvent.setup();
-    signedOut();
+    await asOwner();
     await openReview(user);
     await user.click(button('شروع مرور (10 کارت)'));
     const input = document.createElement('input');
@@ -142,7 +131,7 @@ describe('flashcards — signed out (practice without saving)', () => {
 
   it('swipe right = know, swipe left = don\'t know; a short drag snaps back; a swipe does not flip', async () => {
     const user = userEvent.setup();
-    const { speech } = signedOut();
+    const { speech } = await asOwner();
     await openReview(user);
     await user.click(button('شروع مرور (10 کارت)'));
     const swipe = (dx: number) => {
@@ -183,7 +172,7 @@ describe('flashcards — signed out (practice without saving)', () => {
 
   it('repeat-review shows the unknown cards again (legacy V3) and restart resets the session', async () => {
     const user = userEvent.setup();
-    signedOut();
+    await asOwner();
     await openReview(user);
     await user.click(button('شروع مرور (10 کارت)'));
     const unknown: string[] = [];
@@ -222,7 +211,7 @@ describe('flashcards — signed out (practice without saving)', () => {
 
   it('a running session survives a visit to another section', async () => {
     const user = userEvent.setup();
-    signedOut();
+    await asOwner();
     await openReview(user);
     await user.click(button('شروع مرور (10 کارت)'));
     await user.click(knowBtn());

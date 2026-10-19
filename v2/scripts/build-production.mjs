@@ -10,12 +10,12 @@
 //   2. vite build with base "/", release version and build id;
 //   3. remove source maps from the deployable output;
 //   4. generate the service worker (precache of this release) and version.json;
-//   5. scan every output file for secrets and non-production endpoints.
+//   5. scan every output file for secrets, non-production endpoints and vocabulary content.
 import { spawnSync } from 'node:child_process';
 import { readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseEnv, scanBundle, validateProductionEnv } from './lib/production.mjs';
+import { contentMarkers, findContent, parseEnv, scanBundle, validateProductionEnv } from './lib/production.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const out = resolve(root, 'dist-production');
@@ -59,8 +59,12 @@ const texts = walk(out).filter((f) => /\.(js|css|html|json|webmanifest|txt)$/.te
   .map((f) => ({ file: relative(out, f).replaceAll('\\', '/'), text: readFileSync(f, 'utf8') }));
 const findings = scanBundle(texts);
 if (findings.length) fail(`forbidden content in the build:\n  - ${findings.join('\n  - ')}`);
+// The vocabulary belongs to the owner's account (Firestore library) — never to the public bundle.
+const markers = contentMarkers(JSON.parse(readFileSync(resolve(root, 'src/data/vocabulary/vocabulary.v1.json'), 'utf8')));
+const leaked = findContent(texts, markers);
+if (leaked.length) fail(`vocabulary content found in the public build:\n  - ${leaked.join('\n  - ')}`);
 const html = readFileSync(join(out, 'index.html'), 'utf8');
 if (html.includes('noindex') || !html.includes('href="/assets/')) fail('index.html is not the production page (noindex present or base path is not "/")');
 
-console.log(`✔ dist-production ready: ${precache.length} precached files, service worker ${swVersion}, no secrets or non-production endpoints found.`);
+console.log(`✔ dist-production ready: ${precache.length} precached files, service worker ${swVersion}; no secrets, non-production endpoints or vocabulary content (${markers.length} samples checked).`);
 if (dirty) console.log('  (working tree has uncommitted changes — commit before a release deploy)');

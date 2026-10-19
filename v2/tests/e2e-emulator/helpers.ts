@@ -2,6 +2,7 @@
 // stand-in — NOT real Google OAuth.
 
 import { expect, type Page } from '@playwright/test';
+import { seedLibrary, uidOf } from './library';
 
 export const uniqueEmail = (label: string) => `${label}-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example.test`;
 
@@ -25,8 +26,12 @@ export function trackErrors(page: Page) {
   return errors;
 }
 
-/** Sign in through the Auth Emulator popup (creates the account on first use). */
-export async function signIn(page: Page, email: string, name: string) {
+/**
+ * Sign in through the Auth Emulator popup (creates the account on first use). By default the
+ * account also gets the built-in library (as after the owner import) and the call returns when it
+ * is shown; `{ library: false }` keeps the account without one (any other user).
+ */
+export async function signIn(page: Page, email: string, name: string, opts: { library?: boolean } = {}) {
   const popupPromise = page.waitForEvent('popup');
   await page.getByRole('button', { name: 'ورود با گوگل' }).click();
   const popup = await popupPromise;
@@ -42,7 +47,12 @@ export async function signIn(page: Page, email: string, name: string) {
     await popup.locator('#sign-in').click();
   }
   await closed;
-  await expect(page.getByTestId('account-button')).toBeVisible();
+  await expect(page.getByTestId('account-button')).toBeVisible({ timeout: 15_000 });
+  if (opts.library === false) return;
+  const uid = await uidOf(email);
+  await seedLibrary(uid);
+  // The app watches the library: it appears without a reload (the progress meter exists only with one).
+  await expect(page.getByTestId('header-progress')).toBeVisible({ timeout: 15_000 });
 }
 
 export async function signOut(page: Page) {

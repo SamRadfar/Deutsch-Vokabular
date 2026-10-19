@@ -1,7 +1,8 @@
 // Flashcard workflow in the production build (browse-only: no Firebase configuration, so nothing is
 // saved — persistence is covered by tests/e2e-emulator/flashcards.spec.ts).
 
-import { expect, test, type Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { expect, test } from './fixtures';
 import vocabulary from '../../src/data/vocabulary/vocabulary.v1.json' with { type: 'json' };
 
 const entries = new Map(vocabulary.categories.flatMap((c) => c.subtabs.flatMap((s) => s.groups.flatMap((g) => g.entries))).map((e) => [e.id, e]));
@@ -60,7 +61,7 @@ test('complete flashcard workflow: flip, navigate, answer, summary, repeat, rest
   }
   await expect(page.getByTestId('summary-know')).toHaveText('7');
   await expect(page.getByTestId('summary-again')).toHaveText('3');
-  await expect(page.getByText('نتیجه‌های این جلسه ذخیره نشد')).toBeVisible();
+  await expect(page.getByText(/در فهرست «مرور دوباره» ذخیره شد/)).toBeVisible(); // signed in: results are saved
 
   // Legacy V3: the repeat must show the cards again.
   await page.getByRole('button', { name: 'مرور دوبارهٔ کارت‌های نادانسته (3)' }).click();

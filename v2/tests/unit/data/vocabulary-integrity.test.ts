@@ -2,7 +2,7 @@
 // the legacy shape and comparing it with the Phase 1 baseline fixtures (never edited).
 
 import { describe, expect, it } from 'vitest';
-import { getVocabularyRepository } from '../../../src/services/content/vocabularyRepository';
+import { getBundledRepository as getVocabularyRepository } from '../../../src/services/content/bundled';
 import { toLegacyData, toLegacyTechnicalInfo } from '../../../src/services/content/legacyFormat';
 import { validateTechnicalInfoDataset, validateVocabularyDataset } from '../../../src/services/content/validate';
 import rawTechnicalInfo from '../../../src/data/vocabulary/technical-info.v1.json';

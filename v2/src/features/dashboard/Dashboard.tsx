@@ -63,7 +63,7 @@ export function Dashboard({ categories, onOpenCategory, onOpenReview, onOpenShad
     <section className="db" aria-labelledby="db-title" lang="fa" dir="rtl">
       <div className="db__head page-head">
         <div className="page-head__text">
-          <p className="page-head__eyebrow"><span>داشبورد</span><span>۹۹۹ واژهٔ تخصصی</span></p>
+          <p className="page-head__eyebrow"><span>داشبورد</span><span>{overview.total ? `${overview.total.toLocaleString('fa-IR')} واژهٔ تخصصی` : 'واژه‌های شخصی'}</span></p>
           <h2 id="db-title" className="page-head__title">پیشرفت یادگیری</h2>
           {sync ? <p className={`db__sync db__sync--${sync.tone}`} data-testid="db-sync">پیشرفت همگام با حساب شما: {sync.text}</p> : null}
         </div>
@@ -95,24 +95,26 @@ export function Dashboard({ categories, onOpenCategory, onOpenReview, onOpenShad
             </dl>
           </div>
 
-          <div className="db-card">
-            <h3 className="db-card__title">{ready ? 'پیشرفت در هر دسته (۹۹۹ واژهٔ داخلی، همگام با حساب)' : 'دسته‌ها'}</h3>
-            <ul className="db-cats">
-              {overview.categories.map((c) => (
-                <li key={c.key} data-category={c.theme}>
-                  <button type="button" className="db-cat" onClick={() => onOpenCategory(c.key)} aria-label={ready ? `${c.label}: ${c.learned} از ${c.total} یادگرفته (${c.percent}٪) — نمایش واژه‌ها` : `${c.label}: ${c.total} واژه — نمایش واژه‌ها`}>
-                    <span className="db-cat__label" lang="de" dir="ltr">{(() => { const Icon = categoryIcon(c.key); return Icon ? <Icon className="db-cat__icon" /> : null; })()}{c.label}</span>
-                    <span className="db-cat__count"><span dir="ltr">{ready ? `${c.learned}/${c.total}` : c.total}</span></span>
-                    {ready ? (
-                      <span className="db-bar" aria-hidden="true">
-                        <span style={{ width: `${c.percent}%` }} />
-                      </span>
-                    ) : null}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {overview.categories.length ? (
+            <div className="db-card">
+              <h3 className="db-card__title">{ready ? `پیشرفت در هر دسته (${overview.total.toLocaleString('fa-IR')} واژه، همگام با حساب)` : 'دسته‌ها'}</h3>
+              <ul className="db-cats">
+                {overview.categories.map((c) => (
+                  <li key={c.key} data-category={c.theme}>
+                    <button type="button" className="db-cat" onClick={() => onOpenCategory(c.key)} aria-label={ready ? `${c.label}: ${c.learned} از ${c.total} یادگرفته (${c.percent}٪) — نمایش واژه‌ها` : `${c.label}: ${c.total} واژه — نمایش واژه‌ها`}>
+                      <span className="db-cat__label" lang="de" dir="ltr">{(() => { const Icon = categoryIcon(c.key); return Icon ? <Icon className="db-cat__icon" /> : null; })()}{c.label}</span>
+                      <span className="db-cat__count"><span dir="ltr">{ready ? `${c.learned}/${c.total}` : c.total}</span></span>
+                      {ready ? (
+                        <span className="db-bar" aria-hidden="true">
+                          <span style={{ width: `${c.percent}%` }} />
+                        </span>
+                      ) : null}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </div>
 
         <div className="db-col db-col--side">

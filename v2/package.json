@@ -14,7 +14,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test",
+    "test:e2e": "firebase emulators:exec --only auth,firestore --project demo-deutsch-vokabular \"playwright test\"",
     "content:generate": "node scripts/generate-content.mjs",
     "test:emulator": "firebase emulators:exec --only auth,firestore --project demo-deutsch-vokabular \"vitest run --config vitest.emulator.config.ts\"",
     "test:e2e:emulator": "firebase emulators:exec --only auth,firestore --project demo-deutsch-vokabular \"playwright test -c playwright.emulator.config.ts\"",
@@ -22,7 +22,8 @@
     "ai:dev": "node scripts/ai-dev-server.mjs",
     "screenshots": "firebase emulators:exec --only auth,firestore --project demo-deutsch-vokabular \"playwright test -c playwright.visual.config.ts\"",
     "build:production": "node scripts/build-production.mjs",
-    "deploy:production": "node scripts/deploy-production.mjs"
+    "deploy:production": "node scripts/deploy-production.mjs",
+    "library:import": "node scripts/library-import.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "5.3.0",

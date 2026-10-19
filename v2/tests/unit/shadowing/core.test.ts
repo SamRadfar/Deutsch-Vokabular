@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { describe, expect, it, vi } from 'vitest';
 import { IDBFactory } from 'fake-indexeddb';
-import { getVocabularyRepository } from '../../../src/services/content/vocabularyRepository';
+import { getBundledRepository as getVocabularyRepository } from '../../../src/services/content/bundled';
 import { CATEGORY_KEYS } from '../../../src/models/vocabulary';
 import { flattenCards } from '../../../src/features/review/deck';
 import { pauseDuration, planItem, MAX_PAUSE_MS } from '../../../src/features/shadowing/plan';

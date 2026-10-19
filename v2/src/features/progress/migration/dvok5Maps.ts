@@ -1,17 +1,15 @@
-import rawMaps from '../../../data/legacy/dvok5-index-maps.v1.json';
 import type { Dvok5IndexMap } from '../../../models/legacy';
 
+/** Legacy dvok5 index maps — part of the owner's library (library/dvok5-maps). */
 export interface Dvok5MapSet {
   versions: Dvok5IndexMap[];
 }
-
-export const dvok5Maps = rawMaps as Dvok5MapSet;
 
 /**
  * The entry count of a dvok5 blob identifies the writing version only if no two
  * historical vocabularies share a checkbox count. Returns the problems found (empty = OK).
  */
-export function verifyDvok5MapsUnambiguous(maps: Dvok5MapSet = dvok5Maps): string[] {
+export function verifyDvok5MapsUnambiguous(maps: Dvok5MapSet): string[] {
   const problems: string[] = [];
   const counts = new Map<number, Dvok5IndexMap[]>();
   for (const v of maps.versions) {
@@ -24,7 +22,7 @@ export function verifyDvok5MapsUnambiguous(maps: Dvok5MapSet = dvok5Maps): strin
   return problems;
 }
 
-export function findDvok5Map(entryCount: number, maps: Dvok5MapSet = dvok5Maps): Dvok5IndexMap | undefined {
+export function findDvok5Map(entryCount: number, maps: Dvok5MapSet): Dvok5IndexMap | undefined {
   if (verifyDvok5MapsUnambiguous(maps).length) return undefined; // never guess
   return maps.versions.find((v) => v.checkboxCount === entryCount);
 }

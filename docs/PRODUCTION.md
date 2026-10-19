@@ -47,6 +47,39 @@ The CSP allows only `self` plus Google sign-in (`apis.google.com`, `accounts.goo
 - No secrets are in the repository or the bundle: the build scan runs on every release, and the tracked files were checked. The Firebase web config is public by design; security comes from Auth and the rules.
 - The dev and production environments are fully separate. No user data was copied, and the legacy project was not accessed.
 
+## 4a. Account-owned vocabulary (owner library)
+
+The 999 built-in words belong to the owner's Google account. They are **not** part of the public bundle. `build-production` fails if any content sample, id-registry or legacy-map signature appears in the output.
+
+| | |
+|---|---|
+| Signed out | Welcome screen with Google sign-in only. Nothing of the vocabulary is loaded or shown |
+| Owner | `users/{ownerUid}/library/*`: `meta`, `category-<key>` ×7, `technical-info`, `id-registry`, `dvok5-maps`. Each chunk is a JSON string with its SHA-256 in `meta.chunks`, and the app verifies every hash and validates the content before showing it. Progress keeps working because the `dv_` ids are unchanged |
+| Other accounts | No library: an empty state, and they manage only their personal words |
+| Rules | `library/{docId}`: `read` owner only, `write` **never** from clients |
+| Device copy | A verified copy per uid is kept in IndexedDB (`deutsch-vokabular-v2-library`). It is shown at once on reload and used when the server is unreachable |
+| Source | `v2/src/data/…`, in the private repository only. It is used by the import, the tests and the emulator seeding |
+
+**Owner migration.** It is non-destructive and runs only after the owner's approval.
+
+1. Sign in once on the website with the owner Google account, so the account exists.
+2. Dry run (read-only). It verifies the account (e-mail ↔ uid, Google provider, not disabled) and checks that no library exists yet:
+   `node scripts/library-import.mjs --project deutsch-vokabular --email <owner e-mail>`
+3. Import, with approval:
+   `… --email <owner e-mail> --uid <uid> --confirm <uid>`
+
+   It writes 11 documents in **one atomic, create-only commit** (meta last). It refuses if anything exists, never deletes or updates, and reads everything back to verify it (checksums, 999 entries).
+
+**Rollout order** (each step needs approval):
+
+1. Deploy the rules with the library block (`--only rules`).
+2. Run the import for the verified uid.
+3. Deploy hosting (`--only hosting`). The new build no longer contains the vocabulary.
+
+Without the import, the owner would see an empty library, and the import makes it appear live without a reload.
+
+**Undo.** In the Firebase console, delete `users/{uid}/library/*`. The app then shows an empty library, and the source files stay in the repository.
+
 ## 5. Deploying an update
 
 ```

@@ -154,7 +154,7 @@ describe('personal vocabulary sync (emulator, real SDK)', () => {
     const v = await open(d, { remote: flaky });
     const r = v.add(input({ lemma: 'Wiederholt' }));
     expect(v.getSnapshot().sync.stateOf(r.ok ? r.word.id : '')).toBe('pending');
-    await until(() => settled(v), 15_000, 'uploaded after retries');
+    await until(() => settled(v), 25_000, 'uploaded after retries'); // backoff 2 s + 4 s; headroom for slow CI runners
     const all = await getDocs(collection(d.db, 'users', d.uid, 'customWords'));
     expect(all.size).toBe(1);
     expect(words(v)).toHaveLength(1);
@@ -169,7 +169,7 @@ describe('personal vocabulary sync (emulator, real SDK)', () => {
     first.stop();
     const second = await open(d); // same device store, online now
     expect(lemmas(second)).toEqual(['Vorgemerkt']);
-    await until(() => settled(second), 15_000, 'uploaded after reload');
+    await until(() => settled(second), 25_000, 'uploaded after reload');
     expect((await getDocs(collection(d.db, 'users', d.uid, 'customWords'))).size).toBe(1);
   });
 
