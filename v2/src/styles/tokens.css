@@ -48,7 +48,11 @@
   --frame-gap: 10px;
   --content-max: 1600px;
   --appbar-h: 60px;
-  --bottomnav-h: 64px;
+  /* Phone tab bar: 56px of tap targets, then breathing room above the system gesture area / home
+     indicator (safe-area inset, 0 on devices without one). Fixed elements stay above --bottomnav-total. */
+  --bottomnav-h: 56px;
+  --bottomnav-air: 12px;
+  --bottomnav-total: calc(var(--bottomnav-h) + var(--bottomnav-air) + env(safe-area-inset-bottom, 0px));
 
   /* ── Light theme (default) ── */
   --bg: #f3eeeb;

@@ -19,8 +19,8 @@ export function PronunciationButton({ speechKey, text, label, variant = 'word' }
     <button
       type="button"
       className={`speak-btn${variant === 'example' ? ' speak-btn--example' : ''}${speaking ? ' is-speaking' : ''}`}
-      onClick={() => toggle(speechKey, text)}
-      disabled={!supported}
+      onClick={() => toggle(speechKey, text)} /* unsupported: the provider explains why nothing plays */
+      aria-disabled={supported ? undefined : true}
       aria-label={supported ? (speaking ? `${label} (stop)` : label) : unsupportedLabel}
       aria-pressed={supported ? speaking : undefined}
       title={supported ? label : unsupportedLabel}

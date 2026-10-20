@@ -1,0 +1,72 @@
+# Audio: pronunciation and locked-screen shadowing (v2.0.2)
+
+## 1. Live pronunciation (Web Speech API)
+
+`src/features/pronunciation/speechService.ts` drives `window.speechSynthesis` for the 🔊 buttons in
+Vocabulary, Flashcards and the "live speech" Shadowing mode.
+
+### Why playback was sometimes silent (root causes found in v2.0.1)
+
+| # | Cause | Effect | Fix |
+|---|-------|--------|-----|
+| 1 | The utterance object was not referenced after `speak()`. Chrome garbage-collects unreferenced utterances and then never fires `end`. | The button stayed in "speaking" state; the **next tap on the same button only stopped** (toggle) → nothing audible. | The active utterance is kept referenced; every utterance ends exactly once (end, error, replaced, or watchdog). |
+| 2 | No watchdog in the buttons: a lost `end`/`error` (also on some Android engines) left the state stuck for good. | Same as 1. | Start watchdog (5 s, "no-start") and end watchdog (length-based). |
+| 3 | `cancel()` was called before *every* `speak()`, also on an idle engine. Safari/iOS can drop an utterance queued right after `cancel()`. | Occasional silent taps, mostly iOS. | `cancel()` only when the engine is busy; a dropped utterance (engine idle, never started) is spoken once more after 700 ms. |
+| 4 | A paused engine (Chrome/Android after the page was in the background) was never resumed. | Everything silent until reload. | `resume()` before speaking. |
+| 5 | The first German voice in the list was used, including remote "Google Deutsch" voices (network, 15 s cut-off on desktop Chrome). | Silent or cut-off sentences offline / for long examples. | Voice choice prefers exact `de-DE`, on-device, default voices; long sentences on remote voices get a pause/resume keep-alive. |
+| 6 | Shadowing waited for asynchronously loading voices *after* the click, so the first utterance was outside the user gesture. | iOS Safari may refuse the first utterance. | `unlock()` speaks a silent empty utterance inside the click. |
+| 7 | No feedback. | Silence with no explanation. | A message (`speech-notice`) for: unsupported browser, blocked by the browser, nothing played (volume / iPhone silent switch / Bluetooth / missing German voice), German voice not installed. |
+
+Platform notes: desktop Chrome/Edge load voices asynchronously and need sticky user activation;
+Android Chrome uses the system TTS engine (Settings → Text-to-speech; German data must be installed);
+iOS Safari speaks only after a gesture-started utterance and **is muted by the silent switch**.
+
+## 2. Shadowing with the screen locked ("پخش با صفحهٔ قفل")
+
+`speechSynthesis` cannot be relied on with a locked screen: browsers suspend page timers and
+JavaScript, and speech is not treated as background media. So this mode does not use it.
+
+**Architecture (free, on-device, private):**
+
+1. **Voice download (once, ~96 MB, user-initiated):** the Piper voice `de_DE-thorsten-medium`
+   (MIT), ONNX Runtime Web's WebAssembly binary and the espeak-ng phonemizer
+   (`src/features/audio/voiceAssets.ts`). Pinned URLs (exact Hugging Face revision, exact npm
+   versions on jsDelivr), **SHA-256 verified** before they are stored in Cache Storage
+   (`tts-voice-v1`, origin-private; removable in the UI). Not served from Firebase Hosting, so the
+   Spark transfer quota is not used. Only these public files are fetched — no vocabulary is sent.
+2. **Synthesis on the device** in a Web Worker (`piper.worker.ts`): text → phonemes (espeak-ng
+   WASM) → audio (VITS model, ONNX Runtime WASM, single-threaded). No network, no third-party TTS.
+3. **Rendering** (`audioSession/render.ts`): every distinct word/sentence is synthesized once;
+   repetitions and learner pauses (incl. "pause extended by the sentence length") are laid out as
+   real silence into **one 16-bit mono WAV** in memory (Blob URL). Nothing is stored or uploaded;
+   the audio is released when the session ends.
+4. **Playback** (`audioSession/audioSessionPlayer.ts`): an `HTMLAudioElement` plus the **Media
+   Session API** (lock screen / notification / headset: play, pause, next, previous, seek). The
+   lock screen shows only "Shadowing · Wort n / N" — no vocabulary. Item, step and progress are
+   derived from the audio position, so after the page was suspended the state catches up as soon as
+   scripts run again; skipped items are not counted as practised.
+
+Limits: speed is fixed when the session is prepared; preparation takes time (desktop ≈ 1 s per
+sentence; phones slower) and memory (≈ 2.6 MB per minute of session audio).
+
+### What is verified
+
+* `npm test`: state machine of speech fallbacks, rendering (WAV format, timing, silence), session
+  player (position → item/step, catch-up after suspension, Media Session handlers, blocked start).
+* `node scripts/audio-check.mjs` (real Chromium, **no mocks**, network for the first download):
+  download + checksum, synthesis is audible (RMS), the WAV decodes in the browser at full length,
+  speech in speak steps / silence in pauses, plays to the end, all items counted, Media Session set.
+* Playwright (desktop + Pixel 7 emulation): buttons speak, "no sound" message, mode UI, safe area.
+
+### What only real devices can show (see release notes for the device test results)
+
+* Audible output on the owner's phones.
+* Android Chrome / installed PWA: continues with the screen locked, notification controls.
+* iPhone Safari / home-screen app: continues with the screen locked, lock-screen controls. iOS has
+  historically been less reliable for background audio of **installed** home-screen web apps than of
+  Safari tabs; if the home-screen app stops when locked, use the Safari tab.
+
+## 3. Sound test
+
+Shadowing setup → "آزمایش صدا": shows the selected browser voice and plays a neutral sample
+sentence with the browser voice and (when downloaded) with the on-device voice.

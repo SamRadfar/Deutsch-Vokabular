@@ -20,6 +20,9 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   font-feature-settings: 'cv11', 'ss01';
+  /* viewport-fit=cover: keep content clear of the notch in landscape (0 elsewhere). */
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 button {
   font: inherit;

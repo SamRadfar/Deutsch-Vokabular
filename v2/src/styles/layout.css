@@ -77,8 +77,9 @@
   transition: margin-right var(--dur-2) var(--ease);
 }
 .shell--sidebar .mcontent > * { width: 100%; max-width: var(--content-max); margin-inline: auto; }
-/* Room for the fixed bottom tab bar (64px + safe area) */
-.mcontent--bottom-nav { padding-bottom: calc(var(--bottomnav-h) + 28px + env(safe-area-inset-bottom, 0px)); }
+/* Room for the fixed bottom tab bar (tab bar + breathing room + safe area). Two classes, so the phone
+   padding below cannot override it. */
+.mcontent.mcontent--bottom-nav { padding-bottom: calc(var(--bottomnav-total) + 28px); }
 .app-foot { display: flex; justify-content: center; padding-top: 4px; }
 
 .page-head--compact { padding: 0; }

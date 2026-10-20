@@ -22,6 +22,8 @@ interface Props {
   controls: Controls;
   /** Keyboard shortcuts only while the shadowing tab is visible. */
   active: boolean;
+  /** Pre-rendered audio session: plays with the screen locked; speed is fixed when it was prepared. */
+  audioMode?: boolean;
   rate: number;
   showTranslation: boolean;
   onRate(rate: number): void;
@@ -50,7 +52,7 @@ function phaseText(snap: PlayerSnapshot): string {
   return step.kind === 'speak' ? `گوش کن: ${what}${rep}` : `حالا تو ${what} را بلند تکرار کن${rep}`;
 }
 
-export function ShadowingSession({ snap, cardsById, order, controls, active, rate, showTranslation, onRate, onShowTranslation }: Props) {
+export function ShadowingSession({ snap, cardsById, order, controls, active, audioMode = false, rate, showTranslation, onRate, onShowTranslation }: Props) {
   const rateId = useId();
   const root = useRef<HTMLElement>(null);
   const card = cardsById.get(order[snap.index]!);
@@ -95,10 +97,17 @@ export function ShadowingSession({ snap, cardsById, order, controls, active, rat
       <div className="fc-toolbar">
         <button type="button" className="fc-tool" onClick={controls.end}>پایان جلسه</button>
         <p className="fc-count" data-testid="sh-count"><span dir="ltr">{snap.index + 1} / {snap.total}</span></p>
-        <span className={`sh-wake sh-wake--${snap.wakeLock}`} title="Screen Wake Lock">
-          <span className="sh-wake__dot" aria-hidden="true" />
-          {snap.wakeLock === 'active' ? 'صفحه روشن می‌ماند' : snap.wakeLock === 'unsupported' ? 'روشن‌ماندن صفحه پشتیبانی نمی‌شود' : 'صفحه ممکن است خاموش شود'}
-        </span>
+        {audioMode ? (
+          <span className="sh-wake sh-wake--active" data-testid="sh-lockmode">
+            <span className="sh-wake__dot" aria-hidden="true" />
+            پخش با صفحهٔ قفل
+          </span>
+        ) : (
+          <span className={`sh-wake sh-wake--${snap.wakeLock}`} title="Screen Wake Lock">
+            <span className="sh-wake__dot" aria-hidden="true" />
+            {snap.wakeLock === 'active' ? 'صفحه روشن می‌ماند' : snap.wakeLock === 'unsupported' ? 'روشن‌ماندن صفحه پشتیبانی نمی‌شود' : 'صفحه ممکن است خاموش شود'}
+          </span>
+        )}
       </div>
       <div className="fc-progress" role="progressbar" aria-label="واژه‌های تمرین‌شده" aria-valuemin={0} aria-valuemax={snap.total}
         aria-valuenow={snap.completedIds.length} aria-valuetext={`${snap.completedIds.length} از ${snap.total} واژه تمرین شد`}>
@@ -146,7 +155,8 @@ export function ShadowingSession({ snap, cardsById, order, controls, active, rat
 
       <div className="sh-quick">
         <label htmlFor={rateId}>سرعت</label>
-        <select id={rateId} value={rate} onChange={(e) => onRate(Number(e.currentTarget.value))}>
+        <select id={rateId} value={rate} onChange={(e) => onRate(Number(e.currentTarget.value))} disabled={audioMode}
+          title={audioMode ? 'سرعت هنگام آماده‌سازی جلسه ثابت شده است' : undefined}>
           {RATES.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
         </select>
         <label className="rv-check">

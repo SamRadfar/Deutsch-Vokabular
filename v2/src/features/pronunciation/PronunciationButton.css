@@ -18,7 +18,8 @@
 .speak-btn:hover:not(:disabled),
 .speak-btn.is-speaking { color: var(--ac); background: var(--acl); }
 .speak-btn.is-speaking { animation: pulse-speak 0.6s ease-in-out infinite alternate; }
-.speak-btn:disabled { cursor: not-allowed; opacity: 0.35; }
+.speak-btn:disabled,
+.speak-btn[aria-disabled="true"] { cursor: not-allowed; opacity: 0.35; }
 .speak-btn--example {
   width: 24px;
   height: 24px;
@@ -41,4 +42,44 @@
   .speak-btn { width: 40px; height: 40px; }
   .speak-btn--example { width: 34px; height: 34px; margin-inline-start: 4px; }
   .speak-btn--example svg.lucide { width: 16px; height: 16px; }
+}
+
+/* Playback problem message: above the phone tab bar, bottom corner on desktop. */
+.speech-toast {
+  position: fixed;
+  z-index: 300;
+  inset-inline: 12px;
+  bottom: calc(var(--bottomnav-total) + 12px);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 520px;
+  margin-inline: auto;
+  padding: 12px 14px;
+  font-family: var(--fp);
+  font-size: var(--fs-sm);
+  line-height: 1.7;
+  color: var(--tp);
+  background: var(--sf-solid);
+  border: 1px solid var(--br);
+  border-inline-start: 3px solid var(--warn, var(--brand));
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-3, 0 12px 32px rgba(0, 0, 0, 0.18));
+}
+.speech-toast p { flex: 1; margin: 0; }
+.speech-toast button {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--tm);
+  background: transparent;
+  border: 0;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+.speech-toast button:hover { color: var(--tp); background: var(--sf-hover); }
+@media (min-width: 1024px) {
+  .speech-toast { bottom: 24px; inset-inline: auto 24px; }
 }

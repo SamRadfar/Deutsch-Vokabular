@@ -44,7 +44,9 @@ export function fakeSpeech(supported = true, voice: GermanVoiceStatus = 'availab
       pending.onStart?.();
     }),
     cancel: vi.fn(interrupt),
+    unlock: vi.fn(),
     germanVoice: () => voice,
+    voiceInfo: () => ({ total: 1, german: voice === 'available' ? [{ name: 'Fake Deutsch', lang: 'de-DE', local: true }] : [], selected: null }),
     whenVoicesReady: () => Promise.resolve(),
     onVoicesChanged: () => () => {},
     finish: () => { const p = pending; pending = undefined; p?.onEnd?.(); },

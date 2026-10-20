@@ -24,10 +24,27 @@ const productionHtml = {
   },
 };
 
+// The on-device voice worker gets the ONNX Runtime WebAssembly binary as verified bytes
+// (src/features/audio/voiceAssets.ts: downloaded once from a pinned CDN URL, SHA-256 checked).
+// The bundled ORT build still references its 14 MB .wasm by URL; that file is never requested, so it
+// is dropped from the output instead of being deployed and precached by the service worker.
+const dropOrtWasm = {
+  name: 'dv2-drop-ort-wasm',
+  generateBundle(_options: unknown, bundle: Record<string, { fileName: string }>) {
+    for (const [key, file] of Object.entries(bundle)) {
+      if (/ort-wasm[^/]*\.wasm$/.test(file.fileName)) delete bundle[key];
+    }
+  },
+};
+
 export default defineConfig({
   base,
   ...(hermetic ? { envDir: false as const } : {}),
   plugins: [react(), productionHtml],
+  worker: {
+    format: 'es',
+    plugins: () => [dropOrtWasm],
+  },
   build: {
     outDir: 'dist',
     sourcemap: true,

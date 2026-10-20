@@ -16,7 +16,15 @@ export interface ShadowingSettings {
   /** Speech rate passed to the browser (it may clamp or ignore it). */
   rate: number;
   showTranslation: boolean;
+  /**
+   * 'speech': the browser speaks each step live (instant; stops when the screen locks).
+   * 'audio': the session is rendered on this device into one audio file first, which keeps playing
+   * with the screen locked (lock-screen controls via Media Session).
+   */
+  playback: PlaybackMode;
 }
+
+export type PlaybackMode = 'speech' | 'audio';
 
 export interface ShadowingChoice {
   mode: ReviewMode;
@@ -46,6 +54,7 @@ export const DEFAULT_PREFERENCES: ShadowingPreferences = {
   pauseSec: 4,
   rate: 0.85,
   showTranslation: true,
+  playback: 'speech',
   mode: 'all',
   categories: [...PRACTICE_KEYS],
   size: 30,
@@ -68,6 +77,7 @@ export function sanitizePreferences(raw: unknown): ShadowingPreferences {
     pauseSec: pause,
     rate: oneOf(RATES.map((r) => r.value), v.rate, d.rate),
     showTranslation: typeof v.showTranslation === 'boolean' ? v.showTranslation : d.showTranslation,
+    playback: oneOf(['speech', 'audio'] as const, v.playback, d.playback),
     mode: oneOf(['all', 'unlearned', 'learned', 'again'] as const, v.mode, d.mode),
     categories,
     size: oneOf(SHADOWING_SIZES, v.size, d.size),

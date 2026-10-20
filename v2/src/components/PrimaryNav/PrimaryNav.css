@@ -56,7 +56,9 @@
   backdrop-filter: blur(16px) saturate(1.2);
   -webkit-backdrop-filter: blur(16px) saturate(1.2);
   border-top: 1px solid var(--br);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: calc(var(--bottomnav-air) + env(safe-area-inset-bottom, 0px));
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 .pnav--bottom .pnav__list { display: flex; justify-content: space-around; }
 .pnav--bottom li { flex: 1; }
@@ -64,12 +66,15 @@
   position: relative;
   flex-direction: column;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
   width: 100%;
   min-height: var(--bottomnav-h);
+  padding-top: 4px;
   font-size: var(--fs-2xs);
+  line-height: 1.2;
   color: var(--tm);
 }
+.pnav--bottom .pnav__label { flex: none; }
 .pnav--bottom .pnav__icon { width: 22px; height: 22px; }
 .pnav--bottom .pnav__link.is-active { color: var(--tp); }
 .pnav--bottom .pnav__link.is-active::before {

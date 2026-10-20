@@ -146,6 +146,8 @@ export class ShadowingPlayer {
     const g = ++this.gen;
     if (this.o.speech.germanVoice() === 'unknown') {
       // Voices still loading (Chrome): wait briefly so the first word is not read by a default voice.
+      // The wait leaves this click, so unlock speech now (iOS only speaks after a gesture-started utterance).
+      this.o.speech.unlock();
       this.emit();
       void this.o.speech.whenVoicesReady(this.o.voicesTimeoutMs ?? 1500).then(() => { if (g === this.gen) this.runStep(); });
       return;

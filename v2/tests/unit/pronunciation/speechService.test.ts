@@ -37,7 +37,7 @@ describe('speechService', () => {
     const { synth, spoken } = fakeSynth([{ lang: 'en-US', name: 'en' }, { lang: 'de-DE', name: 'Anna' }]);
     const service = createSpeechService({ speechSynthesis: synth as never, SpeechSynthesisUtterance: FakeUtterance as never });
     service.speak('Außenwand');
-    expect(synth.cancel).toHaveBeenCalled(); // previous speech is stopped first
+    expect(synth.cancel).not.toHaveBeenCalled(); // an idle engine is never cancelled (Safari drops the next utterance)
     expect(spoken[0]).toMatchObject({ text: 'Außenwand', lang: 'de-DE', rate: 0.85, voice: { name: 'Anna' } });
   });
 

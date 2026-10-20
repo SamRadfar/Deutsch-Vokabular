@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { act, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from '../../../src/app/App';
 import { getBundledRepository as getVocabularyRepository } from '../../../src/services/content/bundled';
@@ -221,10 +221,12 @@ describe('pronunciation buttons', () => {
     expect(btn).toHaveAttribute('aria-pressed', 'false');
   });
 
-  it('disables buttons with an explanation when speech is unsupported', async () => {
+  it('marks buttons unavailable and explains it on tap when speech is unsupported', async () => {
     await renderApp(fakeSpeech(false));
     const buttons = screen.getAllByRole('button', { name: 'پخش صدا در این مرورگر پشتیبانی نمی‌شود' });
     expect(buttons.length).toBeGreaterThan(0);
-    for (const b of buttons) expect(b).toBeDisabled();
+    for (const b of buttons) expect(b).toHaveAttribute('aria-disabled', 'true');
+    fireEvent.click(buttons[0]!);
+    expect(screen.getByTestId('speech-notice')).toHaveTextContent('پشتیبانی نمی‌کند');
   });
 });
