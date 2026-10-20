@@ -153,6 +153,27 @@ describe('offline and failures', () => {
     expect(cloud.serverState('alice').get(ids[7]!)).toBe(true);
   });
 
+  it('retries even when the retry timer fires slightly before its due time (timer rounding)', async () => {
+    // Timers may fire a millisecond "early" relative to Date.now() (e.g. Linux). Before the fix the
+    // early flush found the change "not due yet" and nothing scheduled another attempt.
+    const original = globalThis.setTimeout;
+    // Every timer fires at a quarter of its delay — far earlier than real rounding, so the test is deterministic.
+    const early = ((fn: (...a: unknown[]) => void, ms?: number, ...rest: unknown[]) => original(fn, Math.floor((ms ?? 0) / 4), ...rest)) as typeof setTimeout;
+    globalThis.setTimeout = early;
+    try {
+      const cloud = createFakeCloud();
+      const dev = cloud.device('laptop');
+      dev.failNextWrites(2, { code: 'unavailable', permanent: false });
+      const e = engine('alice', createMemoryStore(), dev, { retryBaseMs: 200, retryMaxMs: 400 });
+      await e.start();
+      void e.setLearned(ids[8]!, true);
+      await until(() => settled(e), 5000, 'retry despite early timers');
+      expect(cloud.serverState('alice').get(ids[8]!)).toBe(true);
+    } finally {
+      globalThis.setTimeout = original;
+    }
+  });
+
   it('surfaces permanent failures, keeps the change, and retries on request', async () => {
     const cloud = createFakeCloud();
     const dev = cloud.device('laptop');

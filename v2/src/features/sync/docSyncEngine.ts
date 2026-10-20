@@ -104,6 +104,8 @@ export class DocSyncEngine<V> {
   private readonly inflight = new Set<string>();
   private readonly listeners = new Set<() => void>();
   private readonly retryAt = new Map<string, number>();
+  /** One timer for the earliest due retry (re-armed by flush; see armRetry). */
+  private retryTimer: { at: number; timer: ReturnType<typeof setTimeout> } | null = null;
   private chain: Promise<void> = Promise.resolve();
   private unsubscribe: (() => void) | null = null;
   private timers = new Set<ReturnType<typeof setTimeout>>();
@@ -269,7 +271,10 @@ export class DocSyncEngine<V> {
     for (const op of this.pending.values()) {
       if (op.state !== 'queued' || op.lastError?.permanent || this.inflightFor(op.id)) continue;
       const wait = this.retryAt.get(op.id);
-      if (wait && wait > now) continue;
+      // Not due yet: make sure a timer will come back for it. A timer may fire slightly before
+      // Date.now() reaches its due time (clock rounding); without re-arming, the change would
+      // then wait for an unrelated event (seen on CI).
+      if (wait && wait > now) { this.armRetry(wait); continue; }
       this.send(op);
     }
   }
@@ -314,7 +319,7 @@ export class DocSyncEngine<V> {
     if (!err.permanent) {
       const delay = Math.min((this.o.retryBaseMs ?? 2000) * 2 ** (p.attempts - 1), this.o.retryMaxMs ?? 60_000);
       this.retryAt.set(p.id, Date.now() + delay);
-      this.later(() => this.flush(), delay);
+      this.armRetry(Date.now() + delay);
     }
     await this.persistPending(p);
     this.emit();
@@ -405,6 +410,19 @@ export class DocSyncEngine<V> {
     const next = this.chain.then(task, task);
     this.chain = next.catch(() => {});
     return next;
+  }
+
+  /** Flushes at `at` (1 ms margin for early timers); keeps a single timer for the earliest time. */
+  private armRetry(at: number) {
+    if (this.stopped || (this.retryTimer && this.retryTimer.at <= at)) return;
+    if (this.retryTimer) { clearTimeout(this.retryTimer.timer); this.timers.delete(this.retryTimer.timer); }
+    const timer = setTimeout(() => {
+      this.timers.delete(timer);
+      if (this.retryTimer?.timer === timer) this.retryTimer = null;
+      this.flush();
+    }, Math.max(0, at - Date.now()) + 1);
+    this.timers.add(timer);
+    this.retryTimer = { at, timer };
   }
 
   private later(fn: () => void, ms: number) {
