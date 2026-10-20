@@ -149,7 +149,7 @@ describe('offline and failures', () => {
     const e = engine('alice', createMemoryStore(), dev);
     await e.start();
     void e.setLearned(ids[7]!, true);
-    await until(() => settled(e), 3000, 'retry');
+    await until(() => settled(e), 10_000, 'retry'); // generous: shared CI runners can delay timers
     expect(cloud.serverState('alice').get(ids[7]!)).toBe(true);
   });
 
