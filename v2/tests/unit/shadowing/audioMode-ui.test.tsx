@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from '../../../src/app/App';
+import { setOnDeviceVoiceStore } from '../../../src/features/audio/useOnDeviceVoice';
 import { DEFAULT_PREFERENCES, type ShadowingPreferences } from '../../../src/features/shadowing/settings';
 import { fakeSpeech, mockMatchMedia } from '../../helpers/dom';
 import { ALICE } from '../../helpers/fakeAuth';
@@ -45,6 +46,7 @@ let play: ReturnType<typeof vi.fn>;
 beforeEach(() => {
   mockMatchMedia(() => false);
   voiceState.downloaded = false;
+  setOnDeviceVoiceStore(null); // a fresh app-wide voice store per test
   voiceState.synthesized = [];
   voiceState.disposed = 0;
   play = vi.fn(() => Promise.resolve());
@@ -103,7 +105,7 @@ describe('shadowing — locked-screen audio mode', () => {
   it('live speech mode stays the default and still pauses when the page is hidden', async () => {
     storePrefs({ size: 5, categories: ['fitness'] });
     const { user } = await openShadowing();
-    expect(screen.getByRole('radio', { name: /صدای مرورگر/ })).toBeChecked();
+    expect(screen.getByRole('radio', { name: /پخش زنده/ })).toBeChecked();
     expect(screen.queryByTestId('sh-voice')).toBeNull();
     await user.click(await vi.waitFor(() => screen.getByRole('button', { name: 'شروع تمرین (5 واژه)' }), { timeout: 5000 }));
     expect(screen.getByRole('button', { name: 'توقف موقت' })).toBeInTheDocument();

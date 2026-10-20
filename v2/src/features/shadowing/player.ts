@@ -81,6 +81,8 @@ export function watchdogMs(text: string, rate: number): number {
 }
 
 const MAX_FAILURES = 3;
+/** Longest wait for an utterance to start (on-device voice: loading the model + synthesis). */
+export const START_GRACE_MS = 30_000;
 
 export class ShadowingPlayer {
   private readonly timers: Timers;
@@ -273,14 +275,20 @@ export class ShadowingPlayer {
     let error: string | null = null;
     this.utterancePending = true;
     this.speechStartedAt = this.now();
-    this.timer = this.timers.setTimeout(() => {
-      if (g !== this.gen) return;
-      this.timer = null;
-      this.gen++; // the cancelled utterance's callbacks are now stale
-      this.o.speech.cancel();
-      this.utterancePending = false;
-      this.afterSpeech('timeout');
-    }, watchdogMs(step.text, rate));
+    const watchdog = (ms: number) => {
+      this.clearTimer();
+      this.timer = this.timers.setTimeout(() => {
+        if (g !== this.gen) return;
+        this.timer = null;
+        this.gen++; // the cancelled utterance's callbacks are now stale
+        this.o.speech.cancel();
+        this.utterancePending = false;
+        this.afterSpeech('timeout');
+      }, ms);
+    };
+    // Until sound starts the speech service reports problems itself (the on-device voice first has
+    // to synthesize); once it plays, the length-based watchdog applies.
+    watchdog(Math.max(START_GRACE_MS, watchdogMs(step.text, rate)));
     this.emit();
     this.o.speech.speak(step.text, {
       rate,
@@ -288,6 +296,7 @@ export class ShadowingPlayer {
         if (g !== this.gen) return;
         this.speaking = true;
         this.speechStartedAt = this.now();
+        watchdog(watchdogMs(step.text, rate));
         this.emit();
       },
       onError: (code) => { if (g === this.gen) error = code; },

@@ -21,6 +21,33 @@ Platform notes: desktop Chrome/Edge load voices asynchronously and need sticky u
 Android Chrome uses the system TTS engine (Settings → Text-to-speech; German data must be installed);
 iOS Safari speaks only after a gesture-started utterance and **is muted by the silent switch**.
 
+## 1a. iPhone / iPad: pronunciation as media (v2.0.2, second round)
+
+Owner report: desktop fine, **no sound at all on iPhone**. What the app can and cannot observe:
+
+* Safari's Web Speech output follows the ring/silent switch (reports on Apple's developer forums and
+  WebKit bugs); in silent mode `start` and `end` still fire, so **the page cannot detect the
+  silence** — the earlier "no sound" message could never appear in exactly this case.
+* An `<audio>` element is media playback: heard with the silent switch on, routed like music
+  (speaker / headphones / Bluetooth), and it reports real `playing` / `ended` / errors.
+
+Implementation:
+
+* `audio/mediaOutput.ts` — one shared `<audio>` element, **unlocked synchronously inside the tap**
+  (a 60 ms silent clip), so it may start the synthesized clip a moment later; Safari's
+  `navigator.audioSession.type = 'playback'` where available.
+* `audio/deviceSpeech.ts` — a `SpeechService` on the on-device voice: text → WAV in the worker →
+  shared `<audio>`; clip cache in memory; `start` only when the element really plays.
+* `audio/routedSpeech.ts` — per-utterance routing. `auto` (default): iPhone/iPad use the on-device
+  voice once it is downloaded; other devices use browser speech and fall back to the on-device
+  voice when browser speech reports a failure. User choice in **تنظیمات و آزمایش صدا**.
+* The same routing serves the 🔊 buttons (words, examples), flashcards, live shadowing and the
+  sound test; the lock-screen mode always uses media.
+* Before the voice is downloaded, the first tap on iPhone explains the silent switch once and links
+  to the sound settings (the silence itself is undetectable).
+* Sound settings dialog: three real tests with the browser's own event times — a tone (media), the
+  sample sentence with browser speech, and with the on-device voice — plus a copyable report.
+
 ## 2. Shadowing with the screen locked ("پخش با صفحهٔ قفل")
 
 `speechSynthesis` cannot be relied on with a locked screen: browsers suspend page timers and

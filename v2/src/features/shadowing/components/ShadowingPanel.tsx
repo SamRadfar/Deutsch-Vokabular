@@ -6,7 +6,6 @@ import { usePronunciation } from '../../pronunciation/PronunciationProvider';
 import { modeAvailable, shuffle, type DeckCard, type DeckProgress } from '../../review/deck';
 import { practiceScopes, usePersonal, usePracticeCards } from '../../personal/usePersonal';
 import { openNeuralVoice } from '../../audio/neuralVoice';
-import { useOnDeviceVoice } from '../../audio/useOnDeviceVoice';
 import { AudioSessionPlayer } from '../audioSession/audioSessionPlayer';
 import { renderSession, RenderAbortedError } from '../audioSession/render';
 import { ShadowingPlayer, type PlayerSnapshot, type ShadowingItem } from '../player';
@@ -51,7 +50,6 @@ const none = () => null;
 export function ShadowingPanel({ categories, active, random, wakeLock }: Props) {
   const backend = useShadowingBackend();
   const { service: speech } = usePronunciation();
-  const onDeviceVoice = useOnDeviceVoice();
   const [preparing, setPreparing] = useState<Preparing | null>(null);
   const preparingRef = useRef<Preparing | null>(null);
   preparingRef.current = preparing;
@@ -164,7 +162,7 @@ export function ShadowingPanel({ categories, active, random, wakeLock }: Props) 
   }
 
   if (!session || !snap) {
-    return <ShadowingSetup cards={cards} scopes={scopes} backend={backend} prefs={shown} onChange={updatePrefs} onStart={startNew} onDeviceVoice={onDeviceVoice} />;
+    return <ShadowingSetup cards={cards} scopes={scopes} backend={backend} prefs={shown} onChange={updatePrefs} onStart={startNew} />;
   }
 
   if (snap.status === 'finished') {

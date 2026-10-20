@@ -34,6 +34,8 @@ try {
       ['session played to the end', r.playback.finished && !r.playback.endedEarly],
       ['every item counted as practised', r.playback.completed.join() === 'a,b,c'],
       ['media session metadata set', r.mediaSession && /Shadowing/.test(r.playback.metadataTitle ?? '')],
+      ['pronunciation clip plays as media (start → end, no error)', /^start@\d+$/.test(r.pronunciation[0]) && /^end@\d+$/.test(r.pronunciation[1]) && !r.pronunciation.some((e) => e.startsWith('error'))],
+      ['repeated word comes from the clip cache', r.pronunciation.some((e) => e.startsWith('cached-start@'))],
     ];
     for (const [name, ok] of checks) { console.log(`${ok ? '✔' : '✖'} ${name}`); if (!ok) failed = true; }
   }

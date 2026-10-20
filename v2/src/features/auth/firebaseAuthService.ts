@@ -21,7 +21,16 @@ const codeOf = (e: unknown) => (typeof e === 'object' && e && 'code' in e && typ
  * loading at app start, so by the time the user clicks it is normally resolved and
  * signInWithPopup is called synchronously inside the click handler — without an intervening await.
  */
-export function createFirebaseAuthService(authPromise: Promise<Auth>): AuthService {
+export interface FirebaseAuthOptions {
+  /**
+   * Use a full-page redirect instead of a popup. Only together with a same-origin authDomain
+   * (VITE_FIREBASE_SAME_ORIGIN_AUTH): on iPhone, in the home-screen app and in in-app browsers a
+   * popup opens in another browsing context and loses its state ("missing initial state").
+   */
+  redirect?: boolean;
+}
+
+export function createFirebaseAuthService(authPromise: Promise<Auth>, { redirect = false }: FirebaseAuthOptions = {}): AuthService {
   let ready: { auth: Auth; mod: AuthModule } | null = null;
   const loaded = Promise.all([authPromise, import('firebase/auth')]).then(([auth, mod]) => {
     ready = { auth, mod };
@@ -31,7 +40,8 @@ export function createFirebaseAuthService(authPromise: Promise<Auth>): AuthServi
   const popup = ({ auth, mod }: { auth: Auth; mod: AuthModule }) => {
     const provider = new mod.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
-    return mod.signInWithPopup(auth, provider).then(
+    const start = redirect ? mod.signInWithRedirect(auth, provider) : mod.signInWithPopup(auth, provider);
+    return start.then(
       () => undefined,
       (e: unknown) => { throw new AuthServiceError(codeOf(e)); },
     );
@@ -58,6 +68,16 @@ export function createFirebaseAuthService(authPromise: Promise<Auth>): AuthServi
     async signOut() {
       const { auth, mod } = await loaded;
       await mod.signOut(auth);
+    },
+    async takeRedirectError() {
+      if (!redirect) return null;
+      const { auth, mod } = await loaded;
+      try {
+        await mod.getRedirectResult(auth);
+        return null;
+      } catch (e) {
+        return new AuthServiceError(codeOf(e));
+      }
     },
     async getIdToken() {
       const { auth } = await loaded;

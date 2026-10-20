@@ -119,6 +119,7 @@ test.describe('layout', () => {
   test('touch targets on mobile are at least 32px', async ({ page, isMobile }) => {
     test.skip(!isMobile, 'mobile only');
     await page.goto('./');
+    await page.locator('.speak-btn').first().waitFor(); // measure the rendered list, not the loading shell
     const sizes = await page.locator('.mbtn, .sbtn, .speak-btn, .icon-btn, .pnav__link').evaluateAll((els) =>
       els.slice(0, 40).map((e) => { const r = e.getBoundingClientRect(); return Math.min(r.width, r.height); }));
     expect(Math.min(...sizes)).toBeGreaterThanOrEqual(32);

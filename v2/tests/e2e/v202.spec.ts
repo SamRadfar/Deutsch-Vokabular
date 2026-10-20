@@ -46,9 +46,32 @@ test('shadowing offers the locked-screen mode with an honest download prompt', a
   await expect(page.getByTestId('sh-voice')).toHaveAttribute('data-state', 'missing');
   await expect(page.getByRole('button', { name: /دانلود صدای آلمانی.*96 MB/ })).toBeVisible();
   await expect(page.getByRole('button', { name: /^آماده‌سازی جلسه/ })).toBeDisabled();
-  await page.getByText('آزمایش صدا').click();
-  await page.getByRole('button', { name: /نمونه با صدای مرورگر/ }).click();
+  await page.getByRole('button', { name: 'تنظیمات و آزمایش صدا' }).click();
+  const dialog = page.getByRole('dialog', { name: 'تنظیمات و آزمایش صدا' });
+  await dialog.getByRole('button', { name: /جملهٔ نمونه با صدای مرورگر/ }).click();
   await expect.poll(() => spoken(page)).toEqual(['Guten Tag! Das ist ein Test der deutschen Aussprache.']);
+  await expect(dialog.getByTestId('snd-log-browser')).toContainText('پایان');
+  await dialog.getByRole('button', { name: /بوق آزمایشی/ }).click();
+  await expect(dialog.getByTestId('snd-log-tone')).toContainText('پخش شروع شد'); // real media playback in Chromium
+  await expect(dialog.getByTestId('snd-log-tone')).toContainText('پایان');
+});
+
+test.describe('iPhone', () => {
+  test.use({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1' });
+
+  test('explains the silent switch once and leads to the reliable on-device voice', async ({ page }) => {
+    await installSpeechMock(page);
+    await page.goto('./');
+    await page.getByRole('button', { name: /^Aussprache anhören:/ }).first().click();
+    await expect.poll(() => spoken(page)).toHaveLength(1); // browser speech still used until the voice is downloaded
+    const notice = page.getByTestId('speech-notice');
+    await expect(notice).toHaveAttribute('data-notice', 'ios-hint');
+    await notice.getByRole('button', { name: 'تنظیمات صدا' }).click();
+    const dialog = page.getByRole('dialog', { name: 'تنظیمات و آزمایش صدا' });
+    await expect(dialog.getByTestId('snd-route')).toContainText('صدای مرورگر');
+    await expect(dialog.getByTestId('sh-voice')).toHaveAttribute('data-state', 'missing');
+    await expect(dialog.getByRole('radio', { name: /خودکار/ })).toBeChecked();
+  });
 });
 
 test.describe('phone tab bar and safe area', () => {

@@ -65,6 +65,21 @@ export const FORBIDDEN_PROJECT_IDS = ['deutsch-wortschatz-c7a11'] as const;
  */
 export const PRODUCTION_PROJECT_IDS = ['deutsch-vokabular'] as const;
 
+/**
+ * Same-origin Google sign-in (Firebase "redirect best practices", option 1): on this project's own
+ * Firebase Hosting hosts (live site and preview channels on web.app), the auth helper
+ * /__/auth/handler is served by the page's own host. Safari (iPhone) partitions the storage of a
+ * cross-site helper (…firebaseapp.com inside a web.app page), which breaks sign-in with
+ * "missing initial state". Requires https://<host>/__/auth/handler as an authorized redirect URI of
+ * the Google OAuth client (docs/PRODUCTION.md §8), so it is switched on per build
+ * (VITE_FIREBASE_SAME_ORIGIN_AUTH=true) only after that registration was verified.
+ */
+export function sameOriginAuthDomain(configured: string, projectId: string, hostname: string): string {
+  const host = hostname.toLowerCase();
+  const own = new RegExp(`^${projectId.replace(/[^a-z0-9-]/g, '')}(--[a-z0-9-]+)?\\.(web\\.app|firebaseapp\\.com)$`);
+  return own.test(host) ? host : configured;
+}
+
 const str = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
 const ENVIRONMENTS: readonly FirebaseEnvironment[] = ['emulator', 'development', 'production'];
 

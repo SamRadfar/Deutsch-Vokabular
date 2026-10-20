@@ -7,6 +7,7 @@ export const PREFERENCE_KEYS = {
   review: 'dv2.pref.review.v1',
   shadowing: 'dv2.pref.shadowing.v1',
   sidebar: 'dv2.pref.sidebar.v1',
+  voice: 'dv2.pref.voice.v1',
 } as const;
 
 export type ThemePreference = 'light' | 'dark';

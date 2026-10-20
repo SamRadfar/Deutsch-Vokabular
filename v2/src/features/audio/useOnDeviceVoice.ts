@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import {
   downloadVoice, removeVoice, voiceDownloaded, voiceStorageSupported, VoiceAssetError, VOICE_TOTAL_BYTES, type VoiceStore,
 } from './voiceAssets';
@@ -11,42 +11,67 @@ export type OnDeviceVoiceState =
   | { kind: 'ready' }
   | { kind: 'error'; reason: VoiceAssetError['reason'] | 'unknown' };
 
-/** Download state of the on-device German voice (shared by the shadowing setup and the sound test). */
-export function useOnDeviceVoice(store: VoiceStore = {}) {
-  const [state, setState] = useState<OnDeviceVoiceState>({ kind: 'checking' });
-  const abort = useRef<AbortController | null>(null);
-  const storeRef = useRef(store);
+/**
+ * App-wide download state of the on-device German voice. One store, so a download started in the
+ * sound settings is immediately usable by the pronunciation buttons and by shadowing.
+ */
+export interface OnDeviceVoiceStore {
+  get(): OnDeviceVoiceState;
+  subscribe(listener: () => void): () => void;
+  download(): Promise<void>;
+  cancel(): void;
+  remove(): Promise<void>;
+}
 
-  useEffect(() => {
-    let live = true;
-    if (!voiceStorageSupported(storeRef.current)) { setState({ kind: 'unsupported' }); return; }
-    void voiceDownloaded(storeRef.current).then((ok) => { if (live) setState({ kind: ok ? 'ready' : 'missing' }); });
-    return () => { live = false; abort.current?.abort(); };
-  }, []);
+export function createOnDeviceVoiceStore(store: VoiceStore = {}): OnDeviceVoiceStore {
+  let state: OnDeviceVoiceState = { kind: 'checking' };
+  const listeners = new Set<() => void>();
+  let abort: AbortController | null = null;
+  const set = (next: OnDeviceVoiceState) => { state = next; for (const l of [...listeners]) l(); };
 
-  const download = useCallback(async () => {
-    abort.current?.abort();
-    const ctrl = new AbortController();
-    abort.current = ctrl;
-    setState({ kind: 'downloading', loaded: 0, total: VOICE_TOTAL_BYTES });
-    try {
-      await downloadVoice((p) => { if (!ctrl.signal.aborted) setState({ kind: 'downloading', loaded: p.loaded, total: p.total }); }, ctrl.signal, storeRef.current);
-      if (!ctrl.signal.aborted) setState({ kind: 'ready' });
-    } catch (e) {
-      if (ctrl.signal.aborted) { setState({ kind: 'missing' }); return; }
-      setState({ kind: 'error', reason: e instanceof VoiceAssetError ? e.reason : 'unknown' });
-    }
-  }, []);
+  if (!voiceStorageSupported(store)) state = { kind: 'unsupported' };
+  else void voiceDownloaded(store).then((ok) => { if (state.kind === 'checking') set({ kind: ok ? 'ready' : 'missing' }); }, () => set({ kind: 'missing' }));
 
-  const cancel = useCallback(() => { abort.current?.abort(); }, []);
+  return {
+    get: () => state,
+    subscribe(listener) { listeners.add(listener); return () => { listeners.delete(listener); }; },
+    async download() {
+      if (state.kind === 'unsupported' || state.kind === 'downloading' || state.kind === 'ready') return;
+      const ctrl = new AbortController();
+      abort = ctrl;
+      set({ kind: 'downloading', loaded: 0, total: VOICE_TOTAL_BYTES });
+      try {
+        await downloadVoice((p) => { if (!ctrl.signal.aborted) set({ kind: 'downloading', loaded: p.loaded, total: p.total }); }, ctrl.signal, store);
+        if (!ctrl.signal.aborted) set({ kind: 'ready' });
+      } catch (e) {
+        if (ctrl.signal.aborted) { set({ kind: 'missing' }); return; }
+        set({ kind: 'error', reason: e instanceof VoiceAssetError ? e.reason : 'unknown' });
+      } finally {
+        if (abort === ctrl) abort = null;
+      }
+    },
+    cancel() { abort?.abort(); },
+    async remove() {
+      abort?.abort();
+      await removeVoice(store);
+      set({ kind: 'missing' });
+    },
+  };
+}
 
-  const remove = useCallback(async () => {
-    abort.current?.abort();
-    await removeVoice(storeRef.current);
-    setState({ kind: 'missing' });
-  }, []);
+let shared: OnDeviceVoiceStore | null = null;
+/** The app's store (created on first use). */
+export function onDeviceVoiceStore(): OnDeviceVoiceStore {
+  shared ??= createOnDeviceVoiceStore();
+  return shared;
+}
+/** Tests: replace the shared store. */
+export function setOnDeviceVoiceStore(store: OnDeviceVoiceStore | null) { shared = store; }
 
-  return { state, download, cancel, remove };
+/** Download state of the on-device German voice (shared by sound settings, buttons and shadowing). */
+export function useOnDeviceVoice(store: OnDeviceVoiceStore = onDeviceVoiceStore()) {
+  const state = useSyncExternalStore(store.subscribe, store.get, store.get);
+  return { state, download: store.download, cancel: store.cancel, remove: store.remove };
 }
 
 export function formatMegabytes(bytes: number): string {

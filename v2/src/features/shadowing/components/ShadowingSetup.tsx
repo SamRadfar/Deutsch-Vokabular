@@ -1,6 +1,7 @@
-import { AudioLines, Lock } from 'lucide-react';
+import { AudioLines, Lock, Volume2 } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
-import type { useOnDeviceVoice } from '../../audio/useOnDeviceVoice';
+import { isAppleMobile } from '../../audio/routedSpeech';
+import { useOnDeviceVoice } from '../../audio/useOnDeviceVoice';
 import { usePronunciation } from '../../pronunciation/PronunciationProvider';
 import { modeAvailable, REVIEW_MODES, type DeckCard, type DeckProgress, type PracticeCategoryKey, type ReviewMode } from '../../review/deck';
 import { selectShadowingCards } from '../queue';
@@ -10,7 +11,6 @@ import {
 import type { ShadowingBackend } from '../useShadowingBackend';
 import { formatDuration, formatSeconds } from './format';
 import { PlaybackMode } from './PlaybackMode';
-import { SoundTest } from './SoundTest';
 
 interface Props {
   cards: readonly DeckCard[];
@@ -20,8 +20,6 @@ interface Props {
   prefs: ShadowingPreferences;
   onChange(prefs: ShadowingPreferences): void;
   onStart(): void;
-  /** The on-device voice (needed for the locked-screen playback mode). */
-  onDeviceVoice: ReturnType<typeof useOnDeviceVoice>;
 }
 
 const MODE_TEXT: Record<ReviewMode, string> = {
@@ -42,16 +40,19 @@ function useGermanVoice() {
   return { supported: service.supported, status };
 }
 
-export function ShadowingSetup({ cards, scopes, backend, prefs, onChange, onStart, onDeviceVoice }: Props) {
+export function ShadowingSetup({ cards, scopes, backend, prefs, onChange, onStart }: Props) {
   const ids = { size: useId(), word: useId(), example: useId(), pause: useId(), rate: useId(), tr: useId() };
   const voice = useGermanVoice();
+  const { state: deviceVoice } = useOnDeviceVoice();
+  const { routed, openSoundSettings } = usePronunciation();
   const progress: DeckProgress = { learned: backend.learned, againIds: backend.againIds };
   const selectedCats = new Set(prefs.categories);
   const count = (mode: ReviewMode, cats: ReadonlySet<PracticeCategoryKey> = selectedCats) => selectShadowingCards(cards, mode, cats, progress).length;
   const selected = modeAvailable(prefs.mode, progress) ? count(prefs.mode) : 0;
   const sessionCount = Math.min(selected, prefs.size);
   const audioMode = prefs.playback === 'audio';
-  const canPlay = audioMode ? onDeviceVoice.state.kind === 'ready' : voice.supported;
+  const canPlay = audioMode ? deviceVoice.kind === 'ready' : voice.supported || deviceVoice.kind === 'ready';
+  const iosBrowserSpeech = !audioMode && Boolean(routed) && isAppleMobile() && routed?.route() === 'browser';
   const set = (patch: Partial<ShadowingPreferences>) => onChange({ ...prefs, ...patch });
   const toggleCategory = (key: PracticeCategoryKey, on: boolean) =>
     set({ categories: on ? [...prefs.categories.filter((k) => k !== key), key] : prefs.categories.filter((k) => k !== key) });
@@ -72,7 +73,9 @@ export function ShadowingSetup({ cards, scopes, backend, prefs, onChange, onStar
         <div className="rv-main">
           {!voice.supported && !audioMode ? (
             <p className="rv-notice rv-notice--error" role="alert">این مرورگر از تبدیل متن به گفتار پشتیبانی نمی‌کند؛ تمرین تلفظ در آن ممکن نیست.</p>
-          ) : voice.status === 'missing' && !audioMode ? (
+          ) : iosBrowserSpeech ? (
+            <p className="rv-notice" role="note">روی iPhone صدای مرورگر در حالت بی‌صدا شنیده نمی‌شود. برای پخش مطمئن، در «تنظیمات و آزمایش صدا» صدای آلمانی دستگاه را دانلود کنید.</p>
+          ) : voice.status === 'missing' && !audioMode && routed?.route() !== 'device' ? (
             <p className="rv-notice" role="note">صدای آلمانی روی این دستگاه پیدا نشد؛ مرورگر ممکن است متن را با صدای دیگری بخواند. (در تنظیمات زبان سیستم می‌توانید صدای آلمانی نصب کنید.)</p>
           ) : null}
 
@@ -166,8 +169,7 @@ export function ShadowingSetup({ cards, scopes, backend, prefs, onChange, onStar
             </label>
           </div>
 
-          <PlaybackMode mode={prefs.playback} onMode={(playback) => set({ playback })} voice={onDeviceVoice.state}
-            onDownload={() => { void onDeviceVoice.download(); }} onCancel={onDeviceVoice.cancel} onRemove={() => { void onDeviceVoice.remove(); }} />
+          <PlaybackMode mode={prefs.playback} onMode={(playback) => set({ playback })} />
 
           {modeAvailable(prefs.mode, progress) && selected === 0 ? (
             <p className="rv-empty" role="status">{prefs.categories.length === 0 ? 'دست‌کم یک دسته را انتخاب کنید.' : 'در این انتخاب واژه‌ای نیست.'}</p>
@@ -175,10 +177,12 @@ export function ShadowingSetup({ cards, scopes, backend, prefs, onChange, onStar
           <button type="button" className="fc-primary rv-start" onClick={onStart} disabled={sessionCount === 0 || !canPlay}>
             {sessionCount === 0 ? 'واژه‌ای برای تمرین نیست' : audioMode ? `آماده‌سازی جلسه (${sessionCount} واژه)` : `شروع تمرین (${sessionCount} واژه)`}
           </button>
-          {audioMode && onDeviceVoice.state.kind !== 'ready' && sessionCount > 0 ? (
+          {audioMode && deviceVoice.kind !== 'ready' && sessionCount > 0 ? (
             <p className="sh-start-hint">برای پخش با صفحهٔ قفل، اول صدای آلمانی را دانلود کنید.</p>
           ) : null}
-          <SoundTest voice={onDeviceVoice.state} />
+          <button type="button" className="fc-tool sh-sound-btn" onClick={openSoundSettings}>
+            <Volume2 aria-hidden="true" /> تنظیمات و آزمایش صدا
+          </button>
         </div>
       </div>
     </section>

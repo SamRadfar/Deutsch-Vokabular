@@ -226,16 +226,6 @@
 .sh-voice__remove svg.lucide { width: 14px; height: 14px; }
 .sh-start-hint { margin: 6px 0 0; font-family: var(--fp); font-size: var(--fs-xs); color: var(--tm); }
 
-/* ── Sound test ── */
-.sh-soundtest { margin-top: 14px; font-family: var(--fp); font-size: var(--fs-xs); color: var(--ts); }
-.sh-soundtest summary { cursor: pointer; font-size: var(--fs-sm); font-weight: 600; color: var(--ts); }
-.sh-soundtest[open] { display: flex; flex-direction: column; gap: 8px; }
-.sh-soundtest[open] summary { margin-bottom: 4px; }
-.sh-soundtest p { margin: 0; line-height: 1.7; }
-.sh-soundtest .fc-tool { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; }
-.sh-soundtest .fc-tool svg.lucide { width: 16px; height: 16px; }
-.sh-soundtest__hint { color: var(--tm); font-style: italic; }
-
 /* ── Preparing an audio session ── */
 .sh-prepare { display: flex; flex-direction: column; gap: 12px; max-width: 560px; margin: 24px auto; padding: 20px; font-family: var(--fp); background: var(--sf); border: 1px solid var(--br); border-radius: var(--r-lg); }
 .sh-prepare p { margin: 0; line-height: 1.7; }

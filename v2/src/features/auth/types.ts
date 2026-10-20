@@ -36,6 +36,8 @@ export interface AuthService {
    * own AI worker, which verifies it; never logged or stored by the app.
    */
   getIdToken(): Promise<string | null>;
+  /** Redirect sign-in only: the error of a sign-in that returned to this page (null = none). */
+  takeRedirectError?(): Promise<AuthServiceError | null>;
 }
 
 /** Errors thrown by an AuthService carry the provider's error code. */

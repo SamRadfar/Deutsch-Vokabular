@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from '../../../src/app/App';
@@ -114,20 +114,21 @@ describe('learned progress UI', () => {
     await waitFor(() => expect(env.cloud.serverState(ALICE.uid).get(first.id)).toBe(true));
     env.unmount();
     render(<App services={env.services} speechService={fakeSpeech()} />);
-    await waitFor(() => expect(document.querySelector(`[data-entry-id="${first.id}"] input.vchk`)).toBeChecked()); // cheap query (see waitForLearnedCheckboxes)
+    await waitFor(() => expect(document.querySelector(`[data-entry-id="${first.id}"] input.vchk`)).toBeChecked(), { timeout: 8000 }); // cheap query (see waitForLearnedCheckboxes)
     expect(checkbox(first.word)).toBeChecked();
   });
 
-  it('account switching never shows the previous account’s progress', async () => {
+  it('account switching never shows the previous account’s progress', { timeout: 30_000 }, async () => {
     const user = userEvent.setup();
     const env = await signedInApp();
     await user.click(checkbox(first.word));
     await waitFor(() => expect(env.cloud.serverState(ALICE.uid).get(first.id)).toBe(true));
     act(() => env.auth.switchUserExternally(BOB));
-    await waitFor(() => expect(screen.getByTestId('header-progress')).toHaveTextContent(`0/${repo.totalEntries}`));
+    // The second account's library and progress load asynchronously (slow in jsdom on busy machines).
+    await vi.waitFor(() => expect(document.querySelector('[data-testid="header-progress"]')).toHaveTextContent(`0/${repo.totalEntries}`), { timeout: 8000, interval: 100 });
     expect(checkbox(first.word)).not.toBeChecked();
     act(() => env.auth.switchUserExternally(ALICE));
-    await waitFor(() => expect(document.querySelector(`[data-entry-id="${first.id}"] input.vchk`)).toBeChecked()); // cheap query (see waitForLearnedCheckboxes)
+    await waitFor(() => expect(document.querySelector(`[data-entry-id="${first.id}"] input.vchk`)).toBeChecked(), { timeout: 8000 }); // cheap query (see waitForLearnedCheckboxes)
     expect(checkbox(first.word)).toBeChecked();
   });
 

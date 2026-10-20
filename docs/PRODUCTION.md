@@ -111,3 +111,27 @@ node scripts/smoke-production.mjs https://deutsch-vokabular.web.app
   3. `VITE_AI_ENDPOINT=https://…` in `deploy/production.env`, plus the CSP `connect-src`.
 
   See `docs/AI_DESIGN.md` §6.
+
+## 8. Google sign-in on iPhone (same-origin auth helper)
+
+Safari (iPhone/iPad) partitions the storage of third-party frames. With the default
+`authDomain` (`deutsch-vokabular.firebaseapp.com`) inside a `web.app` page, the sign-in helper is
+cross-site and Google sign-in can fail with *"Unable to process request due to missing initial
+state"* (Firebase: "Best practices for using signInWithRedirect on browsers that block third-party
+storage", option 1). The fix used here: on this project's own Hosting hosts the app uses **its own
+host as `authDomain`** — Firebase Hosting serves `/__/auth/handler` on every site and preview
+channel — and signs in with a **full-page redirect** on iPhone/iPad and in the home-screen app
+(popups there open in another browsing context). Desktop keeps the popup.
+
+Owner action (Google Cloud Console, free): *APIs & Services → Credentials → OAuth 2.0 Client IDs →
+"Web client (auto created by Google Service)" → Authorized redirect URIs* — add
+
+```
+https://deutsch-vokabular.web.app/__/auth/handler
+https://<preview-channel-host>/__/auth/handler   (only while a preview is tested)
+```
+
+Verify (no sign-in needed): an authorization request with that `redirect_uri` must not end on
+`accounts.google.com/signin/oauth/error`. Then set `VITE_FIREBASE_SAME_ORIGIN_AUTH=true` in
+`deploy/production.env`. The page CSP allows the same-origin auth frame (`frame-src 'self'`).
+Authorized domains (Firebase Auth) must contain the host as well.

@@ -154,3 +154,35 @@ export function silentWav(ms = 50, sampleRate = 22_050): Blob {
   writeWavHeader(new DataView(buffer), samples, sampleRate);
   return new Blob([buffer], { type: 'audio/wav' });
 }
+
+/** One spoken text as a short WAV (pronunciation buttons played as media, e.g. on iPhone). */
+export async function renderClip(text: string, rate: number, voice: Synthesizer, leadInMs = 150): Promise<{ wav: Blob; duration: number }> {
+  const sr = voice.sampleRate;
+  const pcm = trimSilence(await voice.synthesize(text, rate), sr);
+  const gain = gainFor(pcm);
+  const lead = Math.round((leadInMs / 1000) * sr);
+  const tail = Math.round(0.1 * sr);
+  const total = lead + pcm.length + tail;
+  const buffer = new ArrayBuffer(44 + total * 2);
+  writeWavHeader(new DataView(buffer), total, sr);
+  const out = new Int16Array(buffer, 44, total);
+  for (let i = 0; i < pcm.length; i++) {
+    const v = pcm[i]! * gain;
+    out[lead + i] = v >= 1 ? 32767 : v <= -1 ? -32768 : Math.round(v * 32767);
+  }
+  return { wav: new Blob([buffer], { type: 'audio/wav' }), duration: total / sr };
+}
+
+/** A short audible test tone (no voice needed): tells "media output works" apart from "speech is muted". */
+export function toneWav(ms = 600, hz = 660, sampleRate = 22_050): Blob {
+  const samples = Math.round((ms / 1000) * sampleRate);
+  const buffer = new ArrayBuffer(44 + samples * 2);
+  writeWavHeader(new DataView(buffer), samples, sampleRate);
+  const out = new Int16Array(buffer, 44, samples);
+  const fade = Math.round(0.02 * sampleRate);
+  for (let i = 0; i < samples; i++) {
+    const env = Math.min(1, i / fade, (samples - i) / fade);
+    out[i] = Math.round(Math.sin((2 * Math.PI * hz * i) / sampleRate) * 0.5 * env * 32767);
+  }
+  return new Blob([buffer], { type: 'audio/wav' });
+}

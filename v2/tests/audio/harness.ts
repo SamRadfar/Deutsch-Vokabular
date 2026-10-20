@@ -4,6 +4,8 @@
 // Media Session API. Uses neutral sample sentences only (no user vocabulary).
 // Run: node scripts/audio-check.mjs   (results: window.__audioCheck)
 
+import { createDeviceSpeechService, createVoiceHandle } from '../../src/features/audio/deviceSpeech';
+import { sharedMediaOutput } from '../../src/features/audio/mediaOutput';
 import { openNeuralVoice } from '../../src/features/audio/neuralVoice';
 import { downloadVoice, voiceDownloaded, VOICE_TOTAL_BYTES } from '../../src/features/audio/voiceAssets';
 import { AudioSessionPlayer } from '../../src/features/shadowing/audioSession/audioSessionPlayer';
@@ -102,6 +104,22 @@ async function run() {
     metadataTitle: (navigator.mediaSession?.metadata as MediaMetadata | null)?.title ?? null,
   };
   player.dispose();
+
+  // Pronunciation buttons on iPhone: the on-device voice played through the shared <audio> element.
+  log('pronunciation via media');
+  const device = createDeviceSpeechService({ output: sharedMediaOutput(), voice: createVoiceHandle() });
+  const events: string[] = [];
+  t = performance.now();
+  await new Promise<void>((resolve) => {
+    device.speak('die Außenwand', {
+      onStart: () => events.push(`start@${Math.round(performance.now() - t)}`),
+      onError: (c) => events.push(`error:${c}`),
+      onEnd: () => { events.push(`end@${Math.round(performance.now() - t)}`); resolve(); },
+    });
+  });
+  t = performance.now();
+  await new Promise<void>((resolve) => device.speak('die Außenwand', { onStart: () => events.push(`cached-start@${Math.round(performance.now() - t)}`), onEnd: () => resolve() }));
+  out.pronunciation = events;
   out.ok = true;
 }
 

@@ -47,6 +47,14 @@ export function AuthProvider({ service, unavailable, children }: Props) {
     });
   }, [service]);
 
+  // Redirect sign-in (iPhone with same-origin auth): a failure is only known after returning here.
+  useEffect(() => {
+    if (!service?.takeRedirectError) return;
+    let live = true;
+    void service.takeRedirectError().then((e) => { if (live && e) setError(toAuthError(e)); });
+    return () => { live = false; };
+  }, [service]);
+
   // Each sign-in attempt gets a number; a cancelled (stale) attempt can never change state later.
   const attempt = useRef(0);
 

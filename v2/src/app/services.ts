@@ -1,6 +1,7 @@
-import { readFirebaseConfig } from '../services/firebase/config';
+import { readFirebaseConfig, sameOriginAuthDomain } from '../services/firebase/config';
 import { getFirebase } from '../services/firebase/app';
 import { createFirebaseAuthService } from '../features/auth/firebaseAuthService';
+import { isAppleMobile } from '../features/audio/routedSpeech';
 import type { AuthService, AuthUnavailableReason } from '../features/auth/types';
 import { createFirestoreProgressRemote } from '../features/progress/firestoreProgressRemote';
 import { createFirestoreAccountRemote } from '../features/progress/accountRemote';
@@ -25,6 +26,10 @@ export interface AppServices {
   library?: LibraryService | null;
 }
 
+function standaloneDisplay(): boolean {
+  try { return window.matchMedia?.('(display-mode: standalone)').matches === true; } catch { return false; }
+}
+
 /** Real services from the public Firebase configuration; browse-only when it is missing. */
 export function createAppServices(): AppServices {
   const config = readFirebaseConfig();
@@ -34,9 +39,16 @@ export function createAppServices(): AppServices {
   if (config.status === 'invalid') {
     return { auth: null, authUnavailable: { reason: 'invalid-config', details: config.problems }, progress: null };
   }
-  const handles = getFirebase(config.options, config.emulators);
+  const sameOrigin = import.meta.env.VITE_FIREBASE_SAME_ORIGIN_AUTH === 'true' && config.environment === 'production';
+  const options = sameOrigin
+    ? { ...config.options, authDomain: sameOriginAuthDomain(config.options.authDomain, config.options.projectId, window.location.hostname) }
+    : config.options;
+  const handles = getFirebase(options, config.emulators);
   const db = handles.then((h) => h.db);
-  const auth = createFirebaseAuthService(handles.then((h) => h.auth));
+  // Same-origin auth makes the redirect flow safe; it is what works on iPhone, in the home-screen app
+  // and in in-app browsers (popups there open in another context). Desktop keeps the popup.
+  const redirect = sameOrigin && (isAppleMobile() || standaloneDisplay());
+  const auth = createFirebaseAuthService(handles.then((h) => h.auth), { redirect });
   const aiConfig = readAiEndpoint();
   if (aiConfig.status === 'invalid') console.warn(`AI disabled: ${aiConfig.problem}`);
   return {

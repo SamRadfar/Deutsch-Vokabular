@@ -36,6 +36,7 @@ export function validateProductionEnv(env) {
   if (![`${PRODUCTION_PROJECT}.firebaseapp.com`, `${PRODUCTION_PROJECT}.web.app`].includes(env.VITE_FIREBASE_AUTH_DOMAIN)) p.push('VITE_FIREBASE_AUTH_DOMAIN must belong to the production project');
   if (env.VITE_FIREBASE_STORAGE_BUCKET && !env.VITE_FIREBASE_STORAGE_BUCKET.startsWith(`${PRODUCTION_PROJECT}.`)) p.push('VITE_FIREBASE_STORAGE_BUCKET belongs to another project');
   if (!['true', 'false'].includes(env.VITE_PERSONAL_WORDS_SYNC)) p.push('VITE_PERSONAL_WORDS_SYNC must be true or false');
+  if ('VITE_FIREBASE_SAME_ORIGIN_AUTH' in env && !['true', 'false'].includes(env.VITE_FIREBASE_SAME_ORIGIN_AUTH)) p.push('VITE_FIREBASE_SAME_ORIGIN_AUTH must be true or false');
   const ai = env.VITE_AI_ENDPOINT ?? '';
   if (ai) {
     let url = null;
