@@ -1,0 +1,144 @@
+/* Floating shadowing card: the whole Document Picture-in-Picture window (≈ 340 × 420), or a
+   compact in-page card in browsers without Document PiP. Uses the app's tokens (light/dark). */
+
+body.sh-float-doc {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--tp);
+  overflow: hidden;
+}
+body.sh-float-doc .sh-float-root { height: 100vh; }
+
+.sh-float {
+  --sf-pad: clamp(12px, 4vw, 18px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+  height: 100%;
+  padding: var(--sf-pad);
+  font-family: var(--fp);
+  color: var(--tp);
+  background: var(--panel);
+}
+
+.sh-float__top { display: flex; align-items: center; gap: 8px; }
+.sh-float__pos {
+  padding: 2px 10px;
+  font-family: var(--fn);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--ts);
+  background: var(--sfalt);
+  border: 1px solid var(--br);
+  border-radius: var(--r-pill);
+}
+.sh-float__state {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-inline-start: auto;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--tm);
+}
+.sh-float__state svg.lucide { width: 15px; height: 15px; }
+.sh-float__state--listen { color: var(--ac, var(--brand)); }
+.sh-float__state--turn { color: var(--brand); }
+.sh-float__x { width: 28px; height: 28px; padding: 0; color: var(--tm); background: transparent; border: 0; border-radius: var(--r-sm); cursor: pointer; }
+.sh-float__x svg.lucide { width: 16px; height: 16px; }
+
+.sh-float__progress { height: 4px; overflow: hidden; background: var(--sfalt); border-radius: 2px; }
+.sh-float__progress span { display: block; height: 100%; background: var(--brand); transition: width var(--dur-2) var(--ease); }
+
+.sh-float__body { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+.sh-float__body p { margin: 0; }
+.sh-float__word {
+  font-family: var(--fn);
+  font-size: clamp(24px, 9vw, 40px);
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-align: center;
+  overflow-wrap: anywhere;
+  transition: color var(--dur-2) var(--ease);
+}
+.sh-float__fa { font-size: clamp(15px, 5vw, 19px); font-weight: 600; color: var(--ts); text-align: center; }
+.sh-float__ex {
+  margin-top: 8px !important;
+  padding: 8px 10px;
+  font-family: var(--fn);
+  font-size: clamp(13px, 4.2vw, 16px);
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--ts);
+  background: var(--sfalt);
+  border-radius: var(--r-md);
+  border-inline-start: 3px solid transparent;
+  transition: border-color var(--dur-2) var(--ease), color var(--dur-2) var(--ease);
+}
+.sh-float__exfa { font-size: var(--fs-xs); line-height: 1.6; color: var(--tm); }
+.sh-float__word.is-speaking { color: var(--brand); }
+.sh-float__ex.is-speaking { color: var(--tp); border-inline-start-color: var(--brand); }
+
+/* "Your turn" countdown */
+.sh-float__turn { height: 3px; overflow: hidden; border-radius: 2px; background: transparent; }
+.sh-float__turn span {
+  display: block;
+  height: 100%;
+  background: var(--brand);
+  transform-origin: right;
+  animation-name: sh-float-count;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+@keyframes sh-float-count { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+.sh-float__notice { margin: 0; font-size: var(--fs-xs); line-height: 1.6; color: var(--warn, var(--ts)); }
+
+.sh-float__controls { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.sh-float__controls button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  color: var(--tp);
+  background: var(--sf);
+  border: 1px solid var(--br);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color var(--dur-1) var(--ease);
+}
+.sh-float__controls button:hover { background: var(--sf-hover); }
+.sh-float__controls button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.sh-float__controls svg.lucide { width: 19px; height: 19px; }
+.sh-float__controls .sh-float__main { width: 52px; height: 52px; color: var(--btn-pri-fg, #fff); background: var(--btn-pri-bg, var(--brand)); border-color: transparent; }
+.sh-float__controls .sh-float__main:hover { background: var(--btn-pri-bg-hover, var(--btn-pri-bg, var(--brand))); }
+.sh-float__controls .sh-float__main svg.lucide { width: 22px; height: 22px; }
+
+.sh-float__fallback { margin: 0; font-size: var(--fs-2xs, 11px); line-height: 1.6; color: var(--tm); }
+
+/* In-page fallback: a compact card in the corner of this page (not above other applications). */
+.sh-float--inpage {
+  position: fixed;
+  z-index: 280;
+  inset-inline-end: 16px;
+  bottom: calc(var(--bottomnav-total) + 16px);
+  width: min(340px, calc(100vw - 32px));
+  height: auto;
+  max-height: min(460px, 70vh);
+  border: 1px solid var(--br);
+  border-radius: var(--r-lg);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+}
+@media (min-width: 1024px) { .sh-float--inpage { bottom: 24px; } }
+
+.sh-float-btn { display: inline-flex; align-items: center; gap: 6px; }
+.sh-float-btn svg.lucide { width: 16px; height: 16px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sh-float__turn span { animation: none; }
+}

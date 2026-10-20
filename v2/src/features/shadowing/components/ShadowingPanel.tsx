@@ -1,5 +1,7 @@
 import '../shadowing.css';
+import '../floating/floating.css';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { createPortal } from 'react-dom';
 import type { Category, WordId } from '../../../models/vocabulary';
 import { PREFERENCE_KEYS, readJsonPreference, writeJsonPreference } from '../../../services/preferences';
 import { usePronunciation } from '../../pronunciation/PronunciationProvider';
@@ -13,6 +15,8 @@ import { buildShadowingQueue, selectShadowingCards } from '../queue';
 import { sanitizePreferences, type ShadowingPreferences } from '../settings';
 import { useShadowingBackend } from '../useShadowingBackend';
 import { createWakeLockPort, type WakeLockPort } from '../wakeLock';
+import { useFloatingPlayer } from '../floating/useFloatingPlayer';
+import { FloatingCard } from './FloatingCard';
 import { ShadowingSession } from './ShadowingSession';
 import { ShadowingSetup } from './ShadowingSetup';
 import { ShadowingSummary } from './ShadowingSummary';
@@ -51,6 +55,8 @@ export function ShadowingPanel({ categories, active, random, wakeLock }: Props) 
   const backend = useShadowingBackend();
   const { service: speech } = usePronunciation();
   const [preparing, setPreparing] = useState<Preparing | null>(null);
+  const floating = useFloatingPlayer();
+  const floatingKind = floating.state.kind;
   const preparingRef = useRef<Preparing | null>(null);
   preparingRef.current = preparing;
   useEffect(() => () => preparingRef.current?.abort.abort(), []);
@@ -81,12 +87,13 @@ export function ShadowingPanel({ categories, active, random, wakeLock }: Props) 
   // Leaving the tab pauses. Hiding the page pauses live speech (timers are throttled and speech
   // stops in the background); an audio session keeps playing — that is its purpose.
   useEffect(() => { if (!active) session?.player.pause('left'); }, [active, session]);
+  // With the floating window open the user works in other applications: the session keeps going.
   useEffect(() => {
-    if (!session || session.audio) return;
+    if (!session || session.audio || floatingKind === 'pip') return;
     const onVisibility = () => { if (document.visibilityState === 'hidden') session.player.pause('background'); };
     document.addEventListener('visibilitychange', onVisibility);
     return () => document.removeEventListener('visibilitychange', onVisibility);
-  }, [session]);
+  }, [session, floatingKind]);
 
   const progress: DeckProgress = { learned: backend.learned, againIds: backend.againIds };
   // A remembered personal mode falls back to "all" while it is unavailable (signed out, loading).
@@ -100,7 +107,7 @@ export function ShadowingPanel({ categories, active, random, wakeLock }: Props) 
     const items: ShadowingItem[] = deck.map((c) => ({ id: c.entry.id, word: c.entry.word, example: c.entry.example }));
     const order = deck.map((c) => c.entry.id);
     if (prefsRef.current.playback === 'audio') { void prepareAudio(items, order); return; }
-    const player = new ShadowingPlayer(items, { speech, settings: () => prefsRef.current, wakeLock: port, onItemCompleted, onFinished });
+    const player = new ShadowingPlayer(items, { speech, settings: () => prefsRef.current, wakeLock: port, timers: floating.timers, onItemCompleted, onFinished });
     setSession({ player, order, audio: false });
     player.play();
   };
@@ -137,6 +144,11 @@ export function ShadowingPanel({ categories, active, random, wakeLock }: Props) 
     const selected = selectShadowingCards(cards, shown.mode, new Set(shown.categories), progress);
     begin(buildShadowingQueue(selected, backend.exposure ?? EMPTY_EXPOSURE, shown.size, random));
   };
+
+  // The floating card belongs to a running session: it closes when the session ends or is left.
+  const sessionRunning = Boolean(session && snap && snap.status !== 'finished');
+  const closeFloating = floating.close;
+  useEffect(() => { if (!sessionRunning && floatingKind !== 'closed') closeFloating(); }, [sessionRunning, floatingKind, closeFloating]);
 
   if (preparing) {
     return (
@@ -178,18 +190,29 @@ export function ShadowingPanel({ categories, active, random, wakeLock }: Props) 
   }
 
   const p = session.player;
+  const card = cardsById.get(session.order[snap.index]!);
+  const floatControls = { play: () => p.play(), pause: () => p.pause(), next: () => p.next(), previous: () => p.previous() };
+  const floatingCard = card && floating.state.kind !== 'closed' ? (
+    <FloatingCard snap={snap} card={card} controls={floatControls} showTranslation={prefs.showTranslation}
+      inPage={floating.state.kind === 'inpage'} {...(floating.state.kind === 'inpage' ? { inPageReason: floating.state.reason } : {})}
+      onClose={floating.close} />
+  ) : null;
   return (
+    <>
     <ShadowingSession
       snap={snap}
       cardsById={cardsById}
       order={session.order}
       active={active}
       audioMode={session.audio}
+      floating={{ open: floating.open, close: floating.close, state: floating.state.kind, supported: floating.supported }}
       controls={{ play: () => p.play(), pause: () => p.pause(), stop: () => p.stop(), next: () => p.next(), previous: () => p.previous(), end: () => p.end() }}
       rate={prefs.rate}
       showTranslation={prefs.showTranslation}
       onRate={(rate) => updatePrefs({ ...prefsRef.current, rate })}
       onShowTranslation={(showTranslation) => updatePrefs({ ...prefsRef.current, showTranslation })}
     />
+    {floating.state.kind === 'pip' && floatingCard ? createPortal(floatingCard, floating.state.container) : floatingCard}
+    </>
   );
 }

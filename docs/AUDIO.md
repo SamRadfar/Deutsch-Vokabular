@@ -97,3 +97,28 @@ sentence; phones slower) and memory (≈ 2.6 MB per minute of session audio).
 
 Shadowing setup → "آزمایش صدا": shows the selected browser voice and plays a neutral sample
 sentence with the browser voice and (when downloaded) with the on-device voice.
+
+## 4. Floating player ("پنجره شناور") — Document Picture-in-Picture
+
+Shadowing → «پنجره شناور» opens a real **Document Picture-in-Picture** window (Chrome / Edge 116+
+on desktop): a separate, always-on-top window of ≈ 340 × 420 px that stays visible when the main
+browser window is minimized or another application is in front. Code: `features/shadowing/floating/`.
+
+* **One session:** the card is a React portal of the running session (same player, same audio, no
+  second playback). Controls in the window (▶/⏸, ⏮, ⏭; Space / ← / →) drive that session.
+* **Timing while minimized:** the live-speech player's pauses are timed with the floating window's
+  timers (`MovableTimers`; that document stays visible, the minimized one may be throttled); pending
+  timers move back when the window closes. Audio sessions ("پخش با صفحهٔ قفل") are driven by the
+  audio timeline anyway. Live speech is not paused when the page is hidden while the window is open.
+* **Lifecycle:** opening twice reuses the window; closing it keeps the session; ending the session,
+  leaving shadowing, signing out or switching accounts closes it (no vocabulary left on screen).
+  The main window is never focused or restored by the app.
+* **Other browsers** (Firefox, Safari, phones): a compact in-page card that says plainly that it does
+  not stay above other applications.
+
+Verified on Windows 11 with headed Chrome 155 and Edge 155 (`npm run test:desktop`, real windows,
+state read from Windows): floating window has the always-on-top flag, the main window stays
+minimized and never becomes the foreground window, the card advances with the session (1/5 → 3/5)
+while minimized, pause/play from the window work, and the real speech engine keeps running while
+minimized (silent test utterances). Not automated: how it looks and sounds on the owner's screen,
+and very long sessions (> 5 min minimized).

@@ -1,4 +1,4 @@
-import { Mic, Pause, Play, SkipBack, SkipForward, Square, Volume2 } from 'lucide-react';
+import { Mic, Pause, PictureInPicture2, Play, SkipBack, SkipForward, Square, Volume2 } from 'lucide-react';
 import { useEffect, useId, useRef } from 'react';
 import type { WordId } from '../../../models/vocabulary';
 import { WordTypeBadge } from '../../vocabulary/components/WordTypeBadge';
@@ -24,6 +24,8 @@ interface Props {
   active: boolean;
   /** Pre-rendered audio session: plays with the screen locked; speed is fixed when it was prepared. */
   audioMode?: boolean;
+  /** Floating player (Document Picture-in-Picture). */
+  floating?: { open(): void; close(): void; state: 'closed' | 'pip' | 'inpage'; supported: boolean };
   rate: number;
   showTranslation: boolean;
   onRate(rate: number): void;
@@ -52,7 +54,7 @@ function phaseText(snap: PlayerSnapshot): string {
   return step.kind === 'speak' ? `گوش کن: ${what}${rep}` : `حالا تو ${what} را بلند تکرار کن${rep}`;
 }
 
-export function ShadowingSession({ snap, cardsById, order, controls, active, audioMode = false, rate, showTranslation, onRate, onShowTranslation }: Props) {
+export function ShadowingSession({ snap, cardsById, order, controls, active, audioMode = false, floating, rate, showTranslation, onRate, onShowTranslation }: Props) {
   const rateId = useId();
   const root = useRef<HTMLElement>(null);
   const card = cardsById.get(order[snap.index]!);
@@ -96,6 +98,13 @@ export function ShadowingSession({ snap, cardsById, order, controls, active, aud
     <section ref={root} className="sh-session" data-category={card.theme} aria-label="جلسهٔ تمرین تلفظ" lang="fa" dir="rtl">
       <div className="fc-toolbar">
         <button type="button" className="fc-tool" onClick={controls.end}>پایان جلسه</button>
+        {floating ? (
+          <button type="button" className="fc-tool sh-float-btn" data-testid="floating-toggle"
+            onClick={floating.state === 'closed' ? floating.open : floating.close} aria-pressed={floating.state !== 'closed'}
+            title={floating.supported ? 'کارت کوچک همیشه‌رو، جدا از مرورگر (Picture-in-Picture)' : 'این مرورگر پنجرهٔ شناور ندارد؛ کارت داخل صفحه نمایش داده می‌شود'}>
+            <PictureInPicture2 aria-hidden="true" /> {floating.state === 'closed' ? 'پنجره شناور' : 'بستن پنجره شناور'}
+          </button>
+        ) : null}
         <p className="fc-count" data-testid="sh-count"><span dir="ltr">{snap.index + 1} / {snap.total}</span></p>
         {audioMode ? (
           <span className="sh-wake sh-wake--active" data-testid="sh-lockmode">
