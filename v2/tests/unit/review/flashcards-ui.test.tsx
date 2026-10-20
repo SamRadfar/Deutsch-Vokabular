@@ -62,7 +62,7 @@ describe('flashcards — practice sessions', () => {
 
     await user.click(button('نمایش معنی'));
     expect(card()).toHaveAttribute('data-side', 'back');
-    expect(within(back).getByText(entry.fa)).toBeInTheDocument();
+    expect(within(back).getAllByText(entry.fa).length).toBeGreaterThan(0); // fa may also equal the pronunciation (e.g. "SketchUp")
     expect(front).toHaveAttribute('inert');
     expect(speech.speak).toHaveBeenLastCalledWith(speechTextForWord(entry.word), expect.anything());
 
