@@ -20,6 +20,8 @@ describe('production build configuration', () => {
     const env = parseEnv(readFileSync('deploy/production.env', 'utf8'));
     expect(validateProductionEnv(env)).toEqual([]);
     expect(env.VITE_FIREBASE_PROJECT_ID).toBe('deutsch-vokabular');
+    // Category sync is on only because the categories rules are deployed to this project.
+    expect(env.VITE_CATEGORY_SYNC).toBe('true');
     // The owner's AI worker (Cloudflare Workers AI, free allocation) — exactly this https origin,
     // and the page CSP allows the app to reach it (and nothing else new).
     expect(env.VITE_AI_ENDPOINT).toBe('https://deutsch-vokabular-ai.sfr-arian.workers.dev');
