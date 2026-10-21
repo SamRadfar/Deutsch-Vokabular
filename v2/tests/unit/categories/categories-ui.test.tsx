@@ -83,6 +83,13 @@ describe('category destination in «افزودن واژه»', () => {
     await user.type(screen.getByRole('searchbox'), 'Koffer');
     await waitFor(() => expect(document.querySelector('.sres__crumb')).toHaveTextContent('Reisen › Gepäck'));
     expect(screen.getByRole('option', { name: 'Reisen' })).toBeInTheDocument();
+    // Progress: own categories with their counts, opening the tab from there.
+    await user.click(link('پیشرفت'));
+    const own = await screen.findByTestId('db-own-categories');
+    expect(own).toHaveTextContent('Reisen');
+    expect(own).toHaveTextContent('0/2');
+    await user.click(within(own).getByRole('button', { name: /^Reisen/ }));
+    expect(screen.getByRole('tab', { name: 'Reisen' })).toHaveAttribute('aria-selected', 'true');
   }, 40_000);
 
   it('a subcategory inside a BUILT-IN category; the library stays unchanged', async () => {

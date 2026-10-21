@@ -25,6 +25,8 @@ interface Props {
   /** After the import: show the new category in "my words". */
   /** After the import: the main category the words went to (null = no category). */
   onImported(mainId: string | null): void;
+  /** Opens the words browser on a category tab (main + subtab). */
+  onOpenCategory?(mainId: string, subtab: string | null): void;
 }
 
 type Step = 'form' | 'generating' | 'preview' | 'done';
@@ -32,7 +34,7 @@ type Step = 'form' | 'generating' | 'preview' | 'done';
 const TYPE_LABEL: Record<string, string> = { n: 'اسم', v: 'فعل', a: 'صفت', au: 'عبارت', x: 'سایر' };
 
 /** «ساخت واژه با هوش مصنوعی»: topic → generate → review/edit → import → sync. */
-export function AiVocabularyGenerator({ ai, vocab, snapshot, categories, duplicates, onClose, onImported }: Props) {
+export function AiVocabularyGenerator({ ai, vocab, snapshot, categories, duplicates, onClose, onImported, onOpenCategory }: Props) {
   const uid = useId();
   const cats = useCategories(categories);
   const [step, setStep] = useState<Step>('form');
@@ -49,7 +51,7 @@ export function AiVocabularyGenerator({ ai, vocab, snapshot, categories, duplica
   const [rows, setRows] = useState<DraftRow[]>([]);
   const [removed, setRemoved] = useState<string[]>([]);
   const [busy, setBusy] = useState<null | 'regenerate' | 'more'>(null);
-  const [imported, setImported] = useState<{ ids: string[]; mainId: string | null; mainName: string | null; skipped: number } | null>(null);
+  const [imported, setImported] = useState<{ ids: string[]; mainId: string | null; subtab: string | null; mainName: string | null; skipped: number } | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
   /** The imported words are written to this device's storage (IndexedDB) — null while writing. */
   const [stored, setStored] = useState<boolean | null>(null);
@@ -139,7 +141,7 @@ export function AiVocabularyGenerator({ ai, vocab, snapshot, categories, duplica
     // Applied at once (in memory, queued for the cloud); existing ids are never overwritten (idempotent).
     const persisted = vocab.addMany(plan.words);
     const main = mainId ? cats.catalog.find((m) => m.id === mainId)?.name ?? (effectiveDest.kind === 'newMain' ? effectiveDest.name : null) : null;
-    setImported({ ids: plan.words.map((w) => w.id), mainId, mainName: main, skipped: plan.invalid.length });
+    setImported({ ids: plan.words.map((w) => w.id), mainId, subtab: plan.words[0]?.placement?.subtab ?? null, mainName: main, skipped: plan.invalid.length });
     setStep('done');
     persisted.then(() => setStored(true), () => setStored(false));
   };
@@ -171,6 +173,9 @@ export function AiVocabularyGenerator({ ai, vocab, snapshot, categories, duplica
           ) : null}
           <p className="gen-done__hint">این واژه‌ها در جستجو، مرور با فلش‌کارت، تمرین تلفظ و آمار هم هستند. در مرور و تلفظ، دستهٔ {imported.mainName ? `«${imported.mainName}»` : '«واژه‌های من»'} را انتخاب کنید.</p>
           <div className="dialog__actions">
+            {imported.mainId && onOpenCategory ? (
+              <button type="button" className="btn" data-testid="gen-open-category" onClick={() => { onOpenCategory(imported.mainId!, imported.subtab); onClose(); }}>نمایش در زبانهٔ دسته</button>
+            ) : null}
             <button type="button" className="btn btn--primary" onClick={() => { onImported(imported.mainId); onClose(); }}>نمایش واژه‌ها</button>
           </div>
         </div>

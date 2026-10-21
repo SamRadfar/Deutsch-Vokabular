@@ -29,6 +29,8 @@ interface Props {
   onFocused(): void;
   onOpenReview(): void;
   onOpenShadowing(): void;
+  /** Opens the words browser on a category tab. */
+  onOpenCategory?(key: string, subtab: string | null): void;
 }
 
 type StatusFilter = 'all' | 'learned' | 'unlearned' | 'incomplete' | 'duplicates';
@@ -56,7 +58,7 @@ const TYPE_FILTER: Array<{ value: 'all' | WordType; label: string }> = [
 ];
 
 /** The "⭐ واژه‌های من" section: the signed-in user's own words (device-local storage). */
-export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, onOpenShadowing }: Props) {
+export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, onOpenShadowing, onOpenCategory }: Props) {
   const progress = useProgress();
   const ai = useAiClient();
   const { vocab, snapshot } = usePersonal();
@@ -284,7 +286,8 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
         <Suspense fallback={<p className="visually-hidden" role="status">در حال بارگذاری…</p>}>
           <AiVocabularyGenerator ai={ai} vocab={vocab} snapshot={snapshot} categories={categories} duplicates={duplicates}
             onClose={() => setGeneratorOpen(false)}
-            onImported={(mainId) => { setQuery(''); setType('all'); setStatus('all'); setCollection(mainId ?? ''); }} />
+            onImported={(mainId) => { setQuery(''); setType('all'); setStatus('all'); setCollection(mainId ?? ''); }}
+            {...(onOpenCategory ? { onOpenCategory } : {})} />
         </Suspense>
       ) : null}
       {managerOpen ? (

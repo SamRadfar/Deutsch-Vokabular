@@ -167,6 +167,12 @@ function AppContent({ repository, environmentLabel, theme, onToggleTheme: toggle
     navigate('words');
   }, [nav.selectCategory, navigate]);
 
+  /** Opens a category tab (e.g. right after an AI import into it). */
+  const openCategory = useCallback((key: string, subtab: string | null) => {
+    selectCategory(key);
+    if (subtab) nav.show(key as CategoryKey, subtab);
+  }, [selectCategory, nav.show]);
+
   const closeMigration = useCallback(() => setMigrationOpen(false), []);
   const envBadge = RELEASE ? (
     <span className="env-badge" title={`Deutsch Vokabular ${RELEASE.version} (${RELEASE.build})`} data-testid="env-badge" lang="en" dir="ltr">
@@ -250,6 +256,7 @@ function AppContent({ repository, environmentLabel, theme, onToggleTheme: toggle
             onFocused={() => setFocusPersonalId(null)}
             onOpenReview={() => navigate('review')}
             onOpenShadowing={() => navigate('shadowing')}
+            onOpenCategory={openCategory}
           />
         ) : null}
         {mounted.has('review') ? (

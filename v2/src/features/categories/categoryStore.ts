@@ -86,25 +86,27 @@ export class CategoryStore {
    * umlaut variants included). Subcategories are allowed below user MAIN categories and below
    * built-in categories (`builtInKeys`), never below a subcategory.
    */
-  create(name: string, parentId: string | null, builtInKeys: ReadonlySet<string> = new Set(), id?: string): CategoryResult {
+  create(name: string, parentId: string | null, builtInKeys: ReadonlySet<string> = new Set(), id?: string, createdAt?: number): CategoryResult {
     const clean = cleanCategoryName(name);
     if (parentId !== null && !this.validParent(parentId, builtInKeys)) return { ok: false, error: 'invalid-parent' };
     const error = validateName(clean, this.children(parentId));
     if (error) return { ok: false, error };
     const at = this.now();
-    const value: CategoryValue = { name: clean, parentId, sort: this.children(parentId).length, deleted: false, createdAt: at, updatedAt: at };
-    const newId = id ?? this.freshId();
+    const value: CategoryValue = { name: clean, parentId, sort: this.children(parentId).length, deleted: false, createdAt: createdAt ?? at, updatedAt: at };
+    // A deleted category stays a tombstone (the rules never revive it): a requested id that is
+    // already known gets a fresh one instead.
+    const newId = id && !this.known(id) ? id : this.freshId();
     void this.engine.set(newId, value);
     return { ok: true, category: toCategory(newId, value) };
   }
 
   /** The existing category with this name under the parent, or a new one (idempotent: retries never duplicate). */
-  ensure(name: string, parentId: string | null, builtInKeys: ReadonlySet<string> = new Set(), id?: string): CategoryResult {
+  ensure(name: string, parentId: string | null, builtInKeys: ReadonlySet<string> = new Set(), id?: string, createdAt?: number): CategoryResult {
     const key = nameKey(name);
     const existing = this.children(parentId).find((c) => nameKey(c.name) === key);
     if (existing) return { ok: true, category: existing };
     if (id && this.getSnapshot().byId.has(id)) return { ok: true, category: this.getSnapshot().byId.get(id)! };
-    return this.create(name, parentId, builtInKeys, id);
+    return this.create(name, parentId, builtInKeys, id, createdAt);
   }
 
   /** Renames; the id stays (every word keeps pointing to it). */
@@ -135,9 +137,13 @@ export class CategoryStore {
     return BUILTIN_KEY_PATTERN.test(parentId) && builtInKeys.has(parentId);
   }
 
+  private known(id: string): boolean {
+    return this.engine.getSnapshot().values.has(id) || !!this.engine.confirmedOf(id);
+  }
+
   private freshId(): string {
     let id = this.newId();
-    while (this.engine.getSnapshot().values.has(id) || this.engine.confirmedOf(id)) id = this.newId();
+    while (this.known(id)) id = this.newId();
     return id;
   }
 

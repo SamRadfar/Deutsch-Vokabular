@@ -8,7 +8,8 @@ import { describeSync } from '../account/SyncStatusIndicator';
 import type { ReviewSnapshot } from '../review/reviewLog';
 import type { ShadowingLogSnapshot } from '../shadowing/shadowingLog';
 import { formatDuration } from '../shadowing/components/format';
-import { learningOverview, reviewActivity } from './stats';
+import { learningOverview, ownCategoryProgress, reviewActivity } from './stats';
+import { useCategories } from '../categories/useCategories';
 import { usePersonal } from '../personal/usePersonal';
 
 interface Props {
@@ -44,6 +45,8 @@ export function Dashboard({ categories, onOpenCategory, onOpenReview, onOpenShad
   const shadow: ShadowingLogSnapshot | null = useSyncExternalStore(ready?.shadowing.subscribe ?? noop, ready?.shadowing.getSnapshot ?? none, ready?.shadowing.getSnapshot ?? none);
 
   const { snapshot: personal } = usePersonal();
+  const { catalog } = useCategories(categories);
+  const own = useMemo(() => ownCategoryProgress(catalog, personal?.words ?? []), [catalog, personal]);
   // Practice statistics count built-in words and the current personal words (deleted ones drop out).
   const knownIds = useMemo(() => {
     const ids = new Set<string>();
@@ -109,6 +112,23 @@ export function Dashboard({ categories, onOpenCategory, onOpenReview, onOpenShad
                           <span style={{ width: `${c.percent}%` }} />
                         </span>
                       ) : null}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          {own.length ? (
+            <div className="db-card" data-testid="db-own-categories">
+              <h3 className="db-card__title">دسته‌های من</h3>
+              <ul className="db-cats">
+                {own.map((c) => (
+                  <li key={c.key} data-category={c.theme}>
+                    <button type="button" className="db-cat" onClick={() => onOpenCategory(c.key)} aria-label={`${c.label}: ${c.learned} از ${c.total} یادگرفته — نمایش واژه‌ها`}>
+                      <span className="db-cat__label" dir="auto">{(() => { const Icon = categoryIcon(c.key); return Icon ? <Icon className="db-cat__icon" /> : null; })()}{c.label}</span>
+                      <span className="db-cat__count"><span dir="ltr">{c.learned}/{c.total}</span></span>
+                      <span className="db-bar" aria-hidden="true"><span style={{ width: `${c.percent}%` }} /></span>
                     </button>
                   </li>
                 ))}

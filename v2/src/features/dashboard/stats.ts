@@ -5,6 +5,8 @@
 import type { Category, CategoryKey, WordId } from '../../models/vocabulary';
 import { categoryName } from '../../models/vocabulary';
 import type { ReviewRecord } from '../review/model';
+import type { CatalogMain } from '../categories/catalog';
+import type { PersonalWord } from '../personal/model';
 import { countCategories, countSubtab, percent } from '../progress/stats';
 
 export interface CategoryProgress {
@@ -39,6 +41,18 @@ export function learningOverview(categories: readonly Category[], learned: Reado
       return { key: c.key, label: categoryName(c.label), theme: c.theme, total, learned: done, percent: percent({ total, learned: done }) };
     }),
   };
+}
+
+/**
+ * The account's own main categories (personal words placed in them; learned = the personal word's
+ * own flag). Empty categories are listed too, so the user sees everything they created.
+ */
+export function ownCategoryProgress(catalog: readonly CatalogMain[], words: readonly PersonalWord[]): CategoryProgress[] {
+  return catalog.filter((m) => !m.builtIn).map((m) => {
+    const placed = words.filter((w) => w.placement?.category === m.id);
+    const learned = placed.filter((w) => w.learned).length;
+    return { key: m.id as CategoryKey, label: m.name, theme: m.theme, total: placed.length, learned, percent: percent({ total: placed.length, learned }) };
+  });
 }
 
 export interface ReviewActivity {

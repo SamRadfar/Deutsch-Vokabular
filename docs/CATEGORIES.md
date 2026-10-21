@@ -41,13 +41,18 @@ saves or imports, and cancelling creates nothing. The AI generator creates the d
 no subcategory is chosen, one subcategory per AI-suggested subcategory of the imported rows.
 
 Deleting a category never deletes words. The user moves them to another destination or leaves them
-uncategorised («واژه‌های من»).
+uncategorised («واژه‌های من»). A deleted category stays a tombstone: recreating one with a known id
+gets a fresh id, because the rules never revive a tombstone.
+
+After an AI import, «نمایش در زبانهٔ دسته» opens the words browser on the destination tab.
+«پیشرفت» lists your own main categories with their word and learned counts.
 
 ## Compatibility
 
 The first generator version stored own categories as `placement.category = "my:<name>"`. After
 loading, `migrateLegacyCollections` creates real categories with **deterministic** ids
-(`stableCategoryId("legacy:<name>")`), so every device computes the same ids. It then reassigns those
+(`stableCategoryId("legacy:<name>")`) and a deterministic `createdAt` (the oldest word of the
+group), so every device writes identical documents. It then reassigns those
 words.
 
 The migration is non-destructive and idempotent:

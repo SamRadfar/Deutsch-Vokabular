@@ -98,6 +98,28 @@ describe('AI vocabulary generator', () => {
     expect(screen.getByRole('rowheader', { name: 'die Jacke' })).toBeInTheDocument();
   });
 
+  it('imports into a NEW subcategory of a built-in category and opens it as a tab', async () => {
+    const { ai, user } = await open();
+    ai.willGenerate([E('Brettschichtholz', 'چوب چندلایه', 'Holz'), E('Holzbalkendecke', 'سقف تیرچوبی', 'Holz')]);
+    ai.useGenerator(() => ({ ok: false, code: 'daily-limit', message: 'سهم امروز تمام شد.' }));
+    await user.click(screen.getByTestId('open-generator'));
+    const dialog = await screen.findByRole('dialog', { name: 'ساخت واژه با هوش مصنوعی' });
+    const q = within(dialog);
+    await user.type(q.getByLabelText('موضوع'), 'Holzbau');
+    await user.click(q.getByRole('radio', { name: '25' }));
+    await user.click(q.getByRole('radio', { name: 'ساخت زیرمجموعه در دسته موجود' }));
+    await user.selectOptions(q.getByLabelText('در دسته اصلی'), 'arch');
+    await user.type(q.getByLabelText('نام زیرمجموعهٔ جدید'), 'Holzbau');
+    await user.click(q.getByRole('button', { name: /ساخت واژه‌ها/ }));
+    const preview = await screen.findByTestId('gen-preview');
+    await user.click(within(preview).getByTestId('gen-import'));
+    await user.click(await screen.findByTestId('gen-open-category'));
+    // The words browser opens on «Architektur» › «Holzbau» with the imported words.
+    expect(screen.getByRole('tab', { name: /Holzbau/ })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('rowheader', { name: 'die Brettschichtholz' })).toBeInTheDocument();
+    expect(screen.getByTestId('header-progress')).toHaveTextContent('0/999');
+  }, 40_000);
+
   it('says honestly when the AI service is not configured (no fake generation)', async () => {
     const env = createFakeServices({ restored: ALICE });
     const user = userEvent.setup();

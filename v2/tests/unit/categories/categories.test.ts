@@ -105,6 +105,18 @@ describe('category store', () => {
     cats.stop();
   });
 
+  it('a deleted category is never revived: recreating with the same id gets a fresh id', async () => {
+    const cats = await setup();
+    const id = await stableCategoryId('legacy:x');
+    const first = cats.ensure('X', null, KEYS, id);
+    expect(first.ok && first.category.id).toBe(id);
+    cats.remove(id);
+    const again = cats.ensure('X', null, KEYS, id);
+    expect(again.ok && again.category.id).not.toBe(id);
+    expect(again.ok && isCategoryId(again.category.id)).toBe(true);
+    cats.stop();
+  });
+
   it('persists on the device and reloads; accounts are isolated', async () => {
     const local = createMemoryStore();
     const one = await setup(local, 'alice');
@@ -233,7 +245,9 @@ describe('legacy "my:" categories (first generator version) — compatibility mi
 
     const b = await device();
     await migrateLegacyCollections(b.vocab, b.cats);
-    expect(b.cats.getSnapshot().categories.map((c) => c.id).sort()).toEqual(a.cats.getSnapshot().categories.map((c) => c.id).sort());
+    // Same ids AND same createdAt on every device (the rules require createdAt to stay unchanged).
+    const docs = (s: CategoryStore) => s.getSnapshot().categories.map((c) => [c.id, c.createdAt]).sort();
+    expect(docs(b.cats)).toEqual(docs(a.cats));
     for (const d of [a, b]) { d.vocab.stop(); d.cats.stop(); }
   });
 });
