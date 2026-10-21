@@ -42,12 +42,3 @@ export function fromValue(id: string, v: CustomWordValue): PersonalWord {
   return { schemaVersion: 1, id, ...rest };
 }
 
-/**
- * Deterministic id for an imported legacy word: two devices importing the same legacy data write
- * the SAME document instead of creating duplicates.
- */
-export async function legacyImportId(legacyId: string): Promise<string> {
-  const bytes = new TextEncoder().encode(`dvok5_custom:${legacyId}`);
-  const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes));
-  return `pw_${[...hash.slice(0, 10)].map((b) => b.toString(16).padStart(2, '0')).join('')}`;
-}

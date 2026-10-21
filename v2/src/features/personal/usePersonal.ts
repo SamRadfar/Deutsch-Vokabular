@@ -3,7 +3,8 @@ import type { Category, WordId } from '../../models/vocabulary';
 import { categoryName } from '../../models/vocabulary';
 import { useProgress } from '../progress/ProgressProvider';
 import { flattenCards, PERSONAL_KEY, PERSONAL_LABEL, personalCards, type DeckCard, type PracticeCategoryKey } from '../review/deck';
-import { isPersonalId } from './model';
+import { listCollections } from './collections';
+import { isPersonalId, type PersonalWord } from './model';
 import type { PersonalSnapshot, PersonalVocabulary } from './personalVocabulary';
 
 const noop = () => () => {};
@@ -53,9 +54,15 @@ export function usePracticeCards(categories: readonly Category[]): DeckCard[] {
   );
 }
 
-/** Scopes offered in practice setups: the built-in categories, plus "my words" when there are any. */
-export function practiceScopes(categories: readonly Category[], personalCount: number): Array<{ key: PracticeCategoryKey; label: string; theme: string }> {
+/**
+ * Scopes offered in practice setups: the built-in categories, "my words" when there are any, and
+ * each user-created category (a subset of "my words").
+ */
+export function practiceScopes(categories: readonly Category[], personal: number | readonly PersonalWord[]): Array<{ key: PracticeCategoryKey; label: string; theme: string }> {
   const scopes: Array<{ key: PracticeCategoryKey; label: string; theme: string }> = categories.map((c) => ({ key: c.key, label: categoryName(c.label), theme: c.theme }));
-  if (personalCount > 0) scopes.push({ key: PERSONAL_KEY, label: PERSONAL_LABEL, theme: 'review' });
+  const words = typeof personal === 'number' ? [] : personal;
+  const count = typeof personal === 'number' ? personal : personal.length;
+  if (count > 0) scopes.push({ key: PERSONAL_KEY, label: PERSONAL_LABEL, theme: 'review' });
+  for (const c of listCollections(words)) scopes.push({ key: c.key as PracticeCategoryKey, label: c.name, theme: 'review' });
   return scopes;
 }

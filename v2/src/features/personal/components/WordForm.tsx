@@ -4,6 +4,7 @@ import type { Category, WordType } from '../../../models/vocabulary';
 import { categoryName } from '../../../models/vocabulary';
 import { Dialog } from '../../../components/Dialog/Dialog';
 import { AiAssist } from '../../ai/components/AiAssist';
+import { COLLECTION_PREFIX, collectionPlacement, type CollectionSummary } from '../collections';
 import type { DuplicateIndex } from '../duplicates';
 import {
   ARTICLES, LIMITS, isValidInput, normalizeInput, validateInput,
@@ -26,6 +27,8 @@ interface Props {
   /** Edit an existing word; absent = new word. */
   word?: PersonalWord;
   categories: readonly Category[];
+  /** The user's own categories (personal words only). */
+  collections?: readonly CollectionSummary[];
   duplicates: DuplicateIndex;
   onSave(input: PersonalWordInput): FieldErrors | null;
   onClose(): void;
@@ -36,7 +39,7 @@ interface Props {
 }
 
 /** Add / edit dialog. Validation messages are shown per field; duplicates only warn. */
-export function WordForm({ word, categories, duplicates, onSave, onClose, aiComplete = false, aiFocus = false }: Props) {
+export function WordForm({ word, categories, collections = [], duplicates, onSave, onClose, aiComplete = false, aiFocus = false }: Props) {
   const [v, setV] = useState<PersonalWordInput>(() => (word ? {
     article: word.article, lemma: word.lemma, type: word.type, grammar: word.grammar, fa: word.fa, example: word.example,
     exampleFa: word.exampleFa, pronunciationFa: word.pronunciationFa, placement: word.placement,
@@ -56,6 +59,9 @@ export function WordForm({ word, categories, duplicates, onSave, onClose, aiComp
 
   const dupes = useMemo(() => (v.lemma.trim() ? duplicates.find(normalizeInput(v).lemma, word?.id) : []), [v, duplicates, word]);
   const category = v.placement ? categories.find((c) => c.key === v.placement!.category) : undefined;
+  const own = v.placement?.category.startsWith(COLLECTION_PREFIX) ? collections.find((c) => c.key === v.placement!.category) ?? {
+    key: v.placement.category, name: v.placement.category.slice(COLLECTION_PREFIX.length), count: 0, subcategories: [],
+  } : undefined;
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
@@ -152,17 +158,34 @@ export function WordForm({ word, categories, duplicates, onSave, onClose, aiComp
               <input {...field('pronunciationFa')} value={v.pronunciationFa} onChange={(e) => set({ pronunciationFa: e.currentTarget.value })} lang="fa" dir="rtl" maxLength={LIMITS.pronunciationFa} autoComplete="off" />
               {err('pronunciationFa')}
             </div>
-            <div className={`pw-field ${category ? 'pw-span-3' : 'pw-span-6'}`}>
+            <div className={`pw-field ${category || own ? 'pw-span-3' : 'pw-span-6'}`}>
               <label htmlFor={id('placement')}>نمایش در دسته</label>
               <select {...field('placement')} value={v.placement?.category ?? ''}
                 onChange={(e) => {
-                  const c = categories.find((x) => x.key === e.currentTarget.value);
-                  set({ placement: c ? { category: c.key, subtab: c.subtabs[0]?.id ?? '' } : null });
+                  const value = e.currentTarget.value;
+                  const c = categories.find((x) => x.key === value);
+                  const mine = collections.find((x) => x.key === value);
+                  set({ placement: c ? { category: c.key, subtab: c.subtabs[0]?.id ?? '' } : mine ? collectionPlacement(mine.name, mine.subcategories[0]?.name ?? '') : null });
                 }}>
                 <option value="">فقط در «واژه‌های من»</option>
-                {categories.map((c) => <option key={c.key} value={c.key}>{categoryName(c.label)}</option>)}
+                {collections.length || own ? (
+                  <optgroup label="دسته‌های من">
+                    {(own && !collections.some((c) => c.key === own.key) ? [own, ...collections] : collections).map((c) => <option key={c.key} value={c.key}>{c.name}</option>)}
+                  </optgroup>
+                ) : null}
+                <optgroup label="دسته‌های اصلی">
+                  {categories.map((c) => <option key={c.key} value={c.key}>{categoryName(c.label)}</option>)}
+                </optgroup>
               </select>
             </div>
+            {own ? (
+              <div className="pw-field pw-span-3">
+                <label htmlFor={id('subtab')}>زیرمجموعه</label>
+                <input id={id('subtab')} value={v.placement!.subtab} list={id('subs')} lang="de" dir="ltr" maxLength={60}
+                  onChange={(e) => set({ placement: { category: own.key, subtab: e.currentTarget.value } })} />
+                <datalist id={id('subs')}>{own.subcategories.map((s) => <option key={s.name} value={s.name} />)}</datalist>
+              </div>
+            ) : null}
             {category ? (
               <div className="pw-field pw-span-3">
                 <label htmlFor={id('subtab')}>زیرمجموعه</label>

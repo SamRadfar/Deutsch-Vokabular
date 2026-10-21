@@ -100,7 +100,7 @@ describe('AI suggestions — new word', () => {
     await user.type(dialog.getByLabelText('واژهٔ آلمانی برای پیشنهاد'), 'Wand');
     ai.willFail('daily-limit');
     await user.click(dialog.getByRole('button', { name: 'دریافت پیشنهاد' }));
-    expect(await dialog.findByRole('alert')).toHaveTextContent('سهم امروز شما از پیشنهادهای هوش مصنوعی تمام شده است');
+    expect(await dialog.findByRole('alert')).toHaveTextContent('سهم امروز شما از هوش مصنوعی تمام شده است');
 
     const release = ai.holdNext();
     ai.willSuggest(NACHHALTIGKEIT);

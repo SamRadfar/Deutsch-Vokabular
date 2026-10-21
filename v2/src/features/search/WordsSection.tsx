@@ -71,8 +71,8 @@ export function WordsSection(p: Props) {
   const { onShow, onShowPersonal, onFocusEntry } = p;
   const showInList = useCallback((card: DeckCard) => {
     onSearch({ query: '', filters: NO_FILTERS });
-    if (card.categoryKey === PERSONAL_KEY) { onShowPersonal(card.entry.id); return; }
-    onShow(card.categoryKey, card.subtabId);
+    if (card.categoryKey === PERSONAL_KEY || card.categoryKey.startsWith('my:')) { onShowPersonal(card.entry.id); return; }
+    onShow(card.categoryKey as Parameters<typeof onShow>[0], card.subtabId);
     onFocusEntry(card.entry.id);
   }, [onSearch, onShow, onShowPersonal, onFocusEntry]);
 

@@ -45,7 +45,7 @@ export interface AiRequest {
 export interface AiResponse {
   suggestion: AiFields;
   /** `mock` = local development provider without an API key (not real AI). */
-  provider: 'anthropic' | 'mock';
+  provider: 'workers-ai' | 'anthropic' | 'mock';
   model: string;
   limits: { remainingToday: number; dailyLimit: number };
 }
@@ -131,4 +131,137 @@ export function validateSuggestion(raw: unknown): AiFields | null {
   if (out.type !== 'n') out.article = null;
   if (!out.lemma || !/\p{L}/u.test(out.lemma) || /[؀-ۿ]/.test(out.lemma)) return null;
   return out as AiFields;
+}
+
+// ── Topic generation (POST /v1/generate) ─────────────────────────────────────────────────────
+// The app asks for one BATCH (≤ GENERATE_LIMITS.batch entries) per request and builds larger lists
+// (25–200) from several batches, so each request stays short, cheap and retryable.
+
+export const AI_LEVELS = ['A1-A2', 'B1-B2', 'C1-C2', 'all'] as const;
+export type AiLevel = (typeof AI_LEVELS)[number];
+export const CEFR = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const;
+
+export const GENERATE_LIMITS = {
+  topic: 80, instructions: 300, batch: 15, subcategory: 40, subcategories: 12,
+  avoid: 250, avoidItem: 60, body: 24_576,
+  lemma: 60, fa: 120, example: 220, exampleFa: 260,
+} as const;
+
+export interface GenerateRequest {
+  topic: string;
+  level: AiLevel;
+  /** Entries in this batch (1 … GENERATE_LIMITS.batch). */
+  count: number;
+  instructions?: string;
+  /** Subcategory names already in use for this topic (keep them consistent across batches). */
+  subcategories?: string[];
+  /** Concentrate this batch on one subcategory (parallel batches do not overlap). */
+  focus?: string;
+  /** German words already generated in THIS session (never the user's saved vocabulary). */
+  avoid?: string[];
+}
+
+export interface GeneratedEntry {
+  article: 'der' | 'die' | 'das' | null;
+  lemma: string;
+  type: 'n' | 'v' | 'a' | 'au' | 'x';
+  /** Optional plural / verb forms. */
+  grammar: string;
+  fa: string;
+  example: string;
+  exampleFa: string;
+  subcategory: string;
+  level: (typeof CEFR)[number] | null;
+}
+
+export interface GenerateResponse {
+  entries: GeneratedEntry[];
+  /** Model entries dropped by validation (malformed, wrong script, missing article, …). */
+  rejected: number;
+  provider: 'workers-ai' | 'anthropic' | 'mock';
+  model: string;
+  limits: { remainingToday: number; dailyLimit: number };
+}
+
+const PERSIAN = /[؀-ۿ]/;
+const LATIN = /[A-Za-zÄÖÜäöüß]/;
+
+export function validateGenerateRequest(raw: unknown): { ok: true; value: GenerateRequest } | { ok: false; error: string } {
+  if (!isObj(raw)) return { ok: false, error: 'body must be a JSON object' };
+  const allowed = new Set(['topic', 'level', 'count', 'instructions', 'subcategories', 'focus', 'avoid']);
+  for (const k of Object.keys(raw)) if (!allowed.has(k)) return { ok: false, error: `unknown field ${k}` };
+  const topic = cleanAiText(raw.topic, GENERATE_LIMITS.topic);
+  if (!topic || !/\p{L}/u.test(topic)) return { ok: false, error: `topic must be text of 1–${GENERATE_LIMITS.topic} characters` };
+  if (!(AI_LEVELS as readonly unknown[]).includes(raw.level)) return { ok: false, error: 'level must be A1-A2, B1-B2, C1-C2 or all' };
+  if (typeof raw.count !== 'number' || !Number.isInteger(raw.count) || raw.count < 1 || raw.count > GENERATE_LIMITS.batch) {
+    return { ok: false, error: `count must be 1–${GENERATE_LIMITS.batch}` };
+  }
+  const value: GenerateRequest = { topic, level: raw.level as AiLevel, count: raw.count };
+  if (raw.instructions !== undefined) {
+    const v = cleanAiText(raw.instructions, GENERATE_LIMITS.instructions);
+    if (v === null) return { ok: false, error: `instructions must be text of at most ${GENERATE_LIMITS.instructions} characters` };
+    if (v) value.instructions = v;
+  }
+  if (raw.focus !== undefined) {
+    const v = cleanAiText(raw.focus, GENERATE_LIMITS.subcategory);
+    if (v === null) return { ok: false, error: 'focus invalid' };
+    if (v) value.focus = v;
+  }
+  for (const [k, maxItems, maxLen] of [['subcategories', GENERATE_LIMITS.subcategories, GENERATE_LIMITS.subcategory], ['avoid', GENERATE_LIMITS.avoid, GENERATE_LIMITS.avoidItem]] as const) {
+    const list = raw[k];
+    if (list === undefined) continue;
+    if (!Array.isArray(list) || list.length > maxItems) return { ok: false, error: `${k} must be a list of at most ${maxItems} items` };
+    const clean: string[] = [];
+    for (const item of list) {
+      const v = cleanAiText(item, maxLen);
+      if (v === null) return { ok: false, error: `${k} items must be text of at most ${maxLen} characters` };
+      if (v) clean.push(v);
+    }
+    if (clean.length) value[k] = clean;
+  }
+  return { ok: true, value };
+}
+
+/** Validates ONE generated entry (model output is untrusted). Returns null if unusable. */
+export function validateGeneratedEntry(raw: unknown): GeneratedEntry | null {
+  if (!isObj(raw)) return null;
+  const s = (k: string, max: number) => cleanAiText(raw[k] ?? '', max);
+  let lemma = s('lemma', GENERATE_LIMITS.lemma) ?? s('word', GENERATE_LIMITS.lemma);
+  const fa = s('fa', GENERATE_LIMITS.fa);
+  const example = s('example', GENERATE_LIMITS.example);
+  const exampleFa = s('exampleFa', GENERATE_LIMITS.exampleFa);
+  const grammar = s('grammar', AI_LIMITS.grammar) ?? '';
+  const sub = s('subcategory', GENERATE_LIMITS.subcategory) ?? '';
+  if (!lemma || fa === null || example === null || exampleFa === null) return null;
+  if (!(AI_TYPES as readonly unknown[]).includes(raw.type)) return null;
+  const type = raw.type as GeneratedEntry['type'];
+  let article: GeneratedEntry['article'] = raw.article === null || raw.article === undefined || raw.article === '' ? null
+    : typeof raw.article === 'string' && (AI_ARTICLES as readonly string[]).includes(raw.article.toLowerCase()) ? raw.article.toLowerCase() as GeneratedEntry['article'] : null;
+  const m = /^(der|die|das)\s+(.+)$/i.exec(lemma);
+  if (m) { article = article ?? (m[1]!.toLowerCase() as GeneratedEntry['article']); lemma = m[2]!; }
+  if (type !== 'n') article = null;
+  if (type === 'n' && !article) return null; // a noun without its article is not useful for learners
+  // German in German fields, Persian in Persian fields; no empty meaning or example.
+  if (!/\p{L}/u.test(lemma) || PERSIAN.test(lemma) || lemma.split(' ').length > 6) return null;
+  if (!fa || !PERSIAN.test(fa) || LATIN.test(fa.replace(/\([^)]*\)/g, ''))) return null;
+  if (example.length < 12 || !LATIN.test(example) || PERSIAN.test(example)) return null;
+  if (!exampleFa || !PERSIAN.test(exampleFa)) return null;
+  if (type === 'n' && !/^\p{Lu}/u.test(lemma)) return null; // German nouns are capitalised
+  const level = typeof raw.level === 'string' && (CEFR as readonly string[]).includes(raw.level.toUpperCase()) ? raw.level.toUpperCase() as GeneratedEntry['level'] : null;
+  return { article, lemma, type, grammar, fa, example, exampleFa, subcategory: sub, level };
+}
+
+/** Pulls the entry list out of a model answer (object with `entries`, a bare array, or JSON text). */
+export function extractGeneratedList(raw: unknown): unknown[] | null {
+  let v = raw;
+  if (typeof v === 'string') {
+    const text = v.replace(/^```(?:json)?\s*|\s*```$/g, '');
+    const start = Math.min(...['{', '['].map((c) => text.indexOf(c)).filter((i) => i >= 0));
+    const end = Math.max(text.lastIndexOf('}'), text.lastIndexOf(']'));
+    if (!Number.isFinite(start) || end <= start) return null;
+    try { v = JSON.parse(text.slice(start, end + 1)); } catch { return null; }
+  }
+  if (Array.isArray(v)) return v;
+  if (isObj(v) && Array.isArray(v.entries)) return v.entries;
+  return null;
 }

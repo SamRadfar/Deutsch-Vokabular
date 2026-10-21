@@ -63,7 +63,7 @@ export function ShadowingPanel({ categories, active, random, wakeLock }: Props) 
   const port = useMemo(() => wakeLock ?? createWakeLockPort(), [wakeLock]);
   const cards = usePracticeCards(categories); // built-in + personal words
   const { snapshot: personal } = usePersonal();
-  const scopes = useMemo(() => practiceScopes(categories, personal?.words.length ?? 0), [categories, personal]);
+  const scopes = useMemo(() => practiceScopes(categories, personal?.words ?? []), [categories, personal]);
   const cardsById = useMemo(() => new Map(cards.map((c) => [c.entry.id, c])), [cards]);
 
   const [prefs, setPrefs] = useState(() => sanitizePreferences(readJsonPreference(PREFERENCE_KEYS.shadowing)));

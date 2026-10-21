@@ -34,13 +34,31 @@ Put `VITE_AI_ENDPOINT=http://127.0.0.1:8787` in `v2/.env.local`. The mock provid
 placeholder values marked «[آزمایشی]», and the app labels them «پیشنهاد آزمایشی». This is **not**
 real AI.
 
-## Deployment — only after the owner's approval
+## Model: Cloudflare Workers AI (free allocation, no API key)
 
-Each of these steps needs approval. The Anthropic API is a **paid** service.
+The worker calls Workers AI through its `AI` binding (`[ai]` in `wrangler.toml`). There is no
+API key to store. The Workers **Free** plan includes **10,000 Neurons per day**; when they are used
+up, Workers AI returns an error (no charge) and the app shows "try again tomorrow". The default
+model `@cf/meta/llama-3.3-70b-instruct-fp8-fast` supports JSON mode. It costs about 34 Neurons per
+generated word, so `LIMIT_WORDS_PER_DAY` / `LIMIT_GLOBAL_WORDS_PER_DAY = 300` keep the service
+inside the free allocation. More needs the Workers Paid plan (not enabled). `ANTHROPIC_API_KEY`
+(paid) is optional; when it is set, it takes precedence.
 
-1. Use a Cloudflare account (the Workers free plan is enough): `npx wrangler login`.
-2. Create the KV namespace with `npx wrangler kv namespace create USAGE`, then put the id into `wrangler.toml`.
-3. Set `ALLOWED_ORIGINS` to the exact origin(s) of the approved V2 hosting.
-4. Store the key as a secret with `npx wrangler secret put ANTHROPIC_API_KEY`. It is typed into the prompt and never committed. Set a monthly spend limit in the Anthropic console.
-5. Deploy with `npx wrangler deploy`. Then set `VITE_AI_ENDPOINT=https://<worker>.workers.dev` for the app.
-6. Run the live test: sign in, generate a word, and check the review step and the limits.
+```
+POST /v1/generate
+Authorization: Bearer <Firebase ID token of deutsch-vokabular>
+{"topic":"Kleidung und Mode","level":"B1-B2","count":15,"subcategories":["Oberteile"],"focus":"Oberteile","avoid":["die Jacke"]}
+→ {"entries":[{article,lemma,type,grammar,fa,example,exampleFa,subcategory,level}], "rejected":1, "provider":"workers-ai", …}
+```
+
+The app builds lists of 25–200 words from batches of at most 15 (`src/features/personal/generate`).
+`avoid` contains only words of the list being built. The user's saved vocabulary is never sent.
+
+## Deployment (owner's Cloudflare account, free plan)
+
+1. `npx wrangler login`: the owner approves in the browser. This is the only interactive step.
+2. `npx wrangler kv namespace create USAGE`, then put the id into `wrangler.toml`.
+3. `npx wrangler deploy`. Workers AI needs no further setup and no key.
+4. Put `VITE_AI_ENDPOINT=https://deutsch-vokabular-ai.<subdomain>.workers.dev` into
+   `deploy/production.env`, and add the same origin to `connect-src` in `firebase.json`.
+5. Run the live test: sign in on the preview and generate 25 words.

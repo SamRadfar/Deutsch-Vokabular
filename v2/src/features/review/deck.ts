@@ -3,13 +3,17 @@
 
 import type { Category, CategoryKey, VocabularyEntry, WordId } from '../../models/vocabulary';
 import { categoryName } from '../../models/vocabulary';
+import { collectionNameOf, isCollectionKey, wordCollection } from '../personal/collections';
 import { toEntry, type PersonalWord } from '../personal/model';
 
 export type ReviewMode = 'all' | 'unlearned' | 'learned' | 'again';
 
 /** Pseudo category of the user's personal words in decks, search and filters. */
 export const PERSONAL_KEY = 'mine';
-export type PracticeCategoryKey = CategoryKey | typeof PERSONAL_KEY;
+/** A user-created category of personal words ("my:<name>", features/personal/collections.ts). */
+export type CollectionKey = `my:${string}`;
+/** Built-in category, all personal words ("mine"), or one user-created category (a subset of "mine"). */
+export type PracticeCategoryKey = CategoryKey | typeof PERSONAL_KEY | CollectionKey;
 export const PERSONAL_LABEL = 'واژه‌های من';
 export const REVIEW_MODES: readonly ReviewMode[] = ['all', 'unlearned', 'learned', 'again'];
 
@@ -20,6 +24,8 @@ export interface DeckCard {
   entry: VocabularyEntry;
   categoryKey: PracticeCategoryKey;
   categoryLabel: string;
+  /** Personal words in a user-created category: its name (the card's categoryKey stays "mine"). */
+  collection?: string;
   /** Accent theme of the category (CSS `data-category`). */
   theme: string;
   subtabId: string;
@@ -58,7 +64,7 @@ export function modeAvailable(mode: ReviewMode, progress: DeckProgress): boolean
 
 export function selectCards(cards: readonly DeckCard[], mode: ReviewMode, scope: ReviewScope, progress: DeckProgress): DeckCard[] {
   if (!modeAvailable(mode, progress)) return [];
-  const inScope = scope === 'all' ? cards : cards.filter((c) => c.categoryKey === scope);
+  const inScope = scope === 'all' ? cards : cards.filter((c) => inPracticeScope(c, scope));
   switch (mode) {
     case 'all': return [...inScope];
     case 'unlearned': return inScope.filter((c) => !progress.learned!.has(c.entry.id));
@@ -87,15 +93,24 @@ export function buildDeck(selected: readonly DeckCard[], size: number | null, ra
   return size === null ? ids : ids.slice(0, size);
 }
 
+/** A card belongs to a scope by its category, or (personal words) by its user-created category. */
+export function inPracticeScope(card: DeckCard, key: PracticeCategoryKey): boolean {
+  return card.categoryKey === key || (isCollectionKey(key) && card.collection === collectionNameOf(key));
+}
+
 /** Practice cards for personal words (after the built-in cards in `order`). */
 export function personalCards(words: readonly PersonalWord[], firstOrder: number): DeckCard[] {
-  return words.map((w, i) => ({
-    entry: toEntry(w),
-    categoryKey: PERSONAL_KEY,
-    categoryLabel: PERSONAL_LABEL,
-    theme: 'review',
-    subtabId: PERSONAL_KEY,
-    subtabLabel: w.placement ? 'Meine Wörter' : 'واژه‌های من',
-    order: firstOrder + i,
-  }));
+  return words.map((w, i) => {
+    const c = wordCollection(w);
+    return {
+      entry: toEntry(w),
+      categoryKey: PERSONAL_KEY,
+      categoryLabel: c ? c.name : PERSONAL_LABEL,
+      ...(c ? { collection: c.name } : {}),
+      theme: 'review',
+      subtabId: PERSONAL_KEY,
+      subtabLabel: c ? c.subcategory : w.placement ? 'Meine Wörter' : 'واژه‌های من',
+      order: firstOrder + i,
+    };
+  });
 }

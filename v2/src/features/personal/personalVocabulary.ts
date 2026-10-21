@@ -176,7 +176,7 @@ export class PersonalVocabulary {
   async addMany(words: PersonalWord[]): Promise<void> {
     const values = this.engine.getSnapshot().values;
     const fresh = words.filter((w) => !values.has(w.id) && !this.engine.confirmedOf(w.id) && isValidPersonalWord(w));
-    await Promise.all(fresh.map((w) => this.engine.set(w.id, toValue(w))));
+    await this.engine.setMany(fresh.map((w) => [w.id, toValue(w)] as const));
   }
 
   /** Resolves when the queued local writes are stored on this device. */

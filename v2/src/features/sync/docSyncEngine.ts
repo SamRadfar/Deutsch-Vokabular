@@ -210,6 +210,32 @@ export class DocSyncEngine<V> {
   }
 
   /**
+   * Many writes at once (bulk import): one state update, one serialized local save, one flush —
+   * instead of one re-render and one flush per document.
+   */
+  setMany(entries: ReadonlyArray<readonly [string, V]>): Promise<void> {
+    if (this.stopped || !entries.length) return Promise.resolve();
+    const bad = entries.find(([id]) => !this.o.isValidId(id));
+    if (bad) return Promise.reject(new Error(`invalid document id ${bad[0]}`));
+    const at = (this.o.now ?? Date.now)();
+    const ops = entries.map(([id, value]): PendingWrite<V> => ({
+      opId: this.o.newOpId?.() ?? crypto.randomUUID(), id, value, clientUpdatedAt: at, state: 'queued', attempts: 0, lastError: null,
+    }));
+    for (const op of ops) { this.pending.set(op.id, op); this.retryAt.delete(op.id); }
+    this.emit();
+    const persisted = this.serial(async () => {
+      try {
+        for (const op of ops) await this.o.local.putPending(this.o.uid, op);
+      } catch {
+        this.status = { ...this.status, lastError: 'local-write-failed' };
+        this.emit();
+      }
+    });
+    this.flush();
+    return persisted;
+  }
+
+  /**
    * Removes a pending write (e.g. after the caller preserved its content elsewhere). Only the op
    * with `opId` is removed, so a newer change is never lost.
    */

@@ -10,7 +10,6 @@ import {
 } from '../../../src/features/personal/model';
 import { PersonalVocabulary } from '../../../src/features/personal/personalVocabulary';
 import { createDuplicateIndex } from '../../../src/features/personal/duplicates';
-import { countImport, planLegacyImport, wordsToImport } from '../../../src/features/personal/legacyImport';
 import { withPersonalGroups, PERSONAL_GROUP_LABEL } from '../../../src/features/personal/browse';
 import { mergeLearned, routeLearned } from '../../../src/features/personal/usePersonal';
 import { flattenCards, personalCards, selectCards } from '../../../src/features/review/deck';
@@ -154,59 +153,6 @@ describe('duplicates', () => {
     // Editing a word never reports the word itself (the built-in "die Übung" still is a duplicate).
     expect(index.find('Übung', mine.id).map((d) => d.kind)).toEqual(['builtIn']);
     expect(index.find('Quatschwort')).toEqual([]);
-  });
-});
-
-describe('legacy custom words import (dvok5_custom)', () => {
-  const legacy = (o: Record<string, unknown>) => ({
-    id: 'cw1712345678901', main: 'arch', tab: 'bau', word: 'die Probewortigkeit', sentence: '', type: 'n', fa: 'واژهٔ آزمایشی',
-    ex: 'Die Probewortigkeit zählt.', exFa: 'آزمایش مهم است.', pr: 'پروبه‌ورتیش‌کایت', status: 'ready', checked: true, ...o,
-  });
-  const ctx = (existing: PersonalWord[] = []) => ({ categories: repo.categories, builtIn, existing, now: 1_800_000_000_000, idFor: (l: string) => `pw_${[...l].map((c) => c.charCodeAt(0).toString(16)).join('').slice(-20).padStart(20, '0')}` });
-
-  it('maps fields, keeps placement, learned flag and creation time; x means "Ausdruck"', () => {
-    const raw = JSON.stringify([legacy({}), legacy({ id: 'cw1712345678902', word: 'auf jeden Fall', type: 'x', main: 'gone', tab: 'nope', checked: false })]);
-    const plan = planLegacyImport(raw, ctx());
-    expect(plan.items.map((i) => i.status)).toEqual(['new', 'new']);
-    expect(plan.items[0]!.word).toMatchObject({ article: 'die', lemma: 'Probewortigkeit', type: 'n', learned: true, placement: { category: 'arch', subtab: 'bau' }, createdAt: 1712345678901, source: 'legacy-import', legacyId: 'cw1712345678901' });
-    expect(plan.items[1]!.word).toMatchObject({ type: 'au', article: null, placement: null, learned: false });
-    expect(plan.items[1]!.unsorted).toBe(true);
-    expect(raw).toContain('die Probewortigkeit'); // input untouched
-  });
-
-  it('is idempotent: words imported before are skipped', async () => {
-    const raw = JSON.stringify([legacy({})]);
-    const vocab = new PersonalVocabulary('alice', createMemoryStore());
-    await vocab.load();
-    await vocab.addMany(wordsToImport(planLegacyImport(raw, ctx()), { includeBuiltInDuplicates: false }));
-    const again = planLegacyImport(raw, ctx([...vocab.getSnapshot().words]));
-    expect(again.items.map((i) => i.status)).toEqual(['already-imported']);
-    expect(wordsToImport(again, { includeBuiltInDuplicates: true })).toEqual([]);
-  });
-
-  it('never duplicates silently: personal duplicates are skipped, built-in duplicates need an explicit choice', () => {
-    const mine = { ...normalizeInput(input({ lemma: 'Probewortigkeit', article: 'die' })), schemaVersion: 1 as const, id: ids(), learned: false, createdAt: 1, updatedAt: 1, source: 'manual' as const, legacyId: null };
-    const raw = JSON.stringify([legacy({}), legacy({ id: 'cw1712345678903', word: 'die Außenwand' }), legacy({ id: 'cw1712345678904', word: 'neu', type: 'a' }), legacy({ id: 'cw1712345678905', word: 'neu', type: 'a' })]);
-    const plan = planLegacyImport(raw, ctx([mine]));
-    expect(plan.items.map((i) => i.status)).toEqual(['duplicate-personal', 'duplicate-builtin', 'new', 'duplicate-personal']);
-    expect(wordsToImport(plan, { includeBuiltInDuplicates: false }).map((w) => w.lemma)).toEqual(['neu']);
-    expect(wordsToImport(plan, { includeBuiltInDuplicates: true }).map((w) => w.lemma)).toEqual(['Außenwand', 'neu']);
-  });
-
-  it('AI-pending words without a meaning are imported as incomplete; broken data is reported, not guessed', () => {
-    const raw = JSON.stringify([
-      legacy({ id: 'cw1712345678906', word: 'Zukunft', status: 'pending', fa: '', ex: '', sentence: 'Die Zukunft ist offen.' }),
-      legacy({ id: 'cw1712345678907', word: '' }),
-      legacy({ id: 'cw1712345678906' }), // duplicate legacy id: dropped by the parser (warning), not imported twice
-      { nonsense: true },
-    ]);
-    const plan = planLegacyImport(raw, ctx());
-    expect(plan.items[0]).toMatchObject({ status: 'incomplete', word: { fa: '', example: 'Die Zukunft ist offen.' } });
-    // The empty word, the repeated id and the non-word are all reported (by the parser or the plan) — none is imported.
-    expect(countImport(plan).invalid + plan.malformed).toBe(3);
-    expect(wordsToImport(plan, { includeBuiltInDuplicates: true })).toHaveLength(1);
-    expect(planLegacyImport('{not json', ctx()).unreadable).toBeTruthy();
-    expect(planLegacyImport(null, ctx()).items).toEqual([]);
   });
 });
 

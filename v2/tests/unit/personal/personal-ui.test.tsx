@@ -210,37 +210,3 @@ describe('my vocabulary — learning tools', () => {
   });
 });
 
-describe('my vocabulary — legacy import', () => {
-  const legacyWords = [
-    { id: 'cw1712345678901', main: 'arch', tab: 'bau', word: 'die Probewortigkeit', sentence: '', type: 'n', fa: 'واژهٔ آزمایشی', ex: '', exFa: '', pr: '', status: 'ready', checked: true },
-    { id: 'cw1712345678902', main: 'arch', tab: 'bau', word: 'die Außenwand', sentence: '', type: 'n', fa: 'دیوار', ex: '', exFa: '', pr: '', status: 'ready', checked: false },
-    { id: 'cw1712345678903', main: 'x', tab: 'y', word: '<b>Zukunft</b>', sentence: 'Die Zukunft.', type: 'x', fa: '', ex: '', exFa: '', pr: '', status: 'pending', checked: false },
-  ];
-
-  it('preview first, import once (idempotent), legacy data untouched, HTML stays text', async () => {
-    const raw = JSON.stringify(legacyWords);
-    localStorage.setItem('dvok5_custom', raw);
-    const { user, env } = await signedIn();
-    await openMine(user);
-    await user.click(button('انتقال از نسخهٔ قدیمی'));
-    const dialog = await screen.findByRole('dialog', { name: 'انتقال واژه‌های شخصی از نسخهٔ قدیمی' });
-    const preview = await within(dialog).findByTestId('pw-import-preview'); // after the deterministic ids are hashed
-    expect(within(preview).getByTestId('pw-import-new')).toHaveTextContent('2');
-    expect(preview).toHaveTextContent('تکراری با واژه‌های داخلی: 1');
-    expect(await storedWords(env.local, ALICE.uid)).toEqual([]); // nothing written before confirming
-    await user.click(within(dialog).getByRole('button', { name: 'انتقال 2 واژه' }));
-    expect(await within(dialog).findByText(/2 واژه به «واژه‌های من» اضافه شد/)).toBeInTheDocument();
-    await user.click(within(dialog).getByRole('button', { name: 'بستن' }));
-
-    expect(cards().map((c) => c.getAttribute('aria-label')).sort()).toEqual(['<b>Zukunft</b>', 'die Probewortigkeit']);
-    expect(document.querySelector('article b')).toBeNull(); // rendered as text, not HTML
-    expect(card('<b>Zukunft</b>')).toHaveTextContent('ناقص');
-    expect(localStorage.getItem('dvok5_custom')).toBe(raw);
-
-    await user.click(button('انتقال از نسخهٔ قدیمی'));
-    const again = await screen.findByRole('dialog', { name: 'انتقال واژه‌های شخصی از نسخهٔ قدیمی' });
-    expect(await within(again).findByTestId('pw-import-new')).toHaveTextContent('0');
-    expect(again).toHaveTextContent('قبلاً منتقل شده: 2');
-    expect(within(again).getByRole('button', { name: 'واژه‌ای برای انتقال نیست' })).toBeDisabled();
-  });
-});

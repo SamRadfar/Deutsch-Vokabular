@@ -1,8 +1,9 @@
-# AI features (Phase 5B)
+# AI features
 
-Status: implemented and tested locally with a mock worker and a mock provider. **Live AI has not
-been tested.** It needs the owner's approval for the Cloudflare deployment and for an Anthropic API
-key, which is a paid service (§6).
+Status (v2.0.2): the worker uses **Cloudflare Workers AI** (free allocation, no API key), and
+Anthropic remains an optional paid alternative. Two features use it: single-word suggestions in the
+word form, and the **topic vocabulary generator** «ساخت واژه با هوش مصنوعی» (§7). Live AI needs only
+the owner's Cloudflare login (free plan) and a `wrangler deploy` (`v2/ai-worker/README.md`).
 
 ## 1. What the legacy app did and what V2 keeps
 
@@ -84,3 +85,27 @@ For local use, `npm run ai:dev` starts the worker handler under Node on 127.0.0.
 2. **Anthropic API key** (a paid service): stored with `wrangler secret put ANTHROPIC_API_KEY`, with a monthly spend limit set in the console.
 3. **Allowed origins**: the exact origin of the V2 hosting, once that is approved.
 4. After these, `VITE_AI_ENDPOINT=https://<worker>.workers.dev` for the app, followed by a live test with a real account.
+
+## 7. Topic vocabulary generator («ساخت واژه با هوش مصنوعی»), v2.0.2
+
+The flow is topic → count (25/50/100/200) → level (A1–A2, B1–B2, C1–C2, all) → target category →
+generate → preview/edit → import → sync. It replaces the removed legacy import UI. The data model is
+unchanged: words with `source: 'legacy-import'` stay valid.
+
+| Part | Where | Notes |
+|---|---|---|
+| Worker endpoint `POST /v1/generate` | `ai-worker/src/index.ts` | Batches of ≤ 15. Limits are counted in **words** (300/day per user and service-wide, which keeps the service inside the free allocation). Timeout is 85 s |
+| Prompt, JSON schema, Workers AI provider | `ai-worker/src/provider.ts` | JSON mode (`response_format: json_schema`). Text answers of other models are parsed tolerantly |
+| Entry validation (worker **and** app) | `ai-worker/src/contract.ts` `validateGeneratedEntry` | Nouns need a correct-form article and capitalisation. German text in German fields and Persian in Persian fields. Length limits. Duplicates inside a batch are dropped |
+| Orchestration | `src/features/personal/generate/generation.ts` | The first batch names the subcategories. Then 2 parallel batches, each focused on one subcategory. `avoid` = the words of this list only. Duplicates are dropped by folded spelling. Transient errors are retried twice. Limits stop the run and keep the partial list |
+| Preview and import | `generate/AiVocabularyGenerator.tsx`, `importPlan.ts` | Nothing is saved before «وارد کردن». Every field is editable. Rows can be removed or regenerated. Duplicates of existing words are flagged and unselected. Each row has its final id from the start, so the import is idempotent and never overwrites |
+| User-created categories | `src/features/personal/collections.ts` | `placement = { category: "my:<name>", subtab: "<subcategory>" }` fits the **deployed** Firestore rules unchanged (bounded strings). The categories appear in «واژه‌های من» (filter, labels), the word form, and practice scopes (review, flashcards, shadowing). Search covers them as personal words |
+| Bulk write | `DocSyncEngine.setMany` | One state update and one flush for 200 words (local first, then cloud sync with retries) |
+
+Privacy: only the topic, level, the optional instructions and the words of the list being built
+are sent to the worker and the model. Saved vocabulary never is.
+
+Tests: `tests/unit/worker/generate.test.ts`, `tests/unit/personal/generate.test.ts`,
+`tests/unit/personal/generator-ui.test.tsx`, `tests/emulator/customWords.rules.test.ts` (own
+categories, isolation), and `tests/e2e-emulator/generator.spec.ts` (200 words → import → second
+device, other account sees nothing).

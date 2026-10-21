@@ -1,4 +1,4 @@
-import { Cloud, HardDrive, Plus, Sparkles, TriangleAlert, Upload } from 'lucide-react';
+import { Cloud, HardDrive, Plus, Sparkles, TriangleAlert, Wand2 } from 'lucide-react';
 import '../personal.css';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import type { Category, WordType } from '../../../models/vocabulary';
@@ -8,6 +8,7 @@ import { EmptyState } from '../../../components/EmptyState/EmptyState';
 import { useProgress } from '../../progress/ProgressProvider';
 import { flattenCards } from '../../review/deck';
 import { fold, queryTerms } from '../../search/normalize';
+import { listCollections, wordCollection } from '../collections';
 import { createDuplicateIndex } from '../duplicates';
 import { displayWord, type PersonalWord, type PersonalWordInput } from '../model';
 import { usePersonal } from '../usePersonal';
@@ -17,8 +18,8 @@ import { PersonalWordCard } from './PersonalWordCard';
 import { WordForm } from './WordForm';
 import { useAiClient } from '../../ai/AiProvider';
 
-// The legacy import (parsers, backup handling) is only loaded when the user opens it.
-const LegacyImportDialog = lazy(() => import('./LegacyImportDialog').then((m) => ({ default: m.LegacyImportDialog })));
+// The AI vocabulary generator is only loaded when the user opens it.
+const AiVocabularyGenerator = lazy(() => import('../generate/AiVocabularyGenerator').then((m) => ({ default: m.AiVocabularyGenerator })));
 
 interface Props {
   categories: readonly Category[];
@@ -65,7 +66,10 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
   const [editing, setEditing] = useState<Editing>(null);
   const [confirmDelete, setConfirmDelete] = useState<PersonalWord | null>(null);
   const [undo, setUndo] = useState<PersonalWord | null>(null);
-  const [importOpen, setImportOpen] = useState(false);
+  const [generatorOpen, setGeneratorOpen] = useState(false);
+  /** '' = all, '-' = words without own category, otherwise a category name. */
+  const [collection, setCollection] = useState('');
+  const collections = useMemo(() => listCollections(words), [words]);
   const [query, setQuery] = useState('');
   const [type, setType] = useState<'all' | WordType>('all');
   const [status, setStatus] = useState<StatusFilter>('all');
@@ -91,6 +95,8 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
 
   const placementLabel = useCallback((w: PersonalWord) => {
     if (!w.placement) return null;
+    const own = wordCollection(w);
+    if (own) return `${own.name} › ${own.subcategory}`;
     const c = categories.find((x) => x.key === w.placement!.category);
     const s = c?.subtabs.find((x) => x.id === w.placement!.subtab);
     return c && s ? `${categoryName(c.label)} › ${s.label}` : null;
@@ -98,6 +104,7 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
 
   const terms = useMemo(() => queryTerms(query), [query]);
   const visible = useMemo(() => words.filter((w) => {
+    if (collection && (collection === '-' ? wordCollection(w) !== null : wordCollection(w)?.name !== collection)) return false;
     if (type !== 'all' && w.type !== type) return false;
     if (status === 'learned' && !w.learned) return false;
     if (status === 'unlearned' && w.learned) return false;
@@ -106,7 +113,7 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
     if (!terms.length) return true;
     const hay = [displayWord(w), w.fa, w.example, w.exampleFa, w.grammar].map((t) => `${fold(t).text} ${fold(t, true).text}`).join(' ');
     return terms.every((t) => hay.includes(t));
-  }), [words, type, status, terms, duplicates]);
+  }), [words, collection, type, status, terms, duplicates]);
 
   const toggleLearned = useCallback((id: string, learned: boolean) => vocab?.setLearned(id, learned), [vocab]);
   const onEdit = useCallback((word: PersonalWord) => setEditing({ mode: 'edit', word }), []);
@@ -158,7 +165,7 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
         <div className="page-head__actions pw__actions">
           <button type="button" className="fc-primary pw__add" onClick={() => setEditing({ mode: 'new' })}><Plus />افزودن واژه</button>
           {ai ? <button type="button" className="fc-secondary" onClick={() => setEditing({ mode: 'new', ai: true })}><Sparkles />افزودن با هوش مصنوعی</button> : null}
-          <button type="button" className="fc-secondary" onClick={() => setImportOpen(true)}><Upload />انتقال از نسخهٔ قدیمی</button>
+          <button type="button" className="fc-secondary" data-testid="open-generator" onClick={() => setGeneratorOpen(true)}><Wand2 />ساخت واژه با هوش مصنوعی</button>
         </div>
       </div>
 
@@ -186,6 +193,16 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
               <span className="visually-hidden">جستجو در واژه‌های من</span>
               <input type="search" value={query} onChange={(e) => setQuery(e.currentTarget.value)} placeholder="جستجو در واژه‌های من" />
             </label>
+            {collections.length ? (
+              <label>
+                <span className="visually-hidden">دسته</span>
+                <select value={collection} onChange={(e) => setCollection(e.currentTarget.value)} aria-label="دسته" data-testid="pw-collection">
+                  <option value="">همهٔ دسته‌ها</option>
+                  {collections.map((c) => <option key={c.key} value={c.name}>{c.name} ({c.count})</option>)}
+                  <option value="-">بدون دستهٔ من</option>
+                </select>
+              </label>
+            ) : null}
             <label>
               <span className="visually-hidden">نوع واژه</span>
               <select value={type} onChange={(e) => setType(e.currentTarget.value as 'all' | WordType)} aria-label="نوع واژه">
@@ -207,7 +224,7 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
           <div className="pw-practice">
             <button type="button" className="fc-secondary" onClick={onOpenReview}>مرور با فلش‌کارت</button>
             <button type="button" className="fc-secondary" onClick={onOpenShadowing}>تمرین تلفظ</button>
-            <span className="pw-practice__hint">در مرور و تلفظ، دستهٔ «واژه‌های من» را انتخاب کنید.</span>
+            <span className="pw-practice__hint">در مرور و تلفظ، «واژه‌های من»{collections.length ? ' یا یکی از دسته‌های خودتان' : ''} را انتخاب کنید.</span>
           </div>
           {visible.length ? (
             <ul className="pw-list" aria-label="فهرست واژه‌های من">
@@ -237,6 +254,7 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
         <WordForm
           {...(editing.mode === 'edit' ? { word: editing.word, aiComplete: !!editing.ai } : { aiFocus: !!editing.ai })}
           categories={categories}
+          collections={collections}
           duplicates={duplicates}
           onSave={save}
           onClose={() => setEditing(null)}
@@ -257,9 +275,11 @@ export function PersonalPanel({ categories, focusId, onFocused, onOpenReview, on
         </Dialog>
       ) : null}
 
-      {importOpen ? (
+      {generatorOpen ? (
         <Suspense fallback={<p className="visually-hidden" role="status">در حال بارگذاری…</p>}>
-          <LegacyImportDialog categories={categories} builtIn={builtIn} vocab={vocab} onClose={() => setImportOpen(false)} />
+          <AiVocabularyGenerator ai={ai} vocab={vocab} snapshot={snapshot} categories={categories} duplicates={duplicates}
+            onClose={() => setGeneratorOpen(false)}
+            onImported={(name) => { setQuery(''); setType('all'); setStatus('all'); setCollection(name ?? ''); }} />
         </Suspense>
       ) : null}
       {focusId ? <FocusDone onDone={onFocused} /> : null}

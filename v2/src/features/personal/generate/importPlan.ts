@@ -1,0 +1,78 @@
+// From reviewed preview rows to personal words. Pure and idempotent:
+//  - every row carries its final word id from the moment it was generated, so importing the same
+//    preview twice (double click, retry after a failure, a second device) writes the SAME documents
+//    and PersonalVocabulary.addMany never overwrites an existing word;
+//  - rows are validated with the same rules as the word form (and the Firestore rules);
+//  - the target is a user-created category (new or existing), a built-in category, or none.
+
+import type { GeneratedEntry } from '../../../../ai-worker/src/contract';
+import { collectionPlacement, DEFAULT_SUBCATEGORY } from '../collections';
+import type { DuplicateIndex, DuplicateMatch } from '../duplicates';
+import {
+  isValidInput, isValidPersonalWord, newPersonalId, normalizeInput, validateInput,
+  type FieldErrors, type PersonalWord, type PersonalWordInput,
+} from '../model';
+
+export interface DraftRow {
+  /** The personal word id this row becomes (stable → idempotent import). */
+  id: string;
+  entry: GeneratedEntry;
+  selected: boolean;
+}
+
+export type ImportTarget =
+  | { kind: 'collection'; name: string }
+  | { kind: 'builtin'; category: string; subtab: string }
+  | { kind: 'none' };
+
+export function draftRows(entries: readonly GeneratedEntry[], duplicates: DuplicateIndex, newId: () => string = () => newPersonalId()): DraftRow[] {
+  // Rows that duplicate a word the user already has start unselected (never imported silently).
+  return entries.map((entry) => ({ id: newId(), entry, selected: duplicates.find(entry.lemma).length === 0 }));
+}
+
+export function rowInput(row: DraftRow, target: ImportTarget): PersonalWordInput {
+  const e = row.entry;
+  const placement = target.kind === 'collection'
+    ? collectionPlacement(target.name, e.subcategory || DEFAULT_SUBCATEGORY)
+    : target.kind === 'builtin' ? { category: target.category, subtab: target.subtab } : null;
+  return {
+    article: e.article, lemma: e.lemma, type: e.type, grammar: e.grammar, fa: e.fa,
+    example: e.example, exampleFa: e.exampleFa, pronunciationFa: '', placement,
+  };
+}
+
+/** Validation messages of a row (empty = importable). */
+export function rowErrors(row: DraftRow): FieldErrors {
+  return validateInput(normalizeInput(rowInput(row, { kind: 'none' })));
+}
+
+export interface ImportPlan {
+  words: PersonalWord[];
+  /** Selected rows that cannot be imported as they are (shown to the user). */
+  invalid: string[];
+}
+
+export function buildImport(rows: readonly DraftRow[], target: ImportTarget, now: number): ImportPlan {
+  const words: PersonalWord[] = [];
+  const invalid: string[] = [];
+  rows.filter((r) => r.selected).forEach((row, i) => {
+    const input = normalizeInput(rowInput(row, target));
+    if (!isValidInput(validateInput(input))) { invalid.push(row.id); return; }
+    // createdAt keeps the preview order (the list shows newest first).
+    const at = now + (rows.length - i);
+    const word: PersonalWord = {
+      schemaVersion: 1, id: row.id, ...input, learned: false, createdAt: at, updatedAt: at, source: 'manual', legacyId: null,
+    };
+    if (isValidPersonalWord(word)) words.push(word); else invalid.push(row.id);
+  });
+  return { words, invalid };
+}
+
+export interface RowCheck {
+  duplicates: DuplicateMatch[];
+  errors: FieldErrors;
+}
+
+export function checkRow(row: DraftRow, duplicates: DuplicateIndex): RowCheck {
+  return { duplicates: duplicates.find(row.entry.lemma), errors: rowErrors(row) };
+}

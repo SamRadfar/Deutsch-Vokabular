@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { App } from '../../../src/app/App';
 import { createMemoryStore } from '../../../src/features/progress/localStore';
 import { PersonalVocabulary } from '../../../src/features/personal/personalVocabulary';
-import { fromValue, isCustomWordValue, legacyImportId, toValue, type CustomWordValue } from '../../../src/features/personal/syncModel';
+import { fromValue, isCustomWordValue, toValue, type CustomWordValue } from '../../../src/features/personal/syncModel';
 import { parseCustomWordDoc } from '../../../src/features/personal/firestoreCustomWordsRemote';
 import type { PersonalWord, PersonalWordInput } from '../../../src/features/personal/model';
 import { readFirebaseConfig } from '../../../src/services/firebase/config';
@@ -46,13 +46,6 @@ describe('sync model', () => {
     expect(parseCustomWordDoc('pw_ffffffffffffffffffff', data)).toBeNull();
     expect(parseCustomWordDoc(data.id, { ...data, schemaVersion: 2 })).toBeNull();
     expect(parseCustomWordDoc(data.id, { ...data, type: 'zz' })).toBeNull();
-  });
-
-  it('legacy import ids are deterministic (two devices → one document) and well-formed', async () => {
-    const a = await legacyImportId('cw1712345678901');
-    expect(a).toMatch(/^pw_[0-9a-f]{20}$/);
-    expect(await legacyImportId('cw1712345678901')).toBe(a);
-    expect(await legacyImportId('cw1712345678902')).not.toBe(a);
   });
 
   it('cloud sync of personal words is off unless enabled (or on the emulator)', () => {

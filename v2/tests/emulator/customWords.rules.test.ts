@@ -106,6 +106,16 @@ describe('customWords: schema', () => {
     await assertSucceeds(setDoc(doc(alice(), path()), word({ article: null, type: 'au', placement: null, fa: '', legacyId: 'cw1712345678901', source: 'legacy-import' })));
   });
 
+  it('user-created categories (AI generator) fit the deployed rules unchanged; over-long names are refused', async () => {
+    await assertSucceeds(setDoc(doc(alice(), path()), word({ placement: { category: 'my:Kleidung und Mode', subtab: 'Oberbekleidung' } })));
+    await assertSucceeds(setDoc(doc(alice(), path('alice', 'pw_0123456789abcdef0124')), word({ id: 'pw_0123456789abcdef0124', placement: { category: `my:${'K'.repeat(37)}`, subtab: 'S'.repeat(60) } })));
+    await assertFails(setDoc(doc(alice(), path('alice', 'pw_0123456789abcdef0125')), word({ id: 'pw_0123456789abcdef0125', placement: { category: `my:${'K'.repeat(38)}`, subtab: 'x' } })));
+    await assertFails(setDoc(doc(alice(), path('alice', 'pw_0123456789abcdef0126')), word({ id: 'pw_0123456789abcdef0126', placement: { category: 'my:Mode', subtab: '' } })));
+    // Another account can neither write nor read them.
+    await assertFails(setDoc(doc(bob(), path()), word({ placement: { category: 'my:Kleidung und Mode', subtab: 'Oberbekleidung' } })));
+    await assertFails(getDoc(doc(bob(), path())));
+  });
+
   it('updatedAt must be the server time', async () => {
     await assertFails(setDoc(doc(alice(), path()), word({ updatedAt: Timestamp.fromMillis(1) })));
   });

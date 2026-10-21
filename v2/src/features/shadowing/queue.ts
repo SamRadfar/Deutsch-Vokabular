@@ -4,7 +4,7 @@
 // Exposure is keyed by stable word id here (the legacy app keyed it by the word text).
 
 import type { WordId } from '../../models/vocabulary';
-import { selectCards, shuffle, type DeckCard, type DeckProgress, type PracticeCategoryKey, type ReviewMode } from '../review/deck';
+import { inPracticeScope, selectCards, shuffle, type DeckCard, type DeckProgress, type PracticeCategoryKey, type ReviewMode } from '../review/deck';
 
 export function exposureWeight(count: number): number {
   return count <= 0 ? 3 : count < 3 ? 2 : 1;
@@ -13,7 +13,8 @@ export function exposureWeight(count: number): number {
 export function selectShadowingCards(
   cards: readonly DeckCard[], mode: ReviewMode, categories: ReadonlySet<PracticeCategoryKey>, progress: DeckProgress,
 ): DeckCard[] {
-  return selectCards(cards, mode, 'all', progress).filter((c) => categories.has(c.categoryKey));
+  const keys = [...categories];
+  return selectCards(cards, mode, 'all', progress).filter((c) => categories.has(c.categoryKey) || keys.some((k) => inPracticeScope(c, k)));
 }
 
 export function buildShadowingQueue(

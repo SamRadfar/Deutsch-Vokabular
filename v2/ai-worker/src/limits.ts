@@ -21,27 +21,33 @@ export type LimitResult =
 const day = (ms: number) => new Date(ms).toISOString().slice(0, 10);
 const secondsToMidnightUtc = (ms: number) => Math.max(60, Math.ceil((Date.UTC(new Date(ms).getUTCFullYear(), new Date(ms).getUTCMonth(), new Date(ms).getUTCDate() + 1) - ms) / 1000));
 
-/** Checks all limits and, if allowed, counts this request (before the paid call is made). */
-export async function checkAndCount(store: CounterStore, uid: string, limits: Limits, nowMs: number): Promise<LimitResult> {
+/**
+ * Checks all limits and, if allowed, counts this request (before the model call is made).
+ * `cost`: units the daily limits are counted in (e.g. generated words); the per-minute limit always
+ * counts requests. `namespace` keeps separate budgets (suggestions vs. generation).
+ */
+export async function checkAndCount(store: CounterStore, uid: string, limits: Limits, nowMs: number,
+  { cost = 1, namespace = '' }: { cost?: number; namespace?: string } = {}): Promise<LimitResult> {
   const minute = Math.floor(nowMs / 60_000);
+  const ns = namespace ? `${namespace}:` : '';
   const keys = {
-    global: `global:${day(nowMs)}`,
-    daily: `user:${uid}:${day(nowMs)}`,
-    burst: `burst:${uid}:${minute}`,
+    global: `${ns}global:${day(nowMs)}`,
+    daily: `${ns}user:${uid}:${day(nowMs)}`,
+    burst: `${ns}burst:${uid}:${minute}`,
   };
   const [g, d, b] = await Promise.all([store.get(keys.global), store.get(keys.daily), store.get(keys.burst)]);
   const global = Number(g ?? 0);
   const daily = Number(d ?? 0);
   const burst = Number(b ?? 0);
-  if (global >= limits.globalPerDay) return { ok: false, code: 'service-limit', retryAfterSeconds: secondsToMidnightUtc(nowMs) };
-  if (daily >= limits.perDay) return { ok: false, code: 'daily-limit', retryAfterSeconds: secondsToMidnightUtc(nowMs) };
+  if (global + cost > limits.globalPerDay) return { ok: false, code: 'service-limit', retryAfterSeconds: secondsToMidnightUtc(nowMs) };
+  if (daily + cost > limits.perDay) return { ok: false, code: 'daily-limit', retryAfterSeconds: secondsToMidnightUtc(nowMs) };
   if (burst >= limits.perMinute) return { ok: false, code: 'rate-limited', retryAfterSeconds: 60 - Math.floor((nowMs % 60_000) / 1000) };
   await Promise.all([
-    store.put(keys.global, String(global + 1), { expirationTtl: 2 * 86_400 }),
-    store.put(keys.daily, String(daily + 1), { expirationTtl: 2 * 86_400 }),
+    store.put(keys.global, String(global + cost), { expirationTtl: 2 * 86_400 }),
+    store.put(keys.daily, String(daily + cost), { expirationTtl: 2 * 86_400 }),
     store.put(keys.burst, String(burst + 1), { expirationTtl: 120 }),
   ]);
-  return { ok: true, remainingToday: limits.perDay - daily - 1 };
+  return { ok: true, remainingToday: limits.perDay - daily - cost };
 }
 
 /** In-memory store (tests and the local development server). */

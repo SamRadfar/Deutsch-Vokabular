@@ -66,29 +66,6 @@ test('create, reload, search, flashcard, delete with undo — and another accoun
   await expect(page.getByText('هنوز واژه‌ای اضافه نکرده‌اید')).toBeVisible();
 });
 
-test('legacy custom words are imported after a preview, once, without touching the legacy data', async ({ page }) => {
-  await page.goto('./');
-  const raw = JSON.stringify([
-    { id: 'cw1712345678901', main: 'arch', tab: 'bau', word: 'die Probewortigkeit', sentence: '', type: 'n', fa: 'واژهٔ آزمایشی', ex: '', exFa: '', pr: '', status: 'ready', checked: true },
-  ]);
-  await page.evaluate((v) => localStorage.setItem('dvok5_custom', v), raw);
-  await signIn(page, uniqueEmail('legacy'), 'Legacy Words');
-  await openMine(page);
-  await page.getByRole('button', { name: 'انتقال از نسخهٔ قدیمی' }).click();
-  const dialog = page.getByRole('dialog', { name: 'انتقال واژه‌های شخصی از نسخهٔ قدیمی' });
-  await expect(dialog.getByTestId('pw-import-new')).toHaveText('1');
-  await dialog.getByRole('button', { name: 'انتقال 1 واژه' }).click();
-  await dialog.getByRole('button', { name: 'بستن', exact: true }).click();
-  await expect(card(page, 'die Probewortigkeit')).toBeVisible();
-  await expect(card(page, 'die Probewortigkeit').getByRole('checkbox')).toBeChecked();
-  expect(await page.evaluate(() => localStorage.getItem('dvok5_custom'))).toBe(raw);
-
-  await page.reload();
-  await expect(card(page, 'die Probewortigkeit')).toBeVisible({ timeout: 15_000 });
-  await page.getByRole('button', { name: 'انتقال از نسخهٔ قدیمی' }).click();
-  await expect(page.getByRole('dialog').getByTestId('pw-import-new')).toHaveText('0');
-});
-
 test('two browsers with the same account: create, edit offline, delete — all devices converge', async ({ browser }) => {
   const email = uniqueEmail('pwsync');
   const laptopCtx = await browser.newContext();
