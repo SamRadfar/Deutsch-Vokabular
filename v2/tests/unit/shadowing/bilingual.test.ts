@@ -37,9 +37,21 @@ describe('exact playback order', () => {
     expect(steps).toEqual([
       'de:die Außenwand', 'pause 1000', 'fa:دیوار خارجی', 'pause 3000 (you)',
       'de:die Außenwand', 'pause 1000', 'fa:دیوار خارجی', 'pause 3000 (you)',
-      'de:Die Außenwand muss gut gedämmt sein.', 'pause 3000 (you)',
+      'de:Die Außenwand muss gut gedämmt sein.',
       'pause 1000', 'fa:دیوار خارجی باید به‌خوبی عایق‌بندی شود.', 'pause 3000 (you)',
     ]);
+  });
+
+  it('examples: pauses between German repetitions, none before the Persian translation, one after it', () => {
+    const ex = 'de:Die Außenwand muss gut gedämmt sein.';
+    const tr = 'fa:دیوار خارجی باید به‌خوبی عایق‌بندی شود.';
+    const s = (o: Partial<ShadowingPreferences>) => describeSteps(planItem(WAND, { ...ACCEPT, wordRepeats: 1, faMeaningRepeats: 0, pauseSec: 3, ...o })).slice(2);
+    expect(s({ exampleRepeats: 2, faExampleRepeats: 2 })).toEqual([ex, 'pause 3000 (you)', ex, 'pause 1000', tr, 'pause 400', tr, 'pause 3000 (you)']);
+    expect(s({ exampleRepeats: 2, deFaDelaySec: 0 })).toEqual([ex, 'pause 3000 (you)', ex, tr, 'pause 3000 (you)']);
+    // Persian translation off: the pause follows the last German example (as before).
+    expect(s({ exampleRepeats: 2, faExample: false })).toEqual([ex, 'pause 3000 (you)', ex, 'pause 3000 (you)']);
+    const steps = planItem(WAND, { ...ACCEPT, wordRepeats: 1, faMeaningRepeats: 0, pauseSec: 3, faExample: false, exampleRepeats: 1 });
+    expect(steps.at(-1)).toMatchObject({ kind: 'pause', target: 'example', extendBySpeech: true });
   });
 
   it('Persian meaning × 2 after EACH German word (not in total); a short gap between the two', () => {
@@ -85,6 +97,10 @@ describe('exact playback order', () => {
       'NEXT',
     ]);
     expect(text({ ...ACCEPT, wordRepeats: 1, faMeaningRepeats: 2, exampleRepeats: 0 })).toEqual(['DE واژه → ⏱ 1 ثانیه → FA معنی × 2', 'NEXT']);
+    // With a learner pause: none between the German example and its translation, one after the translation.
+    expect(text({ ...ACCEPT, wordRepeats: 1, exampleRepeats: 2, pauseSec: 3 })).toEqual([
+      'DE واژه → ⏱ 1 ثانیه → FA معنی → 🗣 3 ثانیه', 'DE مثال × 2 → 🗣 3 ثانیه+ بین تکرارها', '⏱ 1 ثانیه → FA ترجمهٔ مثال → 🗣 3 ثانیه', 'NEXT',
+    ]);
   });
 });
 

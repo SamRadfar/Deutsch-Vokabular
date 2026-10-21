@@ -119,8 +119,13 @@ export function previewLines(prefs: ShadowingPreferences): Line[] {
     } else if (s.purpose === 'gap') {
       const prev = steps[i - 1];
       if (!(prev?.kind === 'speak' && prev.lang === 'fa')) parts.push(`⏱ ${formatSeconds(s.baseMs / 1000)}`);
-    } else if (s.target === 'word' || s.target === 'exampleFa' || s.repetition === s.of) {
-      parts.push(`🗣 ${formatSeconds(s.baseMs / 1000)}${s.extendBySpeech ? '+' : ''}${s.target === 'example' && s.of > 1 ? ' هر بار' : ''}`);
+    } else if (s.target === 'example') {
+      // Pauses between German example repetitions (the last one only when no Persian translation follows).
+      const between = steps.slice(i + 1).some((x) => x.kind === 'speak' && x.target === 'example');
+      const already = parts.some((p) => p.startsWith('🗣'));
+      if (!already) parts.push(`🗣 ${formatSeconds(s.baseMs / 1000)}+${between && s.of > 1 && !steps.slice(i + 1).some((x) => x.kind === 'pause' && x.target === 'example') ? ' بین تکرارها' : s.of > 1 ? ' هر بار' : ''}`);
+    } else {
+      parts.push(`🗣 ${formatSeconds(s.baseMs / 1000)}`);
     }
   }
   push();

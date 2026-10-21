@@ -2,8 +2,9 @@
 //
 //   word cycle × wordRepeats:
 //     German word → [German→Persian delay] → Persian meaning × faMeaningRepeats → learner pause
-//   German example × exampleRepeats (each followed by a learner pause, extended by the sentence length)
+//   German example × exampleRepeats (a learner pause, extended by the sentence length, between them)
 //   [German→Persian delay] → Persian example translation × faExampleRepeats → learner pause
+//   (no learner pause between the last German example and its Persian translation)
 //
 // The examples come only after ALL word cycles. Persian parts are skipped when their count is 0,
 // when the text is empty, or when no Persian voice is available (`persian: false`). With
@@ -77,12 +78,14 @@ export function planItem(item: ShadowingText, s: PlanSettings, opts: { persian?:
 
   if (item.example.trim()) {
     const examples = Math.max(0, s.exampleRepeats);
-    for (let e = 1; e <= examples; e++) {
-      steps.push({ kind: 'speak', target: 'example', lang: 'de', text: item.example, repetition: e, of: examples });
-      learner('example', e, examples, true);
-    }
     const exFa = (item.exampleFa ?? '').trim();
     const faTimes = persian && s.faExample && exFa ? Math.max(0, s.faExampleRepeats ?? 0) : 0;
+    for (let e = 1; e <= examples; e++) {
+      steps.push({ kind: 'speak', target: 'example', lang: 'de', text: item.example, repetition: e, of: examples });
+      // The last German example flows straight into its Persian translation; the learner pause
+      // then follows the translation (below). Without a translation it follows the last example.
+      if (e < examples || faTimes === 0) learner('example', e, examples, true);
+    }
     if (examples > 0 && faTimes > 0) {
       persianBlock('exampleFa', exFa, faTimes);
       learner('exampleFa', 1, 1, false);
