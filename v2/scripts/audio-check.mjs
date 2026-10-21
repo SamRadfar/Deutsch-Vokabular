@@ -24,6 +24,13 @@ try {
   const error = await page.evaluate(() => window.__audioCheckError);
   const result = await page.evaluate(() => window.__audioCheck);
   console.log(JSON.stringify(result, null, 2));
+  const wav = await page.evaluate(() => window.__bilingualWav);
+  if (wav) {
+    const { writeFileSync } = await import('node:fs');
+    const file = join(tmpdir(), 'dv2-bilingual-sample.wav');
+    writeFileSync(file, Buffer.from(wav, 'base64'));
+    console.log(`bilingual sample (neutral words) saved for listening: ${file}`);
+  }
   if (error) { console.error('✖', error); failed = true; } else {
     const r = result;
     const checks = [
@@ -36,6 +43,11 @@ try {
       ['media session metadata set', r.mediaSession && /Shadowing/.test(r.playback.metadataTitle ?? '')],
       ['pronunciation clip plays as media (start → end, no error)', /^start@\d+$/.test(r.pronunciation[0]) && /^end@\d+$/.test(r.pronunciation[1]) && !r.pronunciation.some((e) => e.startsWith('error'))],
       ['repeated word comes from the clip cache', r.pronunciation.some((e) => e.startsWith('cached-start@'))],
+      ['Persian voice speaks (rms > 0.02)', r.persianSample.rms > 0.02],
+      ['bilingual order: DE→pause→FA ×3, DE example ×2, pause→FA example', r.bilingual.order.join() === [
+        'de:word', 'pause:1.0s', 'fa:meaning', 'de:word', 'pause:1.0s', 'fa:meaning', 'de:word', 'pause:1.0s', 'fa:meaning',
+        'de:example', 'de:example', 'pause:1.0s', 'fa:exampleFa'].join()],
+      ['every German and Persian segment is audible, every pause silent', r.bilingual.speechRms.every((v) => v > 0.02) && r.bilingual.pauseRms.every((v) => v < 0.001)],
     ];
     for (const [name, ok] of checks) { console.log(`${ok ? '✔' : '✖'} ${name}`); if (!ok) failed = true; }
   }

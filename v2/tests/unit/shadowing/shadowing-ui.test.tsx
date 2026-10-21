@@ -50,12 +50,12 @@ describe('shadowing — setup and preferences', () => {
     await vi.waitFor(() => expect(screen.getByRole('radio', { name: /یادنگرفته‌ها/ })).toBeEnabled()); // signed in: all modes
 
     const slider = screen.getByRole('slider', { name: /مکث برای تکرار شما/ });
-    expect(slider).toHaveAttribute('min', '1');
+    expect(slider).toHaveAttribute('min', '0');
     expect(slider).toHaveAttribute('max', '8');
     fireEvent.change(slider, { target: { value: '6.5' } });
-    await user.selectOptions(screen.getByLabelText('سرعت گفتار'), '0.55');
-    await user.selectOptions(screen.getByLabelText('تکرار هر واژه'), '3');
-    await user.selectOptions(screen.getByLabelText('تکرار جملهٔ مثال'), '0');
+    await user.selectOptions(screen.getByLabelText('سرعت گفتار آلمانی'), '0.55');
+    await user.selectOptions(screen.getByLabelText('تکرار واژه آلمانی'), '3');
+    await user.selectOptions(screen.getByLabelText('تکرار جمله مثال آلمانی'), '0');
     await user.click(screen.getByRole('checkbox', { name: 'نمایش ترجمهٔ فارسی' }));
     await user.click(button('هیچ‌کدام'));
     expect(button('واژه‌ای برای تمرین نیست')).toBeDisabled();
@@ -68,9 +68,9 @@ describe('shadowing — setup and preferences', () => {
     await setup();
     await userEvent.setup({ advanceTimers: vi.advanceTimersByTime }).click(tab());
     await shadowingShown();
-    expect(screen.getByLabelText('سرعت گفتار')).toHaveValue('0.55');
-    expect(screen.getByLabelText('تکرار هر واژه')).toHaveValue('3');
-    expect(screen.getByText('6.5 ثانیه')).toBeInTheDocument();
+    expect(screen.getByLabelText('سرعت گفتار آلمانی')).toHaveValue('0.55');
+    expect(screen.getByLabelText('تکرار واژه آلمانی')).toHaveValue('3');
+    expect(screen.getByText('6.5 ثانیه', { selector: 'output' })).toBeInTheDocument();
     expect(screen.getByRole('checkbox', { name: /Fitness/ })).toBeChecked();
     expect(screen.getByRole('checkbox', { name: /Dreame/ })).not.toBeChecked();
   });

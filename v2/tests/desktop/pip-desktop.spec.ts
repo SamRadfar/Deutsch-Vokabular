@@ -32,8 +32,8 @@ test('floating card: always on top, keeps updating with the main window minimize
   await page.evaluate(() => { document.title = 'DV-MAIN-WINDOW'; });
   await page.getByRole('link', { name: 'تلفظ', exact: true }).click();
   await page.getByLabel('تعداد واژه در جلسه').selectOption('5');
-  await page.getByLabel('تکرار هر واژه').selectOption('1');
-  await page.getByLabel('تکرار جملهٔ مثال').selectOption('1');
+  await page.getByLabel('تکرار واژه آلمانی').selectOption('1');
+  await page.getByLabel('تکرار جمله مثال آلمانی').selectOption('1');
   await page.getByRole('slider').fill('3');
   await page.getByRole('button', { name: 'شروع تمرین (5 واژه)' }).click();
   await page.evaluate(() => { document.title = 'DV-MAIN-WINDOW'; });

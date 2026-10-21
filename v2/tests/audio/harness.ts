@@ -8,6 +8,7 @@ import { createDeviceSpeechService, createVoiceHandle } from '../../src/features
 import { sharedMediaOutput } from '../../src/features/audio/mediaOutput';
 import { openNeuralVoice } from '../../src/features/audio/neuralVoice';
 import { downloadVoice, voiceDownloaded, VOICE_TOTAL_BYTES } from '../../src/features/audio/voiceAssets';
+import { DEFAULT_PREFERENCES } from '../../src/features/shadowing/settings';
 import { AudioSessionPlayer } from '../../src/features/shadowing/audioSession/audioSessionPlayer';
 import { renderSession } from '../../src/features/shadowing/audioSession/render';
 import type { WordId } from '../../src/models/vocabulary';
@@ -120,6 +121,37 @@ async function run() {
   t = performance.now();
   await new Promise<void>((resolve) => device.speak('die Außenwand', { onStart: () => events.push(`cached-start@${Math.round(performance.now() - t)}`), onEnd: () => resolve() }));
   out.pronunciation = events;
+
+  // Bilingual (German + Persian) session — the real Persian voice ("Amir", fa_IR).
+  log('downloading / opening the Persian voice');
+  if (!(await voiceDownloaded({}, 'fa'))) await downloadVoice(() => {}, undefined, {}, 'fa');
+  const de = await openNeuralVoice();
+  const fa = await openNeuralVoice({ voice: 'fa' });
+  t = performance.now();
+  const faPcm = await fa.synthesize('دیوار خارجی باید به‌خوبی عایق‌بندی شود.', 1);
+  out.persianSample = { synthMs: Math.round(performance.now() - t), seconds: +(faPcm.length / fa.sampleRate).toFixed(2), ...stats(faPcm) };
+  const bi = await renderSession(
+    [{ id: 'bi' as WordId, word: 'der Tisch', fa: 'میز', example: 'Der Tisch steht in der Küche.', exampleFa: 'میز در آشپزخانه است.' }],
+    { ...DEFAULT_PREFERENCES, wordRepeats: 3, faMeaningRepeats: 1, exampleRepeats: 2, faExample: true, faExampleRepeats: 1, deFaDelaySec: 1, pauseSec: 0 },
+    { de, fa }, { leadInMs: 300 },
+  );
+  de.dispose(); fa.dispose();
+  const ctx2 = new AudioContext();
+  const dec = await ctx2.decodeAudioData(await bi.wav.arrayBuffer());
+  const ch = dec.getChannelData(0);
+  const rmsOf = (a: number, b: number) => stats(ch.subarray(Math.floor(a * dec.sampleRate), Math.floor(b * dec.sampleRate))).rms;
+  out.bilingual = {
+    seconds: +bi.duration.toFixed(2),
+    order: bi.items[0]!.steps.map((x) => (x.step.kind === 'speak' ? `${x.step.lang}:${x.step.target}` : `pause:${(x.end - x.start).toFixed(1)}s`)),
+    speechRms: bi.items[0]!.steps.filter((x) => x.step.kind === 'speak').map((x) => +rmsOf(x.start, x.end).toFixed(3)),
+    pauseRms: bi.items[0]!.steps.filter((x) => x.step.kind === 'pause').map((x) => +rmsOf(x.start, x.end).toFixed(4)),
+  };
+  await ctx2.close();
+  // Hand the file to the check script (saved for listening).
+  const bytes = new Uint8Array(await bi.wav.arrayBuffer());
+  let bin = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  (window as unknown as { __bilingualWav: string }).__bilingualWav = btoa(bin);
   out.ok = true;
 }
 

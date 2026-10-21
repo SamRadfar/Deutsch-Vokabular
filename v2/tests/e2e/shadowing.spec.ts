@@ -26,8 +26,8 @@ async function openSetup(page: Page, opts: { size?: string; word?: string; examp
   await page.getByRole('link', { name: 'تلفظ', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'تمرین تلفظ (Shadowing)' })).toBeVisible();
   await page.getByLabel('تعداد واژه در جلسه').selectOption(opts.size ?? '5');
-  await page.getByLabel('تکرار هر واژه').selectOption(opts.word ?? '1');
-  await page.getByLabel('تکرار جملهٔ مثال').selectOption(opts.example ?? '0');
+  await page.getByLabel('تکرار واژه آلمانی').selectOption(opts.word ?? '1');
+  await page.getByLabel('تکرار جمله مثال آلمانی').selectOption(opts.example ?? '0');
   await page.getByRole('slider').fill(opts.pause ?? '1');
 }
 
@@ -44,7 +44,7 @@ test('complete shadowing session: word, your turn, example, highlight, summary',
       const word = document.querySelector('[data-testid="sh-word"]')?.classList.contains('is-speaking');
       const ex = document.querySelector('[data-testid="sh-example"]')?.classList.contains('is-speaking');
       const count = document.querySelector('[data-testid="sh-count"]')?.textContent ?? '';
-      const state = `${count}|${phase.replace(/[🗣🔊]\s*/u, '')}|${word ? 'W' : ''}${ex ? 'E' : ''}`;
+      const state = `${count}|${phase.replace(/[🗣🔊]\s*/u, '').replace(/^(DE|FA)/, '')}|${word ? 'W' : ''}${ex ? 'E' : ''}`;
       if (count && w.__states.at(-1) !== state) w.__states.push(state);
     };
     new MutationObserver(read).observe(document.body, { subtree: true, childList: true, attributes: true, characterData: true });
@@ -112,13 +112,13 @@ test('keyboard controls (desktop)', async ({ page, isMobile }) => {
 
 test('settings persist across reloads', async ({ page }) => {
   await openSetup(page, { size: '10', word: '3', example: '2' });
-  await page.getByLabel('سرعت گفتار').selectOption('1.2');
+  await page.getByLabel('سرعت گفتار آلمانی').selectOption('1.2');
   await page.reload();
   await page.getByRole('link', { name: 'تلفظ', exact: true }).click();
   await expect(page.getByLabel('تعداد واژه در جلسه')).toHaveValue('10');
-  await expect(page.getByLabel('تکرار هر واژه')).toHaveValue('3');
-  await expect(page.getByLabel('تکرار جملهٔ مثال')).toHaveValue('2');
-  await expect(page.getByLabel('سرعت گفتار')).toHaveValue('1.2');
+  await expect(page.getByLabel('تکرار واژه آلمانی')).toHaveValue('3');
+  await expect(page.getByLabel('تکرار جمله مثال آلمانی')).toHaveValue('2');
+  await expect(page.getByLabel('سرعت گفتار آلمانی')).toHaveValue('1.2');
   await page.getByRole('button', { name: 'شروع تمرین (10 واژه)' }).click();
   await expect.poll(() => page.evaluate(() => window.__spoken[0]?.rate)).toBe(1.2);
   expect(await page.evaluate(() => window.__spoken[0]?.lang)).toBe('de-DE');

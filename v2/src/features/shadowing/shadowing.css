@@ -232,3 +232,62 @@
 .sh-prepare progress { width: 100%; height: 10px; accent-color: var(--brand); }
 .sh-prepare__hint { font-size: var(--fs-xs); color: var(--tm); }
 .sh-prepare .fc-tool { align-self: flex-start; }
+.sh-voice__license { font-size: var(--fs-2xs, 11px); color: var(--tm); }
+
+/* Language being spoken (bilingual shadowing) and Persian lines being read */
+.sh-lang {
+  display: inline-flex;
+  align-items: center;
+  margin-inline-end: 6px;
+  padding: 1px 7px;
+  font-family: var(--fn);
+  font-size: var(--fs-2xs, 11px);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  border-radius: var(--r-pill);
+  vertical-align: middle;
+}
+.sh-lang--de { color: #fff; background: color-mix(in srgb, var(--brand) 85%, #000 15%); }
+.sh-lang--fa { color: #fff; background: #0e7c66; }
+.sh-line--fa { border-radius: var(--r-sm); transition: background-color var(--dur-2) var(--ease), color var(--dur-2) var(--ease); }
+.sh-line--fa.is-speaking { color: var(--tp); background: color-mix(in srgb, #0e7c66 14%, transparent); box-shadow: inset 3px 0 0 #0e7c66; }
+
+/* ── «ترتیب و تکرار تلفظ» (bilingual sequence) ── */
+.sh-seq { display: flex; flex-direction: column; gap: 12px; margin: 14px 0 0; padding: 12px; border: 1px solid var(--br); border-radius: var(--r-md); min-width: 0; }
+.sh-seq legend { padding: 0 6px; font-family: var(--fp); font-size: var(--fs-sm); font-weight: 700; color: var(--tp); }
+.sh-seq__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+.sh-seq__grid .sh-pause { grid-column: 1 / -1; }
+.sh-seq__exfa { display: flex; flex-direction: column; gap: 6px; }
+.sh-seq__exfa .rv-check { margin: 0; }
+.sh-seq__voice { display: flex; flex-direction: column; gap: 8px; }
+
+.sh-preview { padding: 10px 12px; background: var(--sfalt); border-radius: var(--r-md); font-family: var(--fp); }
+.sh-preview__title { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; font-size: var(--fs-xs); font-weight: 700; color: var(--ts); }
+.sh-preview__title svg.lucide { width: 14px; height: 14px; }
+.sh-preview ol { display: flex; flex-direction: column; gap: 5px; margin: 0; padding: 0; list-style: none; }
+.sh-preview__line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.sh-preview__arrow { font-size: var(--fs-xs); color: var(--tm); }
+.sh-chip-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 8px;
+  font-family: var(--fn);
+  font-size: var(--fs-2xs, 11px);
+  font-weight: 700;
+  line-height: 1.8;
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+}
+.sh-chip-step svg.lucide { width: 11px; height: 11px; }
+.sh-chip-step.is-de { color: #fff; background: color-mix(in srgb, var(--brand) 85%, #000 15%); }
+.sh-chip-step.is-fa { color: #fff; background: #0e7c66; font-family: var(--fp); }
+.sh-chip-step.is-turn { color: var(--brand); background: color-mix(in srgb, var(--brand) 12%, transparent); }
+.sh-chip-step.is-gap { color: var(--ts); background: var(--sf); border: 1px solid var(--br); }
+.sh-preview__next { display: inline-flex; align-items: center; gap: 4px; font-size: var(--fs-2xs, 11px); font-weight: 700; color: var(--tm); }
+.sh-preview__next svg.lucide { width: 12px; height: 12px; }
+.sh-preview__legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 8px 0 0; font-size: var(--fs-2xs, 11px); color: var(--tm); }
+.sh-preview__legend svg.lucide { width: 11px; height: 11px; }
+@media (max-width: 640px) { .sh-seq__grid { grid-template-columns: 1fr; } }
+.sh-chip-step__lang { font-size: 0.85em; opacity: 0.85; letter-spacing: 0.04em; }
+.sh-chip-step__n { font-family: var(--fn); }

@@ -1,15 +1,15 @@
 import { AudioLines, Lock, Volume2 } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
 import { isAppleMobile } from '../../audio/routedSpeech';
-import { useOnDeviceVoice } from '../../audio/useOnDeviceVoice';
+import { onDeviceVoiceStore, useOnDeviceVoice } from '../../audio/useOnDeviceVoice';
+import { wantsPersian } from '../plan';
+import { SequenceSettings } from './SequenceSettings';
 import { usePronunciation } from '../../pronunciation/PronunciationProvider';
 import { modeAvailable, REVIEW_MODES, type DeckCard, type DeckProgress, type PracticeCategoryKey, type ReviewMode } from '../../review/deck';
 import { selectShadowingCards } from '../queue';
-import {
-  EXAMPLE_REPEATS, PAUSE_RANGE, RATES, SHADOWING_SIZES, WORD_REPEATS, type ShadowingPreferences,
-} from '../settings';
+import { SHADOWING_SIZES, type ShadowingPreferences } from '../settings';
 import type { ShadowingBackend } from '../useShadowingBackend';
-import { formatDuration, formatSeconds } from './format';
+import { formatDuration } from './format';
 import { PlaybackMode } from './PlaybackMode';
 
 interface Props {
@@ -41,9 +41,11 @@ function useGermanVoice() {
 }
 
 export function ShadowingSetup({ cards, scopes, backend, prefs, onChange, onStart }: Props) {
-  const ids = { size: useId(), word: useId(), example: useId(), pause: useId(), rate: useId(), tr: useId() };
+  const ids = { size: useId(), tr: useId() };
   const voice = useGermanVoice();
   const { state: deviceVoice } = useOnDeviceVoice();
+  const { state: faVoice } = useOnDeviceVoice(onDeviceVoiceStore('fa'));
+  const needsPersian = wantsPersian(prefs) && faVoice.kind !== 'ready';
   const { routed, openSoundSettings } = usePronunciation();
   const progress: DeckProgress = { learned: backend.learned, againIds: backend.againIds };
   const selectedCats = new Set(prefs.categories);
@@ -139,44 +141,25 @@ export function ShadowingSetup({ cards, scopes, backend, prefs, onChange, onStar
                 {SHADOWING_SIZES.map((n) => <option key={n} value={n}>{n}</option>)}
               </select>
             </div>
-            <div className="rv-field">
-              <label htmlFor={ids.rate}>سرعت گفتار</label>
-              <select id={ids.rate} value={prefs.rate} onChange={(e) => set({ rate: Number(e.currentTarget.value) })}>
-                {RATES.map((r) => <option key={r.value} value={r.value}>{r.label} (×{r.value})</option>)}
-              </select>
-            </div>
-            <div className="rv-field">
-              <label htmlFor={ids.word}>تکرار هر واژه</label>
-              <select id={ids.word} value={prefs.wordRepeats} onChange={(e) => set({ wordRepeats: Number(e.currentTarget.value) })}>
-                {WORD_REPEATS.map((n) => <option key={n} value={n}>{n} بار</option>)}
-              </select>
-            </div>
-            <div className="rv-field">
-              <label htmlFor={ids.example}>تکرار جملهٔ مثال</label>
-              <select id={ids.example} value={prefs.exampleRepeats} onChange={(e) => set({ exampleRepeats: Number(e.currentTarget.value) })}>
-                {EXAMPLE_REPEATS.map((n) => <option key={n} value={n}>{n === 0 ? 'بدون جمله' : `${n} بار`}</option>)}
-              </select>
-            </div>
-            <div className="rv-field sh-pause">
-              <label htmlFor={ids.pause}>مکث برای تکرار شما: <output htmlFor={ids.pause}>{formatSeconds(prefs.pauseSec)}</output></label>
-              <input id={ids.pause} type="range" min={PAUSE_RANGE.min} max={PAUSE_RANGE.max} step={PAUSE_RANGE.step} value={prefs.pauseSec}
-                onChange={(e) => set({ pauseSec: Number(e.currentTarget.value) })} />
-              <small>بعد از جمله‌ها، مکث به اندازهٔ طول همان جمله بیشتر می‌شود.</small>
-            </div>
             <label className="rv-check" htmlFor={ids.tr}>
               <input id={ids.tr} type="checkbox" checked={prefs.showTranslation} onChange={(e) => set({ showTranslation: e.currentTarget.checked })} />
               نمایش ترجمهٔ فارسی
             </label>
           </div>
 
+          <SequenceSettings prefs={prefs} set={set} persianReady={faVoice.kind === 'ready'} />
+
           <PlaybackMode mode={prefs.playback} onMode={(playback) => set({ playback })} />
 
           {modeAvailable(prefs.mode, progress) && selected === 0 ? (
             <p className="rv-empty" role="status">{prefs.categories.length === 0 ? 'دست‌کم یک دسته را انتخاب کنید.' : 'در این انتخاب واژه‌ای نیست.'}</p>
           ) : null}
-          <button type="button" className="fc-primary rv-start" onClick={onStart} disabled={sessionCount === 0 || !canPlay}>
+          <button type="button" className="fc-primary rv-start" onClick={onStart} disabled={sessionCount === 0 || !canPlay || needsPersian}>
             {sessionCount === 0 ? 'واژه‌ای برای تمرین نیست' : audioMode ? `آماده‌سازی جلسه (${sessionCount} واژه)` : `شروع تمرین (${sessionCount} واژه)`}
           </button>
+          {needsPersian && sessionCount > 0 ? (
+            <p className="sh-start-hint" data-testid="sh-needs-fa">برای خواندن فارسی، اول صدای فارسی را دانلود کنید یا «تکرار معنی فارسی» و ترجمهٔ جمله را خاموش کنید.</p>
+          ) : null}
           {audioMode && deviceVoice.kind !== 'ready' && sessionCount > 0 ? (
             <p className="sh-start-hint">برای پخش با صفحهٔ قفل، اول صدای آلمانی را دانلود کنید.</p>
           ) : null}

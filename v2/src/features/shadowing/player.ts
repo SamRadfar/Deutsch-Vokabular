@@ -22,6 +22,9 @@ export interface ShadowingItem {
   id: WordId;
   word: string;
   example: string;
+  /** Persian meaning and example translation (spoken when Persian is enabled). */
+  fa?: string;
+  exampleFa?: string;
 }
 
 export type PlayerStatus = 'idle' | 'playing' | 'paused' | 'finished';
@@ -58,7 +61,10 @@ export interface Timers {
 }
 
 export interface PlayerOptions {
+  /** German speech. */
   speech: SpeechService;
+  /** Persian speech (on-device voice); without it the Persian steps are left out. */
+  persian?: SpeechService | null;
   /** Read at every step, so rate changes apply from the next utterance and repeats from the next item. */
   settings: () => ShadowingSettings;
   timers?: Timers;
@@ -96,6 +102,8 @@ export class ShadowingPlayer {
   private steps: Step[] = [];
   private speaking = false;
   private utterancePending = false;
+  /** The engine of the utterance in flight (German or Persian). */
+  private activeEngine: SpeechService | null = null;
   private speechStartedAt = 0;
   private lastSpeechMs = 0;
   /** Full length of the current pause step; kept across pause/resume. */
@@ -214,7 +222,15 @@ export class ShadowingPlayer {
 
   private planFor(index: number): Step[] {
     const item = this.items[index];
-    return item ? planItem(item, this.o.settings()) : [];
+    if (!item) return [];
+    const steps = planItem(item, this.o.settings(), { persian: !!this.o.persian });
+    // Prepare the Persian clips of this item and the next one while German is playing.
+    if (this.o.persian?.prefetch) {
+      const next = this.items[index + 1];
+      const texts = [item, next].flatMap((it) => (it ? planItem(it, this.o.settings()).flatMap((s) => (s.kind === 'speak' && s.lang === 'fa' ? [s.text] : [])) : []));
+      this.o.persian.prefetch([...new Set(texts)], this.o.settings().faRate);
+    }
+    return steps;
   }
 
   private moveTo(index: number) {
@@ -232,7 +248,7 @@ export class ShadowingPlayer {
   private halt() {
     this.gen++;
     this.clearTimer();
-    if (this.utterancePending) this.o.speech.cancel();
+    if (this.utterancePending) (this.activeEngine ?? this.o.speech).cancel();
     this.utterancePending = false;
     this.speaking = false;
   }
@@ -271,7 +287,9 @@ export class ShadowingPlayer {
     }
     this.pauseLeft = null;
     this.pauseFull = null;
-    const rate = this.o.settings().rate;
+    const persian = step.lang === 'fa' && this.o.persian ? this.o.persian : null;
+    const engine = persian ?? this.o.speech;
+    const rate = persian ? this.o.settings().faRate : this.o.settings().rate;
     let error: string | null = null;
     this.utterancePending = true;
     this.speechStartedAt = this.now();
@@ -281,7 +299,7 @@ export class ShadowingPlayer {
         if (g !== this.gen) return;
         this.timer = null;
         this.gen++; // the cancelled utterance's callbacks are now stale
-        this.o.speech.cancel();
+        engine.cancel();
         this.utterancePending = false;
         this.afterSpeech('timeout');
       }, ms);
@@ -290,8 +308,10 @@ export class ShadowingPlayer {
     // to synthesize); once it plays, the length-based watchdog applies.
     watchdog(Math.max(START_GRACE_MS, watchdogMs(step.text, rate)));
     this.emit();
-    this.o.speech.speak(step.text, {
+    this.activeEngine = engine;
+    engine.speak(step.text, {
       rate,
+      lang: step.lang === 'fa' ? 'fa-IR' : 'de-DE',
       onStart: () => {
         if (g !== this.gen) return;
         this.speaking = true;

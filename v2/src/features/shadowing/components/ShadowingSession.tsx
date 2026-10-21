@@ -5,6 +5,7 @@ import { WordTypeBadge } from '../../vocabulary/components/WordTypeBadge';
 import type { DeckCard } from '../../review/deck';
 import type { PlayerNotice, PlayerSnapshot } from '../player';
 import { RATES } from '../settings';
+import { describePhase, isYourTurn, LANG_BADGE, speakingTarget } from '../stepLabel';
 
 interface Controls {
   play(): void;
@@ -44,25 +45,17 @@ const KEYS: Record<string, 'toggle' | 'next' | 'previous' | 'stop' | 'translatio
   Space: 'toggle', ArrowRight: 'next', ArrowLeft: 'previous', Escape: 'stop', KeyT: 'translation',
 };
 
-function phaseText(snap: PlayerSnapshot): string {
-  const step = snap.step;
-  if (snap.status === 'idle') return 'آماده — برای شروع روی پخش بزنید';
-  if (snap.status === 'paused') return 'متوقف شده';
-  if (!step) return '';
-  const what = step.target === 'word' ? 'واژه' : 'جمله';
-  const rep = step.of > 1 ? ` (${step.repetition} از ${step.of})` : '';
-  return step.kind === 'speak' ? `گوش کن: ${what}${rep}` : `حالا تو ${what} را بلند تکرار کن${rep}`;
-}
 
 export function ShadowingSession({ snap, cardsById, order, controls, active, audioMode = false, floating, rate, showTranslation, onRate, onShowTranslation }: Props) {
   const rateId = useId();
   const root = useRef<HTMLElement>(null);
   const card = cardsById.get(order[snap.index]!);
-  const step = snap.step;
   const playing = snap.status === 'playing';
-  const speakingWord = playing && step?.kind === 'speak' && step.target === 'word';
-  const speakingExample = playing && step?.kind === 'speak' && step.target === 'example';
-  const yourTurn = step?.kind === 'pause' && snap.pauseMs !== null && snap.status !== 'idle';
+  const target = speakingTarget(snap);
+  const speakingWord = target === 'word';
+  const speakingExample = target === 'example';
+  const yourTurn = isYourTurn(snap);
+  const phase = describePhase(snap);
 
   useEffect(() => {
     root.current?.scrollIntoView?.({ block: 'start' });
@@ -130,18 +123,30 @@ export function ShadowingSession({ snap, cardsById, order, controls, active, aud
           <span lang="de" dir="ltr">{entry.word}</span>
         </p>
         <div className="fc-row"><WordTypeBadge type={entry.type} /><span className="sh-pr" lang="fa" dir="rtl">{entry.pronunciationFa}</span></div>
-        {showTranslation ? <p className="sh-fa" lang="fa" dir="rtl" data-testid="sh-fa">{entry.fa}</p> : null}
+        {showTranslation || target === 'meaning' ? (
+          <p className={`sh-fa sh-line--fa${target === 'meaning' ? ' is-speaking' : ''}`} lang="fa" dir="rtl" data-testid="sh-fa" aria-current={target === 'meaning' ? 'true' : undefined}>
+            {entry.fa}
+          </p>
+        ) : null}
         {entry.example ? (
           <div className={`sh-line sh-line--example${speakingExample ? ' is-speaking' : ''}`} data-testid="sh-example" aria-current={speakingExample ? 'true' : undefined}>
             <span className="sh-eq" aria-hidden="true"><span /><span /><span /></span>
             <span lang="de" dir="ltr">{entry.example}</span>
           </div>
         ) : null}
-        {entry.example && showTranslation ? <p className="sh-exfa" lang="fa" dir="rtl">{entry.exampleFa}</p> : null}
+        {entry.example && (showTranslation || target === 'exampleFa') ? (
+          <p className={`sh-exfa sh-line--fa${target === 'exampleFa' ? ' is-speaking' : ''}`} lang="fa" dir="rtl" data-testid="sh-exfa" aria-current={target === 'exampleFa' ? 'true' : undefined}>
+            {entry.exampleFa}
+          </p>
+        ) : null}
       </div>
 
       <div className={`sh-phase${yourTurn ? ' is-your-turn' : ''}${snap.status === 'paused' ? ' is-paused' : ''}`} data-testid="sh-phase">
-        <p>{yourTurn ? <Mic /> : playing ? <Volume2 /> : null}{phaseText(snap)}</p>
+        <p>
+          {yourTurn ? <Mic /> : playing && phase.kind === 'listen' ? <Volume2 /> : null}
+          {phase.lang ? <span className={`sh-lang sh-lang--${phase.lang}`} data-testid="sh-lang">{LANG_BADGE[phase.lang]}</span> : null}
+          {phase.text}
+        </p>
         {yourTurn ? (
           <span className="sh-countdown" aria-hidden="true">
             {/* keyed: restarts with every pause; a negative delay continues a resumed pause */}

@@ -14,8 +14,8 @@ async function openShadowing(page: Page) {
 
 async function practiseFive(page: Page) {
   await page.getByLabel('تعداد واژه در جلسه').selectOption('5');
-  await page.getByLabel('تکرار هر واژه').selectOption('1');
-  await page.getByLabel('تکرار جملهٔ مثال').selectOption('0');
+  await page.getByLabel('تکرار واژه آلمانی').selectOption('1');
+  await page.getByLabel('تکرار جمله مثال آلمانی').selectOption('0');
   await page.getByRole('slider').fill('1');
   await page.getByRole('button', { name: 'شروع تمرین (5 واژه)' }).click();
   await expect(page.getByRole('heading', { name: 'دور تمرین تمام شد!' })).toBeVisible({ timeout: 30_000 });

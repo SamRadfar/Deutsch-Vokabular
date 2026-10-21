@@ -142,3 +142,5 @@ body.sh-float-doc .sh-float-root { height: 100vh; }
 @media (prefers-reduced-motion: reduce) {
   .sh-float__turn span { animation: none; }
 }
+.sh-float__fa.is-speaking, .sh-float__exfa.is-speaking { color: var(--tp); background: color-mix(in srgb, #0e7c66 14%, transparent); border-radius: var(--r-sm); box-shadow: inset 3px 0 0 #0e7c66; }
+.sh-float__exfa { padding: 2px 6px; }

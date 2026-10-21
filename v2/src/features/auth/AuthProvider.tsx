@@ -119,3 +119,9 @@ export function useSignedInUser() {
   const { state } = useAuth();
   return state.status === 'signed-in' ? state.user : null;
 }
+
+/** The signed-in uid, or null — also outside an AuthProvider (components used standalone in tests). */
+export function useOptionalUid(): string | null {
+  const ctx = useContext(AuthContext);
+  return ctx?.state.status === 'signed-in' ? ctx.state.user.uid : null;
+}

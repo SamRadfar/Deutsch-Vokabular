@@ -122,3 +122,52 @@ minimized and never becomes the foreground window, the card advances with the se
 while minimized, pause/play from the window work, and the real speech engine keeps running while
 minimized (silent test utterances). Not automated: how it looks and sounds on the owner's screen,
 and very long sessions (> 5 min minimized).
+
+## 5. Bilingual shadowing (German + Persian)
+
+**Persian voice:** Piper `fa_IR-amir-medium` (63.5 MB; the dataset is CC0, datacula.com; Piper is
+MIT). It runs on the device in the same WebAssembly worker as the German voice: ONNX Runtime plus
+espeak-ng `fa` phonemes, 22,050 Hz. The download is pinned to a Hugging Face revision and checked
+with SHA-256 (`fb815380…`). It is loaded only when Persian is enabled or downloaded in the sound
+settings. The runtime files (ORT + espeak data) are shared with the German voice and downloaded
+once. It works offline afterwards. `fa_IR-gyro-medium` was not used because its license is unclear.
+Browser TTS is no alternative: Windows, Android and iOS mostly have no Persian system voice.
+
+**Settings «ترتیب و تکرار تلفظ»** (`settings.ts`, stored on the device):
+
+| Setting | Range |
+|---|---|
+| German word | 1–10 |
+| Persian meaning after **each** German word | 0–5 |
+| German example | 0–10 |
+| Persian example translation | on/off, ×0–5 |
+| German→Persian delay | 0 / 0.5 / 1 / 2 / 3 s |
+| Learner pause | 0–8 s (0 = back-to-back) |
+| German and Persian speed | separate |
+
+The defaults keep the old German-only behaviour.
+
+**Order** (`plan.ts`, the single source for the live player, the prepared audio and the preview):
+
+```
+× word repetitions:   DE word → [delay] → FA meaning × n (0.4 s apart) → learner pause
+× example repetitions: DE example → learner pause (+ sentence length)
+once:                 [delay] → FA example translation × m → learner pause
+→ next word
+```
+
+* **Live mode:** German uses browser speech (or the on-device German voice on iPhone). Persian uses
+  the on-device Persian voice played as media. One utterance runs at a time. The Persian clips of
+  the current and next word are synthesized ahead (prefetch).
+* **Prepared / lock-screen audio:** both voices are rendered into one WAV with real silence for
+  every pause. Timing comes from the audio timeline.
+* **UI:** a DE/FA badge, the line being spoken is highlighted (including Persian), with cycle and
+  repetition numbers. The floating Picture-in-Picture card shows the same thing from the same state.
+* **Privacy:** clips exist only in memory. They are cleared and playback stops on sign-out or an
+  account switch.
+
+Verified in real Chromium (`scripts/audio-check.mjs`): the Persian voice is audible. The bilingual
+file has the exact order DE→1 s→FA ×3, DE example ×2, 1 s→FA example. Every German and Persian
+segment is audible and every pause is silent. A listening sample with neutral words is saved to
+`%TEMP%\dv2-bilingual-sample.wav`. Not verified: how natural the voice sounds to the owner, speed
+on phones, and lock-screen playback on real Android/iPhone devices.

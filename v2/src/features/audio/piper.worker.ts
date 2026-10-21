@@ -5,10 +5,10 @@
 
 import createPiperPhonemize, { type PiperPhonemizeOptions } from '@diffusionstudio/piper-wasm/build/piper_phonemize.js';
 import * as ort from 'onnxruntime-web/wasm';
-import { VOICE_CONFIG, type VoiceAssets } from './voiceAssets';
+import type { VoiceAssets, VoiceConfig } from './voiceAssets';
 
 export type WorkerRequest =
-  | { type: 'init'; assets: VoiceAssets }
+  | { type: 'init'; assets: VoiceAssets; config: VoiceConfig }
   | { type: 'synth'; id: number; text: string; lengthScale: number };
 
 export type WorkerResponse =
@@ -25,8 +25,10 @@ const scope = self as unknown as WorkerScope;
 let session: ort.InferenceSession | null = null;
 let phonemizeModule: WebAssembly.Module | null = null;
 let phonemizeData: ArrayBuffer | null = null;
+let config: VoiceConfig | null = null;
 
-async function init(assets: VoiceAssets) {
+async function init(assets: VoiceAssets, voiceConfig: VoiceConfig) {
+  config = voiceConfig;
   phonemizeModule = await WebAssembly.compile(assets.phonemizeWasm);
   phonemizeData = assets.phonemizeData;
   ort.env.wasm.wasmBinary = assets.ortWasm; // never fetched from a URL
@@ -51,7 +53,7 @@ async function phonemeIds(text: string): Promise<number[]> {
     locateFile: (p) => p,
   };
   const program = await createPiperPhonemize(options);
-  program.callMain(['-l', VOICE_CONFIG.espeakVoice, '--input', JSON.stringify([{ text }]), '--espeak_data', '/espeak-ng-data']);
+  program.callMain(['-l', config!.espeakVoice, '--input', JSON.stringify([{ text }]), '--espeak_data', '/espeak-ng-data']);
   const ids: number[] = [];
   for (const line of lines) {
     try {
@@ -69,7 +71,7 @@ async function synth(text: string, lengthScale: number): Promise<Float32Array> {
   const feeds: Record<string, ort.Tensor> = {
     input: new ort.Tensor('int64', BigInt64Array.from(ids, (n) => BigInt(n)), [1, ids.length]),
     input_lengths: new ort.Tensor('int64', BigInt64Array.from([BigInt(ids.length)]), [1]),
-    scales: new ort.Tensor('float32', Float32Array.from([VOICE_CONFIG.noiseScale, lengthScale, VOICE_CONFIG.noiseW]), [3]),
+    scales: new ort.Tensor('float32', Float32Array.from([config!.noiseScale, lengthScale, config!.noiseW]), [3]),
   };
   const result = await session.run(feeds);
   const output = result.output ?? Object.values(result)[0];
@@ -80,7 +82,7 @@ async function synth(text: string, lengthScale: number): Promise<Float32Array> {
 scope.onmessage = (e) => {
   const msg = e.data;
   if (msg.type === 'init') {
-    init(msg.assets).then(
+    init(msg.assets, msg.config).then(
       () => scope.postMessage({ type: 'ready' }),
       (err: unknown) => scope.postMessage({ type: 'error', id: null, message: String((err as Error)?.message ?? err) }),
     );

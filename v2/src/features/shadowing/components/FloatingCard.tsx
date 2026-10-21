@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import type { DeckCard } from '../../review/deck';
 import type { PlayerSnapshot } from '../player';
 import { NOTICE_TEXT } from './ShadowingSession';
+import { describePhase, isYourTurn, LANG_BADGE, speakingTarget } from '../stepLabel';
 
 export interface FloatingControls {
   play(): void;
@@ -22,14 +23,11 @@ interface Props {
   onClose(): void;
 }
 
-function status(snap: PlayerSnapshot): { text: string; kind: 'listen' | 'turn' | 'paused' | 'idle' } {
-  const step = snap.step;
-  if (snap.status === 'idle') return { text: 'آماده', kind: 'idle' };
-  if (snap.status === 'paused') return { text: 'متوقف', kind: 'paused' };
-  if (!step) return { text: '', kind: 'idle' };
-  const what = step.target === 'word' ? 'واژه' : 'جمله';
-  const rep = step.of > 1 ? ` ${step.repetition}/${step.of}` : '';
-  return step.kind === 'speak' ? { text: `گوش کن: ${what}${rep}`, kind: 'listen' } : { text: `نوبت تو: ${what}${rep}`, kind: 'turn' };
+/** Compact phase line: the shared description, shortened for the small window. */
+function status(snap: PlayerSnapshot) {
+  const p = describePhase(snap);
+  const text = p.kind === 'idle' ? 'آماده' : p.kind === 'paused' ? 'متوقف' : p.kind === 'turn' ? p.text.replace(/^حالا تو (.+) را بلند تکرار کن/, 'نوبت تو: $1') : p.text;
+  return { ...p, text };
 }
 
 /** The compact vocabulary card of the floating player (Picture-in-Picture window or in-page). */
@@ -38,11 +36,9 @@ export function FloatingCard({ snap, card, controls, showTranslation, inPage = f
   const latest = useRef({ snap, controls });
   latest.current = { snap, controls };
   const playing = snap.status === 'playing';
-  const step = snap.step;
   const st = status(snap);
-  const speakingWord = playing && step?.kind === 'speak' && step.target === 'word';
-  const speakingExample = playing && step?.kind === 'speak' && step.target === 'example';
-  const yourTurn = step?.kind === 'pause' && snap.pauseMs !== null && snap.status !== 'idle';
+  const target = speakingTarget(snap);
+  const yourTurn = isYourTurn(snap);
   const { entry } = card;
 
   // Keyboard inside the floating window (its own document): Space, ←, →.
@@ -67,6 +63,7 @@ export function FloatingCard({ snap, card, controls, showTranslation, inPage = f
         <span className="sh-float__pos" dir="ltr" data-testid="floating-pos">{snap.index + 1} / {snap.total}</span>
         <span className={`sh-float__state sh-float__state--${st.kind}`} data-testid="floating-state">
           {st.kind === 'listen' ? <Volume2 aria-hidden="true" /> : st.kind === 'turn' ? <Mic aria-hidden="true" /> : null}
+          {st.lang ? <span className={`sh-lang sh-lang--${st.lang}`} data-testid="floating-lang">{LANG_BADGE[st.lang]}</span> : null}
           {st.text}
         </span>
         {inPage ? <button type="button" className="sh-float__x" onClick={onClose} aria-label="بستن کارت شناور"><X /></button> : null}
@@ -76,12 +73,14 @@ export function FloatingCard({ snap, card, controls, showTranslation, inPage = f
       </div>
 
       <div className="sh-float__body">
-        <p className={`sh-float__word${speakingWord ? ' is-speaking' : ''}`} lang="de" dir="ltr" data-testid="floating-word">{entry.word}</p>
-        <p className="sh-float__fa">{entry.fa}</p>
+        <p className={`sh-float__word${target === 'word' ? ' is-speaking' : ''}`} lang="de" dir="ltr" data-testid="floating-word">{entry.word}</p>
+        <p className={`sh-float__fa${target === 'meaning' ? ' is-speaking' : ''}`} data-testid="floating-fa">{entry.fa}</p>
         {entry.example ? (
-          <p className={`sh-float__ex${speakingExample ? ' is-speaking' : ''}`} lang="de" dir="ltr">{entry.example}</p>
+          <p className={`sh-float__ex${target === 'example' ? ' is-speaking' : ''}`} lang="de" dir="ltr">{entry.example}</p>
         ) : null}
-        {entry.example && showTranslation && entry.exampleFa ? <p className="sh-float__exfa">{entry.exampleFa}</p> : null}
+        {entry.example && entry.exampleFa && (showTranslation || target === 'exampleFa') ? (
+          <p className={`sh-float__exfa${target === 'exampleFa' ? ' is-speaking' : ''}`} data-testid="floating-exfa">{entry.exampleFa}</p>
+        ) : null}
       </div>
 
       <div className="sh-float__turn" aria-hidden="true">

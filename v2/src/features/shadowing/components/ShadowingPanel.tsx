@@ -10,6 +10,7 @@ import { practiceScopes, usePersonal, usePracticeCards } from '../../personal/us
 import { openNeuralVoice } from '../../audio/neuralVoice';
 import { AudioSessionPlayer } from '../audioSession/audioSessionPlayer';
 import { renderSession, RenderAbortedError } from '../audioSession/render';
+import { wantsPersian } from '../plan';
 import { ShadowingPlayer, type PlayerSnapshot, type ShadowingItem } from '../player';
 import { buildShadowingQueue, selectShadowingCards } from '../queue';
 import { sanitizePreferences, type ShadowingPreferences } from '../settings';
@@ -53,7 +54,7 @@ const none = () => null;
 /** The "🗣 تلفظ" tab: setup → shadowing session → summary. */
 export function ShadowingPanel({ categories, active, random, wakeLock }: Props) {
   const backend = useShadowingBackend();
-  const { service: speech } = usePronunciation();
+  const { service: speech, persian } = usePronunciation();
   const [preparing, setPreparing] = useState<Preparing | null>(null);
   const floating = useFloatingPlayer();
   const floatingKind = floating.state.kind;
@@ -104,10 +105,12 @@ export function ShadowingPanel({ categories, active, random, wakeLock }: Props) 
 
   /** Starts a session and its first word inside the user's click (browser autoplay policies). */
   const begin = (deck: readonly DeckCard[]) => {
-    const items: ShadowingItem[] = deck.map((c) => ({ id: c.entry.id, word: c.entry.word, example: c.entry.example }));
+    const items: ShadowingItem[] = deck.map((c) => ({ id: c.entry.id, word: c.entry.word, example: c.entry.example, fa: c.entry.fa, exampleFa: c.entry.exampleFa }));
     const order = deck.map((c) => c.entry.id);
     if (prefsRef.current.playback === 'audio') { void prepareAudio(items, order); return; }
-    const player = new ShadowingPlayer(items, { speech, settings: () => prefsRef.current, wakeLock: port, timers: floating.timers, onItemCompleted, onFinished });
+    // Persian (meanings, example translations) with the on-device voice — only when asked for.
+    const fa = wantsPersian(prefsRef.current) ? persian : null;
+    const player = new ShadowingPlayer(items, { speech, persian: fa, settings: () => prefsRef.current, wakeLock: port, timers: floating.timers, onItemCompleted, onFinished });
     setSession({ player, order, audio: false });
     player.play();
   };
@@ -121,14 +124,17 @@ export function ShadowingPanel({ categories, active, random, wakeLock }: Props) 
     setPreparing(state);
     try {
       const voice = await openNeuralVoice();
+      // Bilingual sessions: the Persian voice too (both 22,050 Hz → one continuous file).
+      const faVoice = wantsPersian(prefsRef.current) && persian ? await openNeuralVoice({ voice: 'fa' }).catch((e: unknown) => { voice.dispose(); throw e; }) : null;
       let rendered;
       try {
-        rendered = await renderSession(items, prefsRef.current, voice, {
+        rendered = await renderSession(items, prefsRef.current, { de: voice, fa: faVoice }, {
           signal: abort.signal,
           onProgress: (done, total) => { if (!abort.signal.aborted) setPreparing({ ...state, done, total }); },
         });
       } finally {
         voice.dispose();
+        faVoice?.dispose();
       }
       if (abort.signal.aborted) return;
       const player = new AudioSessionPlayer(rendered, { onItemCompleted, onFinished });

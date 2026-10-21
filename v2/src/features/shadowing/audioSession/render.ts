@@ -6,7 +6,7 @@
 // The audio exists only in memory (a Blob URL) for this session; nothing is uploaded or stored.
 
 import type { WordId } from '../../../models/vocabulary';
-import { pauseDuration, planItem, type Step } from '../plan';
+import { pauseDuration, planItem, type Lang, type PlanSettings, type Step } from '../plan';
 import type { ShadowingSettings } from '../settings';
 import type { ShadowingItem } from '../player';
 
@@ -66,23 +66,38 @@ function gainFor(pcm: Float32Array): number {
   return peak > 0 ? Math.min(3, 0.9 / peak) : 1;
 }
 
+/** German and (optionally) Persian voices. Both must use the same sample rate (Piper medium: 22,050 Hz). */
+export interface SessionVoices {
+  de: Synthesizer;
+  /** Without a Persian voice the Persian steps are left out (the plan never contains them). */
+  fa?: Synthesizer | null;
+}
+
+export type RenderSettings = PlanSettings & Pick<ShadowingSettings, 'rate'> & Partial<Pick<ShadowingSettings, 'faRate'>>;
+
 export async function renderSession(
   items: readonly ShadowingItem[],
-  settings: Pick<ShadowingSettings, 'wordRepeats' | 'exampleRepeats' | 'pauseSec' | 'rate'>,
-  voice: Synthesizer,
+  settings: RenderSettings,
+  voices: Synthesizer | SessionVoices,
   { onProgress, signal, leadInMs = 400 }: RenderOptions = {},
 ): Promise<RenderedSession> {
-  const sr = voice.sampleRate;
-  const plans = items.map((item) => planItem(item, settings));
-  const texts = [...new Set(plans.flatMap((steps) => steps.flatMap((s) => (s.kind === 'speak' ? [s.text] : []))))];
+  const v: SessionVoices = 'synthesize' in voices ? { de: voices } : voices;
+  const sr = v.de.sampleRate;
+  if (v.fa && v.fa.sampleRate !== sr) throw new Error('voices with different sample rates');
+  const plans = items.map((item) => planItem(item, settings, { persian: !!v.fa }));
+  // Every distinct (language, text) once — repetitions reuse it.
+  const keyOf = (lang: Lang, text: string) => `${lang}|${text}`;
+  const texts = [...new Map(plans.flatMap((steps) => steps.flatMap((s) => (s.kind === 'speak' ? [[keyOf(s.lang, s.text), s] as const] : [])))).values()];
 
-  // 1. synthesize every distinct text once (repetitions reuse it)
+  // 1. synthesize
   const clips = new Map<string, { pcm: Float32Array; gain: number }>();
   onProgress?.(0, texts.length);
-  for (const text of texts) {
+  for (const step of texts) {
     if (signal?.aborted) throw new RenderAbortedError();
-    const pcm = trimSilence(await voice.synthesize(text, settings.rate), sr);
-    clips.set(text, { pcm, gain: gainFor(pcm) });
+    const synth = step.lang === 'fa' ? v.fa! : v.de;
+    const rate = step.lang === 'fa' ? settings.faRate ?? 1 : settings.rate;
+    const pcm = trimSilence(await synth.synthesize(step.text, rate), sr);
+    clips.set(keyOf(step.lang, step.text), { pcm, gain: gainFor(pcm) });
     onProgress?.(clips.size, texts.length);
   }
   if (signal?.aborted) throw new RenderAbortedError();
@@ -98,7 +113,7 @@ export async function renderSession(
     const steps = plans[i]!.map((step): TimedStep => {
       const start = cursor;
       if (step.kind === 'speak') {
-        const clip = clips.get(step.text)!;
+        const clip = clips.get(keyOf(step.lang, step.text))!;
         segments.push({ kind: 'clip', clip });
         cursor += clip.pcm.length;
         lastSpeechMs = (clip.pcm.length / sr) * 1000;

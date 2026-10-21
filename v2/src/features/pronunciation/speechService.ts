@@ -61,6 +61,10 @@ export interface SpeechService {
   whenVoicesReady(timeoutMs?: number): Promise<void>;
   /** Notifies when the voice list changes; returns an unsubscribe function. */
   onVoicesChanged(listener: () => void): () => void;
+  /** On-device voices: prepare these texts ahead of their turn (no-op elsewhere). */
+  prefetch?(texts: readonly string[], rate?: number): void;
+  /** On-device voices: forget synthesized clips (account switch / sign-out — they contain private words). */
+  clearCache?(): void;
 }
 
 export const GERMAN = 'de-DE';

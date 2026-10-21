@@ -48,6 +48,8 @@ export const WIDE_QUERY = '(min-width: 1024px)';
 
 interface Props {
   speechService?: SpeechService;
+  /** Tests: the Persian voice (on-device in the app). */
+  persianService?: SpeechService | null;
   /** Injected in tests; defaults to Firebase (or the welcome screen only when unconfigured). */
   services?: AppServices;
 }
@@ -61,12 +63,12 @@ let defaultServices: AppServices | undefined;
  * Composition root: identity → the account's own library → personal progress → the app. Without
  * an account only the welcome screen is shown; the vocabulary is never part of the public bundle.
  */
-export function App({ speechService, services }: Props) {
+export function App({ speechService, persianService, services }: Props) {
   const resolved = services ?? (defaultServices ??= createAppServices());
   const { theme, toggle } = useTheme();
   return (
     <AuthProvider service={resolved.auth} {...(resolved.authUnavailable ? { unavailable: resolved.authUnavailable } : {})}>
-      <PronunciationProvider {...(speechService ? { service: speechService } : {})}>
+      <PronunciationProvider {...(speechService ? { service: speechService } : {})} {...(persianService !== undefined ? { persianService } : {})}>
         <AiProvider client={resolved.ai ?? null}>
           <LibraryGate service={resolved.library ?? null} welcomeExtras={<ThemeToggle theme={theme} onToggle={toggle} />}>
             {(repository) => (

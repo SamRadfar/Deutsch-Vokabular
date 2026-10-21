@@ -1,6 +1,6 @@
 // Main-thread client of the on-device voice worker (piper.worker.ts).
 
-import { loadVoiceAssets, VOICE_CONFIG, type VoiceStore } from './voiceAssets';
+import { loadVoiceAssets, VOICES, type VoiceId, type VoiceStore } from './voiceAssets';
 import type { WorkerRequest, WorkerResponse } from './piper.worker';
 
 export interface NeuralVoice {
@@ -12,13 +12,15 @@ export interface NeuralVoice {
 }
 
 /** Browser speech rate (0.55–1.2) → Piper length scale (larger = slower). */
-export function lengthScaleFor(rate: number): number {
-  return Math.min(2, Math.max(0.6, VOICE_CONFIG.lengthScale / Math.max(rate, 0.1)));
+export function lengthScaleFor(rate: number, base = 1): number {
+  return Math.min(2, Math.max(0.6, base / Math.max(rate, 0.1)));
 }
 
 type WorkerLike = Pick<Worker, 'postMessage' | 'terminate'> & { onmessage: ((e: MessageEvent<WorkerResponse>) => void) | null; onerror: ((e: ErrorEvent) => void) | null };
 
 export interface OpenOptions {
+  /** Which voice (default German). */
+  voice?: VoiceId;
   store?: VoiceStore;
   /** Test seam. */
   createWorker?: () => WorkerLike;
@@ -27,8 +29,9 @@ export interface OpenOptions {
 const defaultWorker = (): WorkerLike => new Worker(new URL('./piper.worker.ts', import.meta.url), { type: 'module', name: 'dv2-voice' }) as unknown as WorkerLike;
 
 /** Loads the stored voice into a new worker. Rejects when the voice is not downloaded or fails to start. */
-export async function openNeuralVoice({ store = {}, createWorker = defaultWorker }: OpenOptions = {}): Promise<NeuralVoice> {
-  const assets = await loadVoiceAssets(store);
+export async function openNeuralVoice({ voice: voiceId = 'de', store = {}, createWorker = defaultWorker }: OpenOptions = {}): Promise<NeuralVoice> {
+  const config = VOICES[voiceId].config;
+  const assets = await loadVoiceAssets(store, voiceId);
   const worker = createWorker();
   let nextId = 1;
   const waiting = new Map<number, { resolve: (pcm: Float32Array) => void; reject: (e: Error) => void }>();
@@ -56,18 +59,18 @@ export async function openNeuralVoice({ store = {}, createWorker = defaultWorker
       const err = new Error(e.message || 'voice worker failed');
       if (fail) fail(err); else failAll(err);
     };
-    const init: WorkerRequest = { type: 'init', assets };
+    const init: WorkerRequest = { type: 'init', assets, config };
     worker.postMessage(init, [assets.model, assets.ortWasm, assets.phonemizeWasm, assets.phonemizeData]);
   }).catch((e: unknown) => { worker.terminate(); throw e; });
 
   return {
-    sampleRate: VOICE_CONFIG.sampleRate,
+    sampleRate: config.sampleRate,
     synthesize(text, rate) {
       if (disposed) return Promise.reject(new Error('voice disposed'));
       const id = nextId++;
       return new Promise<Float32Array>((resolve, reject) => {
         waiting.set(id, { resolve, reject });
-        const req: WorkerRequest = { type: 'synth', id, text, lengthScale: lengthScaleFor(rate) };
+        const req: WorkerRequest = { type: 'synth', id, text, lengthScale: lengthScaleFor(rate, config.lengthScale) };
         worker.postMessage(req);
       });
     },

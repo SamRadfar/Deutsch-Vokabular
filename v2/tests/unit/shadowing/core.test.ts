@@ -74,7 +74,7 @@ describe('session queue (legacy exposure weighting)', () => {
 describe('shadowing preferences', () => {
   it('defaults, and sanitises anything stored out of range', () => {
     expect(sanitizePreferences(null)).toEqual(DEFAULT_PREFERENCES);
-    expect(sanitizePreferences({ wordRepeats: 9, exampleRepeats: -1, pauseSec: 99, rate: 7, mode: 'x', categories: ['arch', 'nope', 'arch'], size: 3, showTranslation: 'yes' }))
+    expect(sanitizePreferences({ wordRepeats: 11, exampleRepeats: -1, pauseSec: 99, rate: 7, mode: 'x', categories: ['arch', 'nope', 'arch'], size: 3, showTranslation: 'yes' }))
       .toEqual({ ...DEFAULT_PREFERENCES, categories: ['arch'] });
     expect(sanitizePreferences({ pauseSec: 2.7, rate: 0.55, wordRepeats: 4, exampleRepeats: 0, showTranslation: false, mode: 'learned', size: 5 }))
       .toMatchObject({ pauseSec: 2.5, rate: 0.55, wordRepeats: 4, exampleRepeats: 0, showTranslation: false, mode: 'learned', size: 5, categories: [...CATEGORY_KEYS, 'mine'] });

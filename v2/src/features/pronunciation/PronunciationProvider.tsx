@@ -4,6 +4,8 @@ import { sharedMediaOutput } from '../audio/mediaOutput';
 import { createRoutedSpeech, isAppleMobile, type RoutedSpeechService, type VoicePreference } from '../audio/routedSpeech';
 import { onDeviceVoiceStore, useOnDeviceVoice } from '../audio/useOnDeviceVoice';
 import { PREFERENCE_KEYS } from '../../services/preferences';
+import { openNeuralVoice } from '../audio/neuralVoice';
+import { useOptionalUid } from '../auth/AuthProvider';
 import { createSpeechService, isUserCancel, type SpeechService } from './speechService';
 import './PronunciationButton.css';
 
@@ -29,6 +31,11 @@ interface PronunciationContextValue {
   service: SpeechService;
   /** Present when the app routes between browser speech and the on-device voice. */
   routed: RoutedSpeechService | null;
+  /**
+   * Persian speech (on-device "Amir" voice, played as media) — null until the Persian voice is
+   * downloaded on this device. Used by shadowing for Persian meanings and example translations.
+   */
+  persian: SpeechService | null;
   voicePreference: VoicePreference;
   setVoicePreference(pref: VoicePreference): void;
   /** Key of the item currently being spoken (null = silent). */
@@ -55,9 +62,11 @@ function readPreference(): VoicePreference {
   } catch { return 'auto'; }
 }
 
-export function PronunciationProvider({ children, service }: { children: ReactNode; service?: SpeechService }) {
+export function PronunciationProvider({ children, service, persianService }: { children: ReactNode; service?: SpeechService; persianService?: SpeechService | null }) {
   const voiceStore = onDeviceVoiceStore();
   const { state: deviceState } = useOnDeviceVoice(voiceStore);
+  const faStore = onDeviceVoiceStore('fa');
+  const { state: faState } = useOnDeviceVoice(faStore);
   const [voicePreference, setPref] = useState<VoicePreference>(readPreference);
   const prefRef = useRef(voicePreference);
   prefRef.current = voicePreference;
@@ -77,6 +86,16 @@ export function PronunciationProvider({ children, service }: { children: ReactNo
     return () => clearTimeout(t);
   }, [deviceRoute, voiceHandle, voicePreference]);
   const speech: SpeechService = service ?? routed!;
+  // One Persian service for the app (its own worker; the shared <audio> element, so it never overlaps).
+  const persianAll = useMemo<SpeechService | null>(() => (persianService !== undefined ? persianService
+    : service ? null : createDeviceSpeechService({ output: sharedMediaOutput(), voiceId: 'fa', voice: createVoiceHandle(() => openNeuralVoice({ voice: 'fa' })) })),
+  [service, persianService]);
+  const persian = persianService !== undefined ? persianService : faState.kind === 'ready' ? persianAll : null;
+
+  // Synthesized clips contain the account's private words: forget them when the account changes.
+  const uid = useOptionalUid();
+  useEffect(() => () => { speech.cancel(); speech.clearCache?.(); routed?.device.clearCache?.(); persianAll?.cancel(); persianAll?.clearCache?.(); },
+    [uid, speech, routed, persianAll]);
 
   const [speakingKey, setSpeakingKey] = useState<string | null>(null);
   const [speakingPhase, setPhase] = useState<SpeakingPhase | null>(null);
@@ -140,8 +159,8 @@ export function PronunciationProvider({ children, service }: { children: ReactNo
   const openSoundSettings = useCallback(() => { setNotice(null); setSettingsOpen(true); }, []);
   const supported = speech.supported || deviceState.kind === 'ready';
   const value = useMemo(() => ({
-    supported, service: speech, routed, voicePreference, setVoicePreference, speakingKey, speakingPhase, toggle, notice, dismissNotice, openSoundSettings,
-  }), [supported, speech, routed, voicePreference, setVoicePreference, speakingKey, speakingPhase, toggle, notice, dismissNotice, openSoundSettings]);
+    supported, service: speech, routed, persian, voicePreference, setVoicePreference, speakingKey, speakingPhase, toggle, notice, dismissNotice, openSoundSettings,
+  }), [supported, speech, routed, persian, voicePreference, setVoicePreference, speakingKey, speakingPhase, toggle, notice, dismissNotice, openSoundSettings]);
   return (
     <PronunciationContext.Provider value={value}>
       {children}

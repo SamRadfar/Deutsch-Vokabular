@@ -12,7 +12,10 @@ import { VoiceDownload } from './VoiceDownload';
 /** A neutral sample sentence (no vocabulary of the user). */
 export const SOUND_TEST_TEXT = 'Guten Tag! Das ist ein Test der deutschen Aussprache.';
 
-type TestId = 'tone' | 'browser' | 'device';
+type TestId = 'tone' | 'browser' | 'device' | 'persian';
+
+/** A neutral Persian sample sentence. */
+export const PERSIAN_TEST_TEXT = 'سلام! این یک آزمایش صدای فارسی است.';
 /** What really happened, with times since the tap (ms). */
 type TestLog = string[];
 
@@ -28,7 +31,7 @@ function standalone(): boolean {
 
 /** Sound settings and a real playback check of each output path (tone, browser speech, on-device voice). */
 export function SoundSettings({ onClose }: { onClose(): void }) {
-  const { routed, voicePreference, setVoicePreference, service } = usePronunciation();
+  const { routed, voicePreference, setVoicePreference, service, persian } = usePronunciation();
   const { state: device } = useOnDeviceVoice();
   const [logs, setLogs] = useState<Partial<Record<TestId, TestLog>>>({});
   const [, force] = useState(0);
@@ -58,9 +61,9 @@ export function SoundSettings({ onClose }: { onClose(): void }) {
       onEnd: () => log('■ پایان'),
     };
     if (id === 'tone') { sharedMediaOutput().play(toneWav(), handlers); log('در صف پخش (media)'); return; }
-    const target = id === 'browser' ? browser : routed?.device;
+    const target = id === 'browser' ? browser : id === 'persian' ? persian : routed?.device;
     if (!target) return;
-    target.speak(SOUND_TEST_TEXT, { rate: 0.9, ...handlers });
+    target.speak(id === 'persian' ? PERSIAN_TEST_TEXT : SOUND_TEST_TEXT, { rate: id === 'persian' ? 1 : 0.9, ...handlers });
     log(id === 'device' ? 'در حال ساخت صدا روی دستگاه…' : 'به موتور گفتار مرورگر داده شد');
   };
 
@@ -122,6 +125,13 @@ export function SoundSettings({ onClose }: { onClose(): void }) {
             اگر «پخش شروع شد» و «پایان» دیده می‌شود ولی صدایی نشنیدید، خروجی صدا بی‌صداست: کلید بی‌صدای iPhone، بلندی صدا یا بلوتوث را بررسی کنید.
             اگر بوق شنیده می‌شود ولی صدای مرورگر نه، روی این دستگاه «صدای آلمانی دستگاه» را انتخاب کنید.
           </p>
+        </section>
+
+        <section className="snd__tests" aria-label="صدای فارسی">
+          <p className="snd__lead"><strong>صدای فارسی</strong> — برای خواندن معنی و ترجمهٔ فارسی در تمرین تلفظ (روی همین دستگاه، آفلاین).</p>
+          <VoiceDownload voice="fa" />
+          <Test id="persian" icon={<Cpu aria-hidden="true" />} label="جملهٔ نمونهٔ فارسی" disabled={!persian} />
+          <p className="snd__hint" lang="fa">{PERSIAN_TEST_TEXT}</p>
         </section>
 
         <details className="snd__diag">
