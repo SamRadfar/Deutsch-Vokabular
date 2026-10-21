@@ -136,3 +136,20 @@ describe('import plan', () => {
     expect(wordCollection(words[0]!)).toEqual({ name: 'Mode', subcategory: 'Oberteile' });
   });
 });
+
+describe('article plausibility (warning only)', () => {
+  it('flags articles that contradict reliable noun endings, and nothing uncertain', async () => {
+    const { articleLooksWrong, suggestedArticle } = await import('../../../src/features/personal/generate/articleHint');
+    expect(articleLooksWrong('der', 'Fundament')).toBe(true); // seen in the live test
+    expect(suggestedArticle('Fundament')).toBe('das');
+    expect(articleLooksWrong('das', 'Fundament')).toBe(false);
+    expect(articleLooksWrong('der', 'Renovierung')).toBe(true);
+    expect(articleLooksWrong('die', 'Tragfähigkeit')).toBe(false);
+    expect(articleLooksWrong('das', 'Mädchen')).toBe(false);
+    expect(articleLooksWrong('der', 'Zement')).toBe(false); // short / exception-prone endings stay silent
+    expect(articleLooksWrong('der', 'Moment')).toBe(false);
+    expect(articleLooksWrong('der', 'Termin')).toBe(false);
+    expect(articleLooksWrong('die', 'Hose')).toBe(false);
+    expect(articleLooksWrong(null, 'renovieren')).toBe(false);
+  });
+});

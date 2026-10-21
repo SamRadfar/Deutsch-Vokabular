@@ -20,7 +20,13 @@ describe('production build configuration', () => {
     const env = parseEnv(readFileSync('deploy/production.env', 'utf8'));
     expect(validateProductionEnv(env)).toEqual([]);
     expect(env.VITE_FIREBASE_PROJECT_ID).toBe('deutsch-vokabular');
-    expect(env.VITE_AI_ENDPOINT).toBe('');
+    // The owner's AI worker (Cloudflare Workers AI, free allocation) — exactly this https origin,
+    // and the page CSP allows the app to reach it (and nothing else new).
+    expect(env.VITE_AI_ENDPOINT).toBe('https://deutsch-vokabular-ai.sfr-arian.workers.dev');
+    const csp = (JSON.parse(readFileSync('firebase.json', 'utf8')) as { hosting: { headers: Array<{ headers: Array<{ key: string; value: string }> }> } })
+      .hosting.headers.flatMap((h) => h.headers).filter((h) => h.key === 'Content-Security-Policy').map((h) => h.value);
+    expect(csp.length).toBeGreaterThan(0);
+    for (const c of csp) expect(/connect-src [^;]*https:\/\/deutsch-vokabular-ai\.sfr-arian\.workers\.dev/.test(c)).toBe(true);
   });
 
   it('accepts only the production project, no emulators, no localhost/mock AI, no secrets', () => {

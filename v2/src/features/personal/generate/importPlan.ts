@@ -7,6 +7,7 @@
 
 import type { GeneratedEntry } from '../../../../ai-worker/src/contract';
 import { collectionPlacement, DEFAULT_SUBCATEGORY } from '../collections';
+import { articleLooksWrong, suggestedArticle } from './articleHint';
 import type { DuplicateIndex, DuplicateMatch } from '../duplicates';
 import {
   isValidInput, isValidPersonalWord, newPersonalId, normalizeInput, validateInput,
@@ -71,8 +72,12 @@ export function buildImport(rows: readonly DraftRow[], target: ImportTarget, now
 export interface RowCheck {
   duplicates: DuplicateMatch[];
   errors: FieldErrors;
+  /** The article contradicts a reliable noun ending — the expected article (a warning only). */
+  articleHint: 'der' | 'die' | 'das' | null;
 }
 
 export function checkRow(row: DraftRow, duplicates: DuplicateIndex): RowCheck {
-  return { duplicates: duplicates.find(row.entry.lemma), errors: rowErrors(row) };
+  const e = row.entry;
+  const hint = e.type === 'n' && articleLooksWrong(e.article, e.lemma) ? suggestedArticle(e.lemma) : null;
+  return { duplicates: duplicates.find(e.lemma), errors: rowErrors(row), articleHint: hint };
 }

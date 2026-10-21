@@ -247,6 +247,11 @@ export function AiVocabularyGenerator({ ai, vocab, snapshot, categories, duplica
                       <CopyX aria-hidden="true" /> تکراری: <bdi lang="de" dir="ltr">{c.duplicates[0]!.word}</bdi> ({c.duplicates[0]!.where}) — به‌طور پیش‌فرض وارد نمی‌شود.
                     </p>
                   ) : null}
+                  {c.articleHint ? (
+                    <p className="gen-row__dup" data-testid="gen-article-hint">
+                      <CircleAlert aria-hidden="true" /> حرف تعریف را بررسی کنید: این پایانه معمولاً «<bdi lang="de">{c.articleHint}</bdi>» دارد.
+                    </p>
+                  ) : null}
                   {errs.length ? <p className="gen-row__err"><CircleAlert aria-hidden="true" /> {errs[0]}</p> : null}
                 </li>
               );

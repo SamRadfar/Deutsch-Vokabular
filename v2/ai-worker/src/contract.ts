@@ -185,6 +185,10 @@ export interface GenerateResponse {
 
 const PERSIAN = /[؀-ۿ]/;
 const LATIN = /[A-Za-zÄÖÜäöüß]/;
+/** Letters of any script other than Arabic/Persian (models sometimes mix in CJK, Cyrillic, Hangul …). */
+const FOREIGN_IN_PERSIAN = /[^\P{L}\p{Script=Arabic}]/u;
+/** German text: Latin letters only (no Persian, Cyrillic, CJK …). */
+const NON_LATIN_LETTER = /[^\P{L}\p{Script=Latin}]/u;
 
 export function validateGenerateRequest(raw: unknown): { ok: true; value: GenerateRequest } | { ok: false; error: string } {
   if (!isObj(raw)) return { ok: false, error: 'body must be a JSON object' };
@@ -242,10 +246,12 @@ export function validateGeneratedEntry(raw: unknown): GeneratedEntry | null {
   if (type !== 'n') article = null;
   if (type === 'n' && !article) return null; // a noun without its article is not useful for learners
   // German in German fields, Persian in Persian fields; no empty meaning or example.
-  if (!/\p{L}/u.test(lemma) || PERSIAN.test(lemma) || lemma.split(' ').length > 6) return null;
-  if (!fa || !PERSIAN.test(fa) || LATIN.test(fa.replace(/\([^)]*\)/g, ''))) return null;
-  if (example.length < 12 || !LATIN.test(example) || PERSIAN.test(example)) return null;
-  if (!exampleFa || !PERSIAN.test(exampleFa)) return null;
+  if (!/\p{L}/u.test(lemma) || NON_LATIN_LETTER.test(lemma) || lemma.split(' ').length > 6) return null;
+  // Persian fields: Persian script only (a Latin term in parentheses is allowed in the meaning).
+  const faCore = fa.replace(/\([^)]*\)/g, '');
+  if (!fa || !PERSIAN.test(fa) || FOREIGN_IN_PERSIAN.test(faCore)) return null;
+  if (example.length < 12 || !LATIN.test(example) || NON_LATIN_LETTER.test(example)) return null;
+  if (!exampleFa || !PERSIAN.test(exampleFa) || FOREIGN_IN_PERSIAN.test(exampleFa.replace(/[A-Za-zÄÖÜäöüß]+/g, ''))) return null;
   if (type === 'n' && !/^\p{Lu}/u.test(lemma)) return null; // German nouns are capitalised
   const level = typeof raw.level === 'string' && (CEFR as readonly string[]).includes(raw.level.toUpperCase()) ? raw.level.toUpperCase() as GeneratedEntry['level'] : null;
   return { article, lemma, type, grammar, fa, example, exampleFa, subcategory: sub, level };

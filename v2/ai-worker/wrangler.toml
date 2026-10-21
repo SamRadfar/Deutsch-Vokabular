@@ -15,17 +15,18 @@ binding = "AI"
 FIREBASE_PROJECT_ID = "deutsch-vokabular"
 # Exact origins of the app (live site, its firebaseapp.com alias, the current preview channel).
 ALLOWED_ORIGINS = "https://deutsch-vokabular.web.app,https://deutsch-vokabular.firebaseapp.com,https://deutsch-vokabular--v202-test-ww73499n.web.app"
-AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+AI_MODEL = "@cf/openai/gpt-oss-120b"
 LIMIT_PER_MINUTE = "12"
 LIMIT_PER_DAY = "60"
 LIMIT_GLOBAL_PER_DAY = "300"
-# ≈ 34 Neurons per generated word with the model above → 300 words ≈ 10,000 Neurons (free allocation).
-LIMIT_WORDS_PER_DAY = "300"
-LIMIT_GLOBAL_WORDS_PER_DAY = "300"
+# Measured ≈ 8.3 Neurons per generated word with the model above (live check) → 900 words ≈ 7,500
+# Neurons, leaving room for retries and single-word suggestions inside the 10,000 free Neurons.
+LIMIT_WORDS_PER_DAY = "600"
+LIMIT_GLOBAL_WORDS_PER_DAY = "900"
 # Never "true" in a deployed worker.
 ALLOW_MOCK_PROVIDER = "false"
 
 # Usage counters (rate and daily limits): `wrangler kv namespace create USAGE`, then put the id here.
 [[kv_namespaces]]
 binding = "USAGE"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
+id = "7a016e4c56504d4bb0a88af5d94d2d31"

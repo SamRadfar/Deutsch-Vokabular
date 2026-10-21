@@ -81,6 +81,12 @@ describe('generation request validation', () => {
     expect(validateGeneratedEntry({ ...GOOD, lemma: 'jacke' })).toBeNull(); // noun not capitalised
     expect(validateGeneratedEntry({ ...GOOD, lemma: 'ژاکت' })).toBeNull();
     expect(validateGeneratedEntry({ ...GOOD, fa: 'jacket' })).toBeNull();
+    // Real model output seen in the live test: other scripts mixed into Persian.
+    expect(validateGeneratedEntry({ ...GOOD, fa: 'دレス' })).toBeNull();
+    expect(validateGeneratedEntry({ ...GOOD, fa: 'галستوک' })).toBeNull();
+    expect(validateGeneratedEntry({ ...GOOD, exampleFa: 'خواهر من یک د레스 زیبا می‌پوشد.' })).toBeNull();
+    expect(validateGeneratedEntry({ ...GOOD, fa: 'ژاکت (Jacke)' })).not.toBeNull();
+    expect(validateGeneratedEntry({ ...GOOD, example: 'Ich trage eine Курточка.' })).toBeNull();
     expect(validateGeneratedEntry({ ...GOOD, example: 'Jacke.' })).toBeNull();
     expect(validateGeneratedEntry({ ...GOOD, exampleFa: '' })).toBeNull();
     expect(validateGeneratedEntry({ ...GOOD, type: 'zz' })).toBeNull();
@@ -106,11 +112,17 @@ describe('Workers AI provider (free allocation, no API key)', () => {
     expect(json.model).toBe(DEFAULT_WORKERS_AI_MODEL);
     expect(json.entries.map((e: { lemma: string }) => e.lemma)).toEqual(['Jacke', 'Mantel']);
     expect(json.rejected).toBe(2); // duplicate + Latin "fa"
-    const input = calls[0]!.input as { messages: Array<{ role: string; content: string }>; response_format: { type: string } };
+    const input = calls[0]!.input as { messages: Array<{ role: string; content: string }>; reasoning_effort?: string };
     expect(calls[0]!.model).toBe(DEFAULT_WORKERS_AI_MODEL);
-    expect(input.response_format.type).toBe('json_schema');
+    expect(input.reasoning_effort).toBe('low');
     expect(JSON.parse(input.messages[1]!.content)).toEqual(REQ); // only the request — nothing else of the user
     expect(JSON.stringify(json)).not.toMatch(/api[_-]?key|secret/i);
+  });
+
+  it('uses JSON mode for models that support it (llama-3.3-70b)', async () => {
+    const { ai, calls } = fakeAi({ response: { entries: [GOOD] } });
+    await workersAiProvider(ai, '@cf/meta/llama-3.3-70b-instruct-fp8-fast').generate({ topic: 'Mode', level: 'all', count: 1 });
+    expect((calls[0]!.input as { response_format: { type: string } }).response_format.type).toBe('json_schema');
   });
 
   it('accepts text answers of models without JSON mode', async () => {

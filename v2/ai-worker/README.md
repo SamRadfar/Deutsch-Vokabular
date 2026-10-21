@@ -39,10 +39,16 @@ real AI.
 The worker calls Workers AI through its `AI` binding (`[ai]` in `wrangler.toml`). There is no
 API key to store. The Workers **Free** plan includes **10,000 Neurons per day**; when they are used
 up, Workers AI returns an error (no charge) and the app shows "try again tomorrow". The default
-model `@cf/meta/llama-3.3-70b-instruct-fp8-fast` supports JSON mode. It costs about 34 Neurons per
-generated word, so `LIMIT_WORDS_PER_DAY` / `LIMIT_GLOBAL_WORDS_PER_DAY = 300` keep the service
-inside the free allocation. More needs the Workers Paid plan (not enabled). `ANTHROPIC_API_KEY`
-(paid) is optional; when it is set, it takes precedence.
+model is `@cf/openai/gpt-oss-120b` with reasoning effort "low". The live check measured it at about
+**8.3 Neurons per word** and about 30 s per batch of 15, with better Persian than
+`llama-3.3-70b-instruct-fp8-fast`, which costs about 34 Neurons per word and mixed foreign scripts
+into Persian. `LIMIT_WORDS_PER_DAY = 600` per user and `LIMIT_GLOBAL_WORDS_PER_DAY = 900` keep the
+service inside the free allocation. More needs the Workers Paid plan (not enabled). An
+`ANTHROPIC_API_KEY` (paid) is optional; when it is set, it takes precedence.
+
+Deployed (owner's account, free plan): `https://deutsch-vokabular-ai.sfr-arian.workers.dev`, with
+KV `USAGE`. The real model was checked with `node scripts/ai-live-check.mjs "<topic>" 15`
+(same provider code, prompt and validation, via the owner's wrangler login; it prints Neurons).
 
 ```
 POST /v1/generate

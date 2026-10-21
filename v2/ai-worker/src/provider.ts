@@ -122,7 +122,13 @@ export const WORKERS_AI_JSON_MODE = [
   '@cf/meta/llama-3.3-70b-instruct-fp8-fast', '@cf/meta/llama-3.1-8b-instruct', '@cf/meta/llama-3-8b-instruct',
   '@hf/nousresearch/hermes-2-pro-mistral-7b', '@cf/deepseek-ai/deepseek-r1-distill-qwen-32b',
 ];
-export const DEFAULT_WORKERS_AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+/**
+ * gpt-oss-120b (reasoning "low"): measured in the live check at ≈ 8 Neurons per generated word and
+ * ≈ 30 s per batch of 15, with clearly better Persian and a better mix of word types than
+ * llama-3.3-70b (≈ 34 Neurons per word, mixed foreign scripts into Persian). No JSON mode: the answer
+ * is parsed from text and validated like any other.
+ */
+export const DEFAULT_WORKERS_AI_MODEL = '@cf/openai/gpt-oss-120b';
 
 /** Text or object the model returned, for the shapes Workers AI uses (chat, JSON mode, OpenAI-style). */
 export function modelOutput(res: unknown): unknown {
@@ -164,6 +170,8 @@ export function workersAiProvider(ai: AiBinding, model: string = DEFAULT_WORKERS
         max_tokens: maxTokens,
         temperature: 0.35,
         ...(json ? { response_format: { type: 'json_schema', json_schema: schema } } : {}),
+        // Reasoning models: short reasoning is enough for word lists (faster, fewer Neurons).
+        ...(/gpt-oss/.test(model) ? { reasoning_effort: 'low' } : {}),
       });
     } catch (e) {
       const msg = String((e as Error)?.message ?? e);
