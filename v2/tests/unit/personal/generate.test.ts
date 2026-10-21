@@ -4,13 +4,16 @@ import 'fake-indexeddb/auto';
 import { describe, expect, it } from 'vitest';
 import type { GeneratedEntry, GenerateRequest } from '../../../ai-worker/src/contract';
 import type { GenerateResult } from '../../../src/features/ai/aiClient';
-import { listCollections, wordCollection } from '../../../src/features/personal/collections';
+import { applyDestination, buildCatalog, countWords, placementOf, type Destination } from '../../../src/features/categories/catalog';
+import { CategoryStore } from '../../../src/features/categories/categoryStore';
+import { DIRECT_SUBTAB } from '../../../src/features/categories/model';
+import type { Category } from '../../../src/models/vocabulary';
 import { createDuplicateIndex } from '../../../src/features/personal/duplicates';
 import { runGeneration } from '../../../src/features/personal/generate/generation';
-import { buildImport, draftRows } from '../../../src/features/personal/generate/importPlan';
+import { buildImport, draftRows, type DraftRow } from '../../../src/features/personal/generate/importPlan';
 import { PersonalVocabulary } from '../../../src/features/personal/personalVocabulary';
 import { createMemoryStore } from '../../../src/features/progress/localStore';
-import { personalCards, selectCards } from '../../../src/features/review/deck';
+import { personalCards, selectCards, type PracticeCategoryKey } from '../../../src/features/review/deck';
 import { selectShadowingCards } from '../../../src/features/shadowing/queue';
 import { practiceScopes } from '../../../src/features/personal/usePersonal';
 import { createFakeAi } from '../../helpers/fakeAi';
@@ -84,25 +87,50 @@ describe('runGeneration', () => {
 
 describe('import plan', () => {
   const noDupes = createDuplicateIndex([], []);
+  const builtIn = new Set(['fitness']);
+  const library = [{ key: 'fitness', label: 'Fitness', theme: 'fitness', subtabs: [{ id: 'training', icon: '', label: 'Training', fa: '', groups: [] }] }] as unknown as Category[];
 
-  it('imports into a NEW own category with AI subcategories; idempotent; never overwrites', async () => {
+  /** What the generator does at «وارد کردن»: commit the destination, then one sub per AI subcategory. */
+  function importInto(cats: CategoryStore, rows: DraftRow[], dest: Destination, at: number) {
+    const placed = applyDestination(dest, cats, builtIn);
+    if (!placed.ok) throw new Error(placed.error);
+    const subs = new Map<string, string>();
+    if (placed.mainId && placed.placement?.subtab === DIRECT_SUBTAB) {
+      for (const name of new Set(rows.map((r) => r.entry.subcategory).filter(Boolean))) {
+        const sub = cats.ensure(name, placed.mainId, builtIn);
+        if (sub.ok) subs.set(name, sub.category.id);
+      }
+    }
+    return buildImport(rows, (row) => (placed.mainId && subs.size ? placementOf(placed.mainId, subs.get(row.entry.subcategory) ?? null) : placed.placement), at);
+  }
+
+  it('imports into a NEW main category with the AI subcategories; idempotent; never overwrites', async () => {
     const vocab = new PersonalVocabulary('alice', createMemoryStore());
+    const cats = new CategoryStore('alice', createMemoryStore());
     await vocab.load();
+    await cats.load();
     const rows = draftRows(Array.from({ length: 120 }, (_, i) => entry(i, i % 3 ? 'Oberteile' : 'Schuhe')), noDupes);
-    const plan = buildImport(rows, { kind: 'collection', name: 'Kleidung und Mode' }, 1_000);
+    // Preview only: nothing is created yet.
+    expect(cats.getSnapshot().categories).toEqual([]);
+    const dest: Destination = { kind: 'newMain', name: 'Kleidung und Mode', subName: '' };
+    const plan = importInto(cats, rows, dest, 1_000);
     expect(plan.invalid).toEqual([]);
     await vocab.addMany(plan.words);
-    await vocab.addMany(buildImport(rows, { kind: 'collection', name: 'Kleidung und Mode' }, 2_000).words); // double click / retry
+    await vocab.addMany(importInto(cats, rows, dest, 2_000).words); // double click / retry
     const words = vocab.getSnapshot().words;
     expect(words).toHaveLength(120);
-    expect(words.every((w) => w.source === 'manual' && w.placement?.category === 'my:Kleidung und Mode')).toBe(true);
-    expect(listCollections(words)).toEqual([{ key: 'my:Kleidung und Mode', name: 'Kleidung und Mode', count: 120, subcategories: [{ name: 'Oberteile', count: 80 }, { name: 'Schuhe', count: 40 }] }]);
+    const main = cats.children(null);
+    expect(main.map((c) => c.name)).toEqual(['Kleidung und Mode']); // no duplicate category on retry
+    expect(cats.children(main[0]!.id).map((c) => c.name).sort()).toEqual(['Oberteile', 'Schuhe']);
+    expect(words.every((w) => w.source === 'manual' && w.placement?.category === main[0]!.id)).toBe(true);
+    expect(countWords(words).get(main[0]!.id)).toBe(120);
     // An edited word is never overwritten by a re-import of the same preview.
     const first = words.find((w) => w.id === rows[0]!.id)!;
     vocab.update(first.id, { ...first, fa: 'ویرایش‌شده' });
     await vocab.addMany(plan.words);
     expect(vocab.getSnapshot().byId.get(first.id)!.fa).toBe('ویرایش‌شده');
     vocab.stop();
+    cats.stop();
   });
 
   it('only selected rows; duplicates of existing words start unselected; invalid edits are reported', () => {
@@ -110,30 +138,42 @@ describe('import plan', () => {
     const rows = draftRows([entry(1), entry(2), entry(3)], existing);
     expect(rows.map((r) => r.selected)).toEqual([false, true, true]);
     rows[2] = { ...rows[2]!, entry: { ...rows[2]!.entry, fa: '' } };
-    const plan = buildImport(rows, { kind: 'none' }, 1);
+    const plan = buildImport(rows, () => null, 1);
     expect(plan.words.map((w) => w.lemma)).toEqual([noun(2)]);
     expect(plan.invalid).toEqual([rows[2]!.id]);
     expect(plan.words[0]!.placement).toBeNull();
   });
 
-  it('can target a built-in category; empty subcategories get a default name', () => {
+  it('can target a built-in category, a new subcategory under it, or an existing main directly', async () => {
+    const cats = new CategoryStore('alice', createMemoryStore());
+    await cats.load();
     const rows = draftRows([{ ...entry(4), subcategory: '' }], noDupes);
-    expect(buildImport(rows, { kind: 'builtin', category: 'fitness', subtab: 'training' }, 1).words[0]!.placement).toEqual({ category: 'fitness', subtab: 'training' });
-    expect(buildImport(rows, { kind: 'collection', name: 'Mode' }, 1).words[0]!.placement).toEqual({ category: 'my:Mode', subtab: 'Allgemein' });
+    expect(importInto(cats, rows, { kind: 'existing', mainId: 'fitness', subId: 'training' }, 1).words[0]!.placement).toEqual({ category: 'fitness', subtab: 'training' });
+    const viaNewSub = importInto(cats, rows, { kind: 'newSub', mainId: 'fitness', name: 'Mobilität' }, 1).words[0]!.placement!;
+    const sub = cats.children('fitness')[0]!;
+    expect(viaNewSub).toEqual({ category: 'fitness', subtab: sub.id });
+    expect(sub).toMatchObject({ name: 'Mobilität', parentId: 'fitness' });
+    const mode = cats.create('Mode', null).ok ? cats.children(null)[0]! : null;
+    expect(importInto(cats, rows, { kind: 'existing', mainId: mode!.id, subId: null }, 1).words[0]!.placement).toEqual({ category: mode!.id, subtab: DIRECT_SUBTAB });
+    cats.stop();
   });
 
-  it('imported words are practice cards: "my words" and their own category scope', () => {
+  it('imported words are practice cards: "my words" and their own category scope', async () => {
+    const cats = new CategoryStore('alice', createMemoryStore());
+    await cats.load();
     const rows = draftRows([entry(5), entry(6)], noDupes);
-    const words = buildImport(rows, { kind: 'collection', name: 'Mode' }, 1).words;
-    const cards = personalCards(words, 100_000);
-    expect(cards[0]).toMatchObject({ categoryKey: 'mine', collection: 'Mode', categoryLabel: 'Mode', subtabLabel: 'Oberteile' });
+    const words = importInto(cats, rows, { kind: 'newMain', name: 'Mode', subName: '' }, 1).words;
+    const catalog = buildCatalog(library, cats.getSnapshot().categories);
+    const mode = catalog.find((m) => m.name === 'Mode')!;
+    const cards = personalCards(words, 100_000, catalog);
+    expect(cards[0]).toMatchObject({ categoryKey: mode.id, personal: true, categoryLabel: 'Mode', subtabLabel: 'Oberteile', theme: 'mine' });
     const progress = { learned: new Set() as ReadonlySet<never>, againIds: null };
-    expect(selectCards(cards, 'all', 'my:Mode', progress)).toHaveLength(2);
+    expect(selectCards(cards, 'all', mode.id as PracticeCategoryKey, progress)).toHaveLength(2);
     expect(selectCards(cards, 'all', 'mine', progress)).toHaveLength(2);
-    expect(selectCards(cards, 'all', 'my:Andere', progress)).toHaveLength(0);
-    expect(selectShadowingCards(cards, 'all', new Set(['my:Mode' as const]), progress)).toHaveLength(2);
-    expect(practiceScopes([], words).map((s) => s.key)).toEqual(['mine', 'my:Mode']);
-    expect(wordCollection(words[0]!)).toEqual({ name: 'Mode', subcategory: 'Oberteile' });
+    expect(selectCards(cards, 'all', 'fitness', progress)).toHaveLength(0);
+    expect(selectShadowingCards(cards, 'all', new Set([mode.id as PracticeCategoryKey]), progress)).toHaveLength(2);
+    expect(practiceScopes(library, words.length, catalog).map((s) => s.key)).toEqual(['fitness', mode.id, 'mine']);
+    cats.stop();
   });
 });
 

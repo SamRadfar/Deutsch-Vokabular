@@ -7,7 +7,10 @@
  */
 
 export const CATEGORY_KEYS = ['arch', 'acad', 'bautechnik', 'bauphysik', 'fitness', 'anatomie', 'dreame'] as const;
-export type CategoryKey = (typeof CATEGORY_KEYS)[number];
+/** The library's built-in categories. */
+export type BuiltInCategoryKey = (typeof CATEGORY_KEYS)[number];
+/** A category of the words page: built-in, or one of the account's own main categories ("uc_…", features/categories). */
+export type CategoryKey = BuiltInCategoryKey | `uc_${string}`;
 
 /** Legacy word-type codes. `x` has no legacy badge (DQ-2) but is preserved as-is. */
 export const WORD_TYPES = ['n', 'v', 'a', 'au', 'x'] as const;

@@ -41,19 +41,21 @@ export interface ProgressLocalStore {
 }
 
 /** Synced collections besides progress (each has its own confirmed and pending stores). */
-export type DocCollection = 'customWords';
+export type DocCollection = 'customWords' | 'categories';
 
 export const DB_NAME = 'deutsch-vokabular-v2';
 // v1: progress + meta. v2 (Phase 4A): + review-state. v3 (Phase 4B): + shadowing-exposure.
 // v4 (Phase 5A): + personal-words. v5 (Phase 5A.1): + custom-confirmed, custom-pending (personal
-// vocabulary sync). Upgrades only ever add stores; the v4 personal-words store is kept as a backup.
-const DB_VERSION = 5;
+// vocabulary sync). v6 (v2.0.2): + category-confirmed, category-pending (account categories).
+// Upgrades only ever add stores; the v4 personal-words store is kept as a backup.
+const DB_VERSION = 6;
 const STORES = {
   confirmed: 'progress-confirmed', pending: 'progress-pending', meta: 'meta', reviews: 'review-state', exposure: 'shadowing-exposure',
   personal: 'personal-words',
 } as const;
 const DOC_STORES: Record<DocCollection, { confirmed: string; pending: string }> = {
   customWords: { confirmed: 'custom-confirmed', pending: 'custom-pending' },
+  categories: { confirmed: 'category-confirmed', pending: 'category-pending' },
 };
 
 const req = <T>(r: IDBRequest<T>) => new Promise<T>((resolve, reject) => {

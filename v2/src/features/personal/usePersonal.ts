@@ -3,8 +3,9 @@ import type { Category, WordId } from '../../models/vocabulary';
 import { categoryName } from '../../models/vocabulary';
 import { useProgress } from '../progress/ProgressProvider';
 import { flattenCards, PERSONAL_KEY, PERSONAL_LABEL, personalCards, type DeckCard, type PracticeCategoryKey } from '../review/deck';
-import { listCollections } from './collections';
-import { isPersonalId, type PersonalWord } from './model';
+import { buildCatalog, type CatalogMain } from '../categories/catalog';
+import { useCategories } from '../categories/useCategories';
+import { isPersonalId } from './model';
 import type { PersonalSnapshot, PersonalVocabulary } from './personalVocabulary';
 
 const noop = () => () => {};
@@ -44,25 +45,25 @@ export function routeLearned(
 /** Offset of personal cards in content order (after all built-in cards). */
 export const PERSONAL_ORDER_OFFSET = 100_000;
 
-/** All practice cards: the library's built-in entries, then the user's personal words. */
+/** All practice cards: the library's built-in entries, then the user's personal words (in their categories). */
 export function usePracticeCards(categories: readonly Category[]): DeckCard[] {
   const { snapshot } = usePersonal();
+  const { catalog } = useCategories(categories);
   const builtIn = useMemo(() => flattenCards(categories), [categories]);
   return useMemo(
-    () => (snapshot?.words.length ? [...builtIn, ...personalCards(snapshot.words, PERSONAL_ORDER_OFFSET)] : builtIn),
-    [builtIn, snapshot],
+    () => (snapshot?.words.length ? [...builtIn, ...personalCards(snapshot.words, PERSONAL_ORDER_OFFSET, catalog)] : builtIn),
+    [builtIn, snapshot, catalog],
   );
 }
 
 /**
- * Scopes offered in practice setups: the built-in categories, "my words" when there are any, and
- * each user-created category (a subset of "my words").
+ * Scopes offered in practice setups: the built-in categories, the account's own main categories,
+ * and "my words" (all personal words) when there are any.
  */
-export function practiceScopes(categories: readonly Category[], personal: number | readonly PersonalWord[]): Array<{ key: PracticeCategoryKey; label: string; theme: string }> {
-  const scopes: Array<{ key: PracticeCategoryKey; label: string; theme: string }> = categories.map((c) => ({ key: c.key, label: categoryName(c.label), theme: c.theme }));
-  const words = typeof personal === 'number' ? [] : personal;
-  const count = typeof personal === 'number' ? personal : personal.length;
-  if (count > 0) scopes.push({ key: PERSONAL_KEY, label: PERSONAL_LABEL, theme: 'review' });
-  for (const c of listCollections(words)) scopes.push({ key: c.key as PracticeCategoryKey, label: c.name, theme: 'review' });
+export function practiceScopes(categories: readonly Category[], personalCount: number, catalog: readonly CatalogMain[] = buildCatalog(categories, [])): Array<{ key: PracticeCategoryKey; label: string; theme: string }> {
+  const scopes: Array<{ key: PracticeCategoryKey; label: string; theme: string }> = catalog.map((c) => ({
+    key: c.id as PracticeCategoryKey, label: c.builtIn ? categoryName(categories.find((x) => x.key === c.id)?.label ?? c.name) : c.name, theme: c.theme,
+  }));
+  if (personalCount > 0) scopes.push({ key: PERSONAL_KEY, label: PERSONAL_LABEL, theme: 'review' });
   return scopes;
 }

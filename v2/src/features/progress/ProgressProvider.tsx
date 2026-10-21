@@ -9,6 +9,9 @@ import { ProgressSyncEngine, type ProgressView } from './syncEngine';
 import { ReviewLog } from '../review/reviewLog';
 import { ShadowingLog } from '../shadowing/shadowingLog';
 import { PersonalVocabulary } from '../personal/personalVocabulary';
+import { CategoryStore } from '../categories/categoryStore';
+import type { CategoryValue } from '../categories/model';
+import { migrateLegacyCollections } from '../categories/migration';
 
 export interface ProgressServices {
   createRemote(): ProgressRemote;
@@ -20,12 +23,14 @@ export interface ProgressServices {
    * personal words is switched off (they stay on the device; see config personalWordsSync).
    */
   createPersonalRemote?(): DocRemote<CustomWordValue> | null;
+  /** Remote for the account's categories (users/{uid}/categories); null = device-only. */
+  createCategoryRemote?(): DocRemote<CategoryValue> | null;
 }
 
 export type ProgressContextValue =
   | { status: 'unavailable' }
   | { status: 'loading'; uid: string }
-  | { status: 'ready'; uid: string; view: ProgressView; engine: ProgressSyncEngine; account: AccountRemote; reviews: ReviewLog; shadowing: ShadowingLog; personal: PersonalVocabulary };
+  | { status: 'ready'; uid: string; view: ProgressView; engine: ProgressSyncEngine; account: AccountRemote; reviews: ReviewLog; shadowing: ShadowingLog; personal: PersonalVocabulary; categories: CategoryStore };
 
 const ProgressContext = createContext<ProgressContextValue>({ status: 'unavailable' });
 
@@ -42,7 +47,7 @@ export function ProgressProvider({ services, knownIds, children }: { services: P
   const uid = user?.uid ?? null;
   const [store, setStore] = useState<Promise<ProgressLocalStore> | null>(null);
   const [engine, setEngine] = useState<ProgressSyncEngine | null>(null);
-  const [logs, setLogs] = useState<{ reviews: ReviewLog; shadowing: ShadowingLog; personal: PersonalVocabulary } | null>(null);
+  const [logs, setLogs] = useState<{ reviews: ReviewLog; shadowing: ShadowingLog; personal: PersonalVocabulary; categories: CategoryStore } | null>(null);
 
   useEffect(() => {
     if (services && !store) setStore(services.createLocalStore());
@@ -55,6 +60,7 @@ export function ProgressProvider({ services, knownIds, children }: { services: P
     let cancelled = false;
     let created: ProgressSyncEngine | null = null;
     let createdPersonal: PersonalVocabulary | null = null;
+    let createdCategories: CategoryStore | null = null;
     void (async () => {
       const local = await store;
       const deviceId = await getDeviceId(local);
@@ -63,13 +69,17 @@ export function ProgressProvider({ services, knownIds, children }: { services: P
       const online = typeof navigator === 'undefined' ? true : navigator.onLine;
       const personal = new PersonalVocabulary(uid, local, { remote: services.createPersonalRemote?.() ?? null, deviceId, online });
       createdPersonal = personal;
-      await Promise.all([reviewLog.load(), shadowingLog.load(), personal.load()]);
-      if (cancelled) { personal.stop(); return; }
+      const categories = new CategoryStore(uid, local, { remote: services.createCategoryRemote?.() ?? null, deviceId, online });
+      createdCategories = categories;
+      await Promise.all([reviewLog.load(), shadowingLog.load(), personal.load(), categories.load()]);
+      if (cancelled) { personal.stop(); categories.stop(); return; }
+      // Words of the first AI-generator version ("my:<name>" placements) get real categories (idempotent).
+      await migrateLegacyCollections(personal, categories).catch(() => {});
       created = new ProgressSyncEngine({
         uid, local, remote: services.createRemote(), deviceId, knownIds,
         online: typeof navigator === 'undefined' ? true : navigator.onLine,
       });
-      setLogs({ reviews: reviewLog, shadowing: shadowingLog, personal });
+      setLogs({ reviews: reviewLog, shadowing: shadowingLog, personal, categories });
       setEngine(created);
       await created.start();
     })();
@@ -77,13 +87,14 @@ export function ProgressProvider({ services, knownIds, children }: { services: P
       cancelled = true;
       created?.stop();
       createdPersonal?.stop();
+      createdCategories?.stop();
     };
   }, [uid, services, store, knownIds]);
 
   useEffect(() => {
     if (!engine) return;
-    const on = () => { engine.setOnline(true); logs?.personal.setOnline(true); };
-    const off = () => { engine.setOnline(false); logs?.personal.setOnline(false); };
+    const on = () => { engine.setOnline(true); logs?.personal.setOnline(true); logs?.categories.setOnline(true); };
+    const off = () => { engine.setOnline(false); logs?.personal.setOnline(false); logs?.categories.setOnline(false); };
     window.addEventListener('online', on);
     window.addEventListener('offline', off);
     return () => {
@@ -118,7 +129,7 @@ export function ProgressProvider({ services, knownIds, children }: { services: P
   const value = useMemo<ProgressContextValue>(() => {
     if (!uid || !services) return { status: 'unavailable' };
     if (!engine || engine.uid !== uid || !logs || logs.reviews.uid !== uid || !view || view.status.phase !== 'ready') return { status: 'loading', uid };
-    return { status: 'ready', uid, view, engine, account: services.account, reviews: logs.reviews, shadowing: logs.shadowing, personal: logs.personal };
+    return { status: 'ready', uid, view, engine, account: services.account, reviews: logs.reviews, shadowing: logs.shadowing, personal: logs.personal, categories: logs.categories };
   }, [uid, services, engine, logs, view]);
 
   return <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>;

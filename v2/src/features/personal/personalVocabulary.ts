@@ -179,6 +179,23 @@ export class PersonalVocabulary {
     await this.engine.setMany(fresh.map((w) => [w.id, toValue(w)] as const));
   }
 
+  /**
+   * Moves words to another category (one batched write). Only the placement changes; words that no
+   * longer exist are skipped. Returns how many words were moved.
+   */
+  async reassign(ids: readonly string[], placement: PersonalWord['placement']): Promise<number> {
+    const at = this.now();
+    const changes: Array<readonly [string, ReturnType<typeof toValue>]> = [];
+    for (const id of ids) {
+      const w = this.live(id);
+      if (!w) continue;
+      const same = (w.placement?.category ?? null) === (placement?.category ?? null) && (w.placement?.subtab ?? null) === (placement?.subtab ?? null);
+      if (!same) changes.push([id, toValue({ ...w, placement: placement ? { ...placement } : null, updatedAt: at })] as const);
+    }
+    await this.engine.setMany(changes);
+    return changes.length;
+  }
+
   /** Resolves when the queued local writes are stored on this device. */
   flushed(): Promise<void> { return this.engine.whenStored(); }
 

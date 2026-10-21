@@ -5,9 +5,8 @@ import { panelElementId, tabElementId } from '../../components/TabList/TabList';
 import { CategoryView } from '../vocabulary/components/CategoryView';
 import type { EntryProgress } from '../vocabulary/components/LearnedCheckbox';
 import { MAIN_TABS_PREFIX } from '../vocabulary/components/MainNavigation';
-import { PERSONAL_KEY, type DeckCard } from '../review/deck';
+import type { DeckCard } from '../review/deck';
 import { usePersonal, usePracticeCards } from '../personal/usePersonal';
-import { withPersonalGroups } from '../personal/browse';
 import { createSearchIndex, filtersActive, NO_FILTERS, type SearchFilters } from './searchIndex';
 import { SearchResults } from './SearchResults';
 import { VocabularySearch } from './VocabularySearch';
@@ -18,7 +17,11 @@ export interface WordsSearchState {
 }
 
 interface Props {
+  /** The library's built-in categories (practice cards add the personal words themselves). */
   categories: readonly Category[];
+  /** Everything the browser shows: built-in (+ own subcategories) and own main categories. */
+  browse: readonly Category[];
+  /** The active category of `browse`. */
   category: Category;
   activeSubtabId: string;
   onSelectSubtab(id: string): void;
@@ -37,10 +40,9 @@ interface Props {
 
 /** The "words" section: search + filters above the category browser, or the result list. */
 export function WordsSection(p: Props) {
-  const { categories, search, onSearch, progress, learned } = p;
+  const { categories, browse, search, onSearch, progress, learned } = p;
   const cards = usePracticeCards(categories); // built-in + personal words
   const { snapshot: personal } = usePersonal();
-  const browseCategory = useMemo(() => withPersonalGroups(p.category, personal?.words ?? []), [p.category, personal]);
   const index = useMemo(() => createSearchIndex(cards), [cards]);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -71,7 +73,7 @@ export function WordsSection(p: Props) {
   const { onShow, onShowPersonal, onFocusEntry } = p;
   const showInList = useCallback((card: DeckCard) => {
     onSearch({ query: '', filters: NO_FILTERS });
-    if (card.categoryKey === PERSONAL_KEY || card.categoryKey.startsWith('my:')) { onShowPersonal(card.entry.id); return; }
+    if (card.personal) { onShowPersonal(card.entry.id); return; }
     onShow(card.categoryKey as Parameters<typeof onShow>[0], card.subtabId);
     onFocusEntry(card.entry.id);
   }, [onSearch, onShow, onShowPersonal, onFocusEntry]);
@@ -106,7 +108,7 @@ export function WordsSection(p: Props) {
         ref={inputRef}
         query={search.query}
         filters={filters}
-        categories={categories}
+        categories={browse}
         personalCount={personal?.words.length ?? 0}
         statusAvailable={statusAvailable}
         resultCount={hits ? hits.length : null}
@@ -120,7 +122,7 @@ export function WordsSection(p: Props) {
         <div role="tabpanel" id={panelElementId(MAIN_TABS_PREFIX, p.category.key)} aria-labelledby={tabElementId(MAIN_TABS_PREFIX, p.category.key)}>
           <CategoryView
             key={p.category.key}
-            category={browseCategory}
+            category={p.category}
             activeSubtabId={p.activeSubtabId}
             onSelectSubtab={(id) => { onFocusEntry(null); p.onSelectSubtab(id); }}
             getTechnicalInfo={p.getTechnicalInfo}

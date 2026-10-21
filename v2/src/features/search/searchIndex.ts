@@ -3,7 +3,7 @@
 // cost per keystroke for this dataset), so no worker or external index is needed.
 
 import type { WordId } from '../../models/vocabulary';
-import type { DeckCard, PracticeCategoryKey } from '../review/deck';
+import { inPracticeScope, type DeckCard, type PracticeCategoryKey } from '../review/deck';
 import { fold, originalRange, queryTerms, type Folded } from './normalize';
 
 export type SearchField = 'word' | 'fa' | 'example' | 'exampleFa';
@@ -76,7 +76,7 @@ export function createSearchIndex(cards: readonly DeckCard[]): SearchIndex {
       const hits: SearchHit[] = [];
       for (const e of entries) {
         const { card } = e;
-        if (filters.category !== 'all' && card.categoryKey !== filters.category) continue;
+        if (filters.category !== 'all' && !inPracticeScope(card, filters.category)) continue;
         if (filters.subtab !== 'all' && card.subtabId !== filters.subtab) continue;
         // Status filter; `keep` holds words toggled in the current result view so they do not vanish under the cursor.
         if (filters.status !== 'all' && learned && !keep?.has(card.entry.id)) {

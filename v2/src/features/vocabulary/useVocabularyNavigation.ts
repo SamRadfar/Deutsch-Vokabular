@@ -12,7 +12,11 @@ export function useVocabularyNavigation(categories: readonly Category[]) {
   const [subtabByCategory, setSubtabByCategory] = useState<Partial<Record<CategoryKey, string>>>({});
 
   const activeCategory: Category | undefined = categories.find((c) => c.key === activeKey) ?? first;
-  const activeSubtabId = activeCategory ? subtabByCategory[activeCategory.key] ?? activeCategory.subtabs[0]?.id ?? '' : '';
+  // A remembered subtab that no longer exists (e.g. a deleted own subcategory) falls back to the first.
+  const remembered = activeCategory ? subtabByCategory[activeCategory.key] : undefined;
+  const activeSubtabId = activeCategory
+    ? (remembered && activeCategory.subtabs.some((s) => s.id === remembered) ? remembered : activeCategory.subtabs[0]?.id ?? '')
+    : '';
 
   const selectSubtab = useCallback(
     (id: string) => { if (activeCategory) setSubtabByCategory((prev) => ({ ...prev, [activeCategory.key]: id })); },

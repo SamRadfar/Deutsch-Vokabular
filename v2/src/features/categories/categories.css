@@ -1,0 +1,55 @@
+/* Category destination (shared control) and category management. */
+.cat-dest { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 12px; min-width: 0; border: 1px solid var(--br); border-radius: var(--r-md); font-family: var(--fp); }
+.cat-dest legend { padding: 0 6px; font-size: var(--fs-sm); font-weight: 700; color: var(--ts); }
+.cat-dest__opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.cat-dest__opt {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 6px 10px;
+  font-size: var(--fs-sm);
+  color: var(--ts);
+  background: var(--sf);
+  border: 1px solid var(--br);
+  border-radius: var(--r-md);
+  cursor: pointer;
+}
+.cat-dest__opt input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.cat-dest__opt:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+.cat-dest__opt svg.lucide { width: 16px; height: 16px; flex-shrink: 0; color: var(--tm); }
+.cat-dest__opt.is-selected { color: var(--tp); border-color: color-mix(in srgb, var(--brand) 55%, transparent); background: color-mix(in srgb, var(--sf) 86%, var(--brand) 14%); }
+.cat-dest__opt.is-selected svg.lucide { color: var(--brand); }
+.cat-dest__opt.is-disabled { opacity: 0.5; cursor: not-allowed; }
+.cat-dest__fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; }
+.cat-dest__fields select, .cat-dest__fields input { width: 100%; min-width: 0; }
+.cat-dest__hint { grid-column: 1 / -1; margin: 0; font-size: var(--fs-xs); line-height: 1.7; color: var(--tm); }
+.cat-dest__error { margin: 0; font-size: var(--fs-xs); color: var(--err, #c0392b); }
+
+.catm { display: flex; flex-direction: column; gap: 14px; font-family: var(--fp); }
+.catm__intro { margin: 0; font-size: var(--fs-xs); line-height: 1.7; color: var(--tm); }
+.catm__new { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
+.catm__new .pw-field { flex: 1 1 200px; margin: 0; }
+.catm__list { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.catm__main { padding: 10px 12px; background: var(--sf); border: 1px solid var(--br); border-radius: var(--r-md); }
+.catm__row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; min-height: 34px; }
+.catm__name { flex: 1 1 160px; min-width: 0; font-weight: 650; color: var(--tp); overflow-wrap: anywhere; }
+.catm__sub .catm__name { font-weight: 500; color: var(--ts); }
+.catm__count { padding: 0 8px; font-family: var(--fn); font-size: var(--fs-2xs, 11px); font-weight: 700; color: var(--ts); background: var(--sfalt); border-radius: var(--r-pill); }
+.catm__lock { display: inline-flex; align-items: center; gap: 3px; font-size: var(--fs-2xs, 11px); color: var(--tm); }
+.catm__lock svg.lucide { width: 12px; height: 12px; }
+.catm__subs { display: flex; flex-direction: column; gap: 4px; margin: 6px 0 0; padding: 0 14px 0 0; list-style: none; border-inline-start: 2px solid var(--br); }
+.catm__btn { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; font: inherit; font-size: var(--fs-xs); color: var(--ts); background: transparent; border: 1px solid transparent; border-radius: var(--r-sm); cursor: pointer; }
+.catm__btn:hover { color: var(--tp); background: var(--sf-hover); border-color: var(--br); }
+.catm__btn svg.lucide { width: 14px; height: 14px; }
+.catm__btn--danger:hover { color: var(--err, #c0392b); }
+.catm__edit { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; flex: 1 1 220px; }
+.catm__edit input { flex: 1 1 140px; min-width: 0; }
+.catm__panel { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; padding: 10px; background: var(--sfalt); border-radius: var(--r-md); }
+.catm__panel p { margin: 0; font-size: var(--fs-sm); line-height: 1.7; }
+.catm__sync { margin: 0; font-size: var(--fs-xs); color: var(--tm); }
+
+@media (max-width: 640px) {
+  .cat-dest__opts, .cat-dest__fields { grid-template-columns: 1fr; }
+}

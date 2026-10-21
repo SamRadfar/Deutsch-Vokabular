@@ -88,7 +88,7 @@ export function sanitizePreferences(raw: unknown): ShadowingPreferences {
     ? Math.round(v.pauseSec / PAUSE_RANGE.step) * PAUSE_RANGE.step : d.pauseSec;
   const categories = Array.isArray(v.categories)
     ? [...new Set(v.categories.filter((k): k is PracticeCategoryKey => (PRACTICE_KEYS as readonly unknown[]).includes(k)
-      || (typeof k === 'string' && k.startsWith('my:') && k.length > 3 && k.length <= 40)))]
+      || (typeof k === 'string' && /^uc_[0-9a-f]{20}$/.test(k))))]
     : d.categories;
   return {
     wordRepeats: oneOf(WORD_REPEATS, v.wordRepeats, d.wordRepeats),

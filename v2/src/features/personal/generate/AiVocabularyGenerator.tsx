@@ -1,16 +1,18 @@
 import { Check, CircleAlert, Cloud, CopyX, RefreshCw, Sparkles, Trash2, Wand2 } from 'lucide-react';
 import { useId, useMemo, useRef, useState } from 'react';
 import type { Category } from '../../../models/vocabulary';
-import { categoryName } from '../../../models/vocabulary';
 import { Dialog } from '../../../components/Dialog/Dialog';
 import type { AiClient } from '../../ai/aiClient';
 import type { AiLevel } from '../../../../ai-worker/src/contract';
-import { cleanCollectionName, COLLECTION_NAME_MAX, listCollections } from '../collections';
+import { CategoryDestinationPicker } from '../../categories/CategoryDestinationPicker';
+import { destinationError, placementOf, type Destination } from '../../categories/catalog';
+import { DIRECT_SUBTAB } from '../../categories/model';
+import { useCategories } from '../../categories/useCategories';
 import type { DuplicateIndex } from '../duplicates';
 import { ARTICLES } from '../model';
 import type { PersonalSnapshot, PersonalVocabulary } from '../personalVocabulary';
 import { entryWord, GENERATE_COUNTS, GENERATE_LEVELS, runGeneration, type GenerationProgress, type GenerationResult } from './generation';
-import { buildImport, checkRow, draftRows, type DraftRow, type ImportTarget } from './importPlan';
+import { buildImport, checkRow, draftRows, type DraftRow } from './importPlan';
 import './generate.css';
 
 interface Props {
@@ -21,10 +23,10 @@ interface Props {
   duplicates: DuplicateIndex;
   onClose(): void;
   /** After the import: show the new category in "my words". */
-  onImported(collectionName: string | null): void;
+  /** After the import: the main category the words went to (null = no category). */
+  onImported(mainId: string | null): void;
 }
 
-type TargetChoice = 'new' | 'existing' | 'builtin' | 'none';
 type Step = 'form' | 'generating' | 'preview' | 'done';
 
 const TYPE_LABEL: Record<string, string> = { n: 'اسم', v: 'فعل', a: 'صفت', au: 'عبارت', x: 'سایر' };
@@ -32,32 +34,33 @@ const TYPE_LABEL: Record<string, string> = { n: 'اسم', v: 'فعل', a: 'صف�
 /** «ساخت واژه با هوش مصنوعی»: topic → generate → review/edit → import → sync. */
 export function AiVocabularyGenerator({ ai, vocab, snapshot, categories, duplicates, onClose, onImported }: Props) {
   const uid = useId();
-  const collections = useMemo(() => listCollections(snapshot.words), [snapshot.words]);
+  const cats = useCategories(categories);
   const [step, setStep] = useState<Step>('form');
   const [topic, setTopic] = useState('');
   const [count, setCount] = useState<number>(50);
   const [level, setLevel] = useState<AiLevel>('B1-B2');
   const [instructions, setInstructions] = useState('');
-  const [targetChoice, setTargetChoice] = useState<TargetChoice>('new');
-  const [newName, setNewName] = useState('');
-  const [existing, setExisting] = useState(collections[0]?.name ?? '');
-  const [builtinCat, setBuiltinCat] = useState(categories[0]?.key ?? '');
-  const [builtinSub, setBuiltinSub] = useState(categories[0]?.subtabs[0]?.id ?? '');
+  /** Where the words go — nothing is created before «وارد کردن». */
+  const [dest, setDest] = useState<Destination>({ kind: 'newMain', name: '', subName: '' });
+  /** Use the AI's subcategories (when no subcategory is chosen): each becomes a real subcategory. */
+  const [aiSubs, setAiSubs] = useState(true);
   const [progress, setProgress] = useState<GenerationProgress | null>(null);
   const [result, setResult] = useState<Omit<GenerationResult, 'entries'> | null>(null);
   const [rows, setRows] = useState<DraftRow[]>([]);
   const [removed, setRemoved] = useState<string[]>([]);
   const [busy, setBusy] = useState<null | 'regenerate' | 'more'>(null);
-  const [imported, setImported] = useState<{ ids: string[]; collection: string | null; skipped: number } | null>(null);
+  const [imported, setImported] = useState<{ ids: string[]; mainId: string | null; mainName: string | null; skipped: number } | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
   /** The imported words are written to this device's storage (IndexedDB) — null while writing. */
   const [stored, setStored] = useState<boolean | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const abort = useRef<AbortController | null>(null);
 
-  const collectionName = targetChoice === 'new' ? cleanCollectionName(newName || topic) : targetChoice === 'existing' ? existing : null;
-  const target: ImportTarget = targetChoice === 'builtin' && builtinCat ? { kind: 'builtin', category: builtinCat, subtab: builtinSub }
-    : collectionName ? { kind: 'collection', name: collectionName } : { kind: 'none' };
-  const builtinCategory = categories.find((c) => c.key === builtinCat);
+  // A new main category without a name takes the topic as its name.
+  const effectiveDest: Destination = dest.kind === 'newMain' && !dest.name.trim() ? { ...dest, name: topic.trim() } : dest;
+  const destError = destinationError(effectiveDest, cats.catalog);
+  /** AI subcategories apply when the words go to a main category without a chosen subcategory. */
+  const aiSubsApply = (effectiveDest.kind === 'newMain' && !effectiveDest.subName.trim()) || (effectiveDest.kind === 'existing' && effectiveDest.subId === null);
 
   const checks = useMemo(() => new Map(rows.map((r) => [r.id, checkRow(r, duplicates)])), [rows, duplicates]);
   const selected = rows.filter((r) => r.selected);
@@ -100,7 +103,7 @@ export function AiVocabularyGenerator({ ai, vocab, snapshot, categories, duplica
   const start = () => {
     setFormError(null);
     if (!topic.trim()) { setFormError('موضوع را بنویسید (مثلاً «Kleidung und Mode» یا «پزشکی»).'); return; }
-    if (targetChoice === 'existing' && !existing) { setFormError('یک دستهٔ موجود انتخاب کنید.'); return; }
+    if (destError) { setFormError(destError); return; }
     void generate('new');
   };
 
@@ -113,11 +116,30 @@ export function AiVocabularyGenerator({ ai, vocab, snapshot, categories, duplica
   };
 
   const doImport = () => {
-    const plan = buildImport(rows, target, Date.now());
+    setImportError(null);
+    if (destError) { setImportError(destError); return; }
+    // Only now are new categories created — the same call finds them again on a retry (no duplicates).
+    const placed = cats.apply(effectiveDest);
+    if (!placed.ok) { setImportError(placed.error); return; }
+    const mainId = placed.mainId;
+    const subIds = new Map<string, string>();
+    if (cats.store && mainId && aiSubs && aiSubsApply) {
+      for (const name of new Set(rows.filter((r) => r.selected && r.entry.subcategory.trim()).map((r) => r.entry.subcategory.trim()))) {
+        const sub = cats.store.ensure(name, mainId, cats.builtInKeys);
+        if (sub.ok) subIds.set(name, sub.category.id);
+      }
+    }
+    const placementFor = (row: DraftRow) => {
+      if (!mainId || !placed.placement) return null;
+      if (placed.placement.subtab !== DIRECT_SUBTAB || !subIds.size) return placed.placement;
+      return placementOf(mainId, subIds.get(row.entry.subcategory.trim()) ?? null);
+    };
+    const plan = buildImport(rows, placementFor, Date.now());
     if (!plan.words.length) return;
     // Applied at once (in memory, queued for the cloud); existing ids are never overwritten (idempotent).
     const persisted = vocab.addMany(plan.words);
-    setImported({ ids: plan.words.map((w) => w.id), collection: target.kind === 'collection' ? target.name : null, skipped: plan.invalid.length });
+    const main = mainId ? cats.catalog.find((m) => m.id === mainId)?.name ?? (effectiveDest.kind === 'newMain' ? effectiveDest.name : null) : null;
+    setImported({ ids: plan.words.map((w) => w.id), mainId, mainName: main, skipped: plan.invalid.length });
     setStep('done');
     persisted.then(() => setStored(true), () => setStored(false));
   };
@@ -134,7 +156,7 @@ export function AiVocabularyGenerator({ ai, vocab, snapshot, categories, duplica
     return (
       <Dialog title={title} onClose={close} size="lg">
         <div className="gen-done" data-testid="gen-done">
-          <p className="gen-done__big"><Check aria-hidden="true" /> {present} واژه به «واژه‌های من»{imported.collection ? <> در دستهٔ «<bdi>{imported.collection}</bdi>»</> : null} اضافه شد.</p>
+          <p className="gen-done__big"><Check aria-hidden="true" /> {present} واژه به «واژه‌های من»{imported.mainName ? <> در دستهٔ «<bdi>{imported.mainName}</bdi>»</> : null} اضافه شد.</p>
           <p className="gen-sync" role="status" data-testid="gen-stored">
             {stored === null ? 'در حال ذخیره روی این دستگاه…' : stored && snapshot.saved ? 'روی این دستگاه ذخیره شد.' : 'ذخیره روی این دستگاه ناموفق بود؛ واژه‌ها فقط تا بستن صفحه می‌مانند.'}
           </p>
@@ -147,9 +169,9 @@ export function AiVocabularyGenerator({ ai, vocab, snapshot, categories, duplica
           {failed ? (
             <p className="rv-notice rv-notice--error" role="alert">{failed} واژه به حساب ارسال نشد. <button type="button" className="pw-retry" onClick={() => vocab.retryFailed()}>تلاش دوباره</button></p>
           ) : null}
-          <p className="gen-done__hint">این واژه‌ها در جستجو، مرور با فلش‌کارت، تمرین تلفظ و آمار هم هستند. در مرور و تلفظ، دستهٔ {imported.collection ? `«${imported.collection}»` : '«واژه‌های من»'} را انتخاب کنید.</p>
+          <p className="gen-done__hint">این واژه‌ها در جستجو، مرور با فلش‌کارت، تمرین تلفظ و آمار هم هستند. در مرور و تلفظ، دستهٔ {imported.mainName ? `«${imported.mainName}»` : '«واژه‌های من»'} را انتخاب کنید.</p>
           <div className="dialog__actions">
-            <button type="button" className="btn btn--primary" onClick={() => { onImported(imported.collection); onClose(); }}>نمایش واژه‌ها</button>
+            <button type="button" className="btn btn--primary" onClick={() => { onImported(imported.mainId); onClose(); }}>نمایش واژه‌ها</button>
           </div>
         </div>
       </Dialog>
@@ -258,10 +280,15 @@ export function AiVocabularyGenerator({ ai, vocab, snapshot, categories, duplica
             })}
           </ol>
 
-          <TargetPicker uid={uid} choice={targetChoice} setChoice={setTargetChoice} newName={newName} setNewName={setNewName} topic={topic}
-            collections={collections.map((c) => c.name)} existing={existing} setExisting={setExisting}
-            categories={categories} builtinCat={builtinCat} setBuiltinCat={(k) => { setBuiltinCat(k); setBuiltinSub(categories.find((c) => c.key === k)?.subtabs[0]?.id ?? ''); }}
-            builtinSub={builtinSub} setBuiltinSub={setBuiltinSub} builtinCategory={builtinCategory} />
+          <CategoryDestinationPicker value={dest} onChange={setDest} catalog={cats.catalog}
+            newMainHint={<>بدون نام، نام دسته همان موضوع می‌شود{topic.trim() ? <> («<bdi>{topic.trim()}</bdi>»)</> : null}.</>} />
+          {aiSubsApply ? (
+            <label className="rv-check">
+              <input type="checkbox" checked={aiSubs} onChange={(e) => setAiSubs(e.currentTarget.checked)} />
+              زیرمجموعه‌های پیشنهادی هوش مصنوعی را بساز (در صورت نیاز)
+            </label>
+          ) : null}
+          {importError ? <p className="rv-notice rv-notice--error" role="alert">{importError}</p> : null}
 
           <div className="dialog__actions dialog__footer">
             <button type="button" className="btn" onClick={close}>انصراف (هیچ چیز ذخیره نمی‌شود)</button>
@@ -306,10 +333,14 @@ export function AiVocabularyGenerator({ ai, vocab, snapshot, categories, duplica
             </label>
           ))}
         </fieldset>
-        <TargetPicker uid={uid} choice={targetChoice} setChoice={setTargetChoice} newName={newName} setNewName={setNewName} topic={topic}
-          collections={collections.map((c) => c.name)} existing={existing} setExisting={setExisting}
-          categories={categories} builtinCat={builtinCat} setBuiltinCat={(k) => { setBuiltinCat(k); setBuiltinSub(categories.find((c) => c.key === k)?.subtabs[0]?.id ?? ''); }}
-          builtinSub={builtinSub} setBuiltinSub={setBuiltinSub} builtinCategory={builtinCategory} />
+        <CategoryDestinationPicker value={dest} onChange={setDest} catalog={cats.catalog}
+            newMainHint={<>بدون نام، نام دسته همان موضوع می‌شود{topic.trim() ? <> («<bdi>{topic.trim()}</bdi>»)</> : null}.</>} />
+          {aiSubsApply ? (
+            <label className="rv-check">
+              <input type="checkbox" checked={aiSubs} onChange={(e) => setAiSubs(e.currentTarget.checked)} />
+              زیرمجموعه‌های پیشنهادی هوش مصنوعی را بساز (در صورت نیاز)
+            </label>
+          ) : null}
         <div className="pw-field">
           <label htmlFor={`${uid}-ins`}>توضیح بیشتر (اختیاری)</label>
           <textarea id={`${uid}-ins`} value={instructions} onChange={(e) => setInstructions(e.currentTarget.value)} maxLength={300} rows={2}
@@ -328,70 +359,3 @@ export function AiVocabularyGenerator({ ai, vocab, snapshot, categories, duplica
     </Dialog>
   );
 }
-
-interface TargetProps {
-  uid: string;
-  choice: TargetChoice;
-  setChoice(c: TargetChoice): void;
-  newName: string;
-  setNewName(v: string): void;
-  topic: string;
-  collections: string[];
-  existing: string;
-  setExisting(v: string): void;
-  categories: readonly Category[];
-  builtinCat: string;
-  setBuiltinCat(v: string): void;
-  builtinSub: string;
-  setBuiltinSub(v: string): void;
-  builtinCategory: Category | undefined;
-}
-
-/** Where the imported words go: a new or existing own category, or a built-in category. */
-function TargetPicker(p: TargetProps) {
-  return (
-    <fieldset className="gen-target" data-testid="gen-target">
-      <legend>دسته</legend>
-      <label className="gen-target__opt">
-        <input type="radio" name={`${p.uid}-target`} checked={p.choice === 'new'} onChange={() => p.setChoice('new')} /> دستهٔ جدید
-      </label>
-      {p.choice === 'new' ? (
-        <input className="gen-target__input" value={p.newName} onChange={(e) => p.setNewName(e.currentTarget.value)} maxLength={COLLECTION_NAME_MAX}
-          placeholder={p.topic || 'نام دسته'} aria-label="نام دستهٔ جدید" />
-      ) : null}
-      {p.collections.length ? (
-        <>
-          <label className="gen-target__opt">
-            <input type="radio" name={`${p.uid}-target`} checked={p.choice === 'existing'} onChange={() => p.setChoice('existing')} /> دستهٔ موجود من
-          </label>
-          {p.choice === 'existing' ? (
-            <select className="gen-target__input" value={p.existing} onChange={(e) => p.setExisting(e.currentTarget.value)} aria-label="دستهٔ موجود">
-              {p.collections.map((n) => <option key={n} value={n}>{n}</option>)}
-            </select>
-          ) : null}
-        </>
-      ) : null}
-      {p.categories.length ? (
-        <>
-          <label className="gen-target__opt">
-            <input type="radio" name={`${p.uid}-target`} checked={p.choice === 'builtin'} onChange={() => p.setChoice('builtin')} /> نمایش در یکی از دسته‌های اصلی
-          </label>
-          {p.choice === 'builtin' ? (
-            <span className="gen-target__pair">
-              <select value={p.builtinCat} onChange={(e) => p.setBuiltinCat(e.currentTarget.value)} aria-label="دستهٔ اصلی">
-                {p.categories.map((c) => <option key={c.key} value={c.key}>{categoryName(c.label)}</option>)}
-              </select>
-              <select value={p.builtinSub} onChange={(e) => p.setBuiltinSub(e.currentTarget.value)} aria-label="زیرمجموعه">
-                {p.builtinCategory?.subtabs.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
-              </select>
-            </span>
-          ) : null}
-        </>
-      ) : null}
-      <label className="gen-target__opt">
-        <input type="radio" name={`${p.uid}-target`} checked={p.choice === 'none'} onChange={() => p.setChoice('none')} /> بدون دسته (فقط «واژه‌های من»)
-      </label>
-    </fieldset>
-  );
-}
-

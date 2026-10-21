@@ -189,5 +189,5 @@ html[data-theme='dark'] {
 [data-category='bauphysik'] { --ac: var(--ac-bauphysik); --acl: var(--acl-bauphysik); --acg: var(--acg-bauphysik); --grp: var(--grp-bauphysik); }
 [data-category='fitness'] { --ac: var(--ac-fitness); --acl: var(--acl-fitness); --acg: var(--acg-fitness); --grp: var(--grp-fitness); }
 [data-category='anatomie'] { --ac: var(--ac-anatomie); --acl: var(--acl-anatomie); --acg: var(--acg-anatomie); --grp: var(--grp-anatomie); }
-[data-category='review'] { --ac: var(--ac-review); --acl: var(--acl-review); --acg: var(--acg-review); --grp: var(--grp-review); }
+[data-category='review'], [data-category='mine'] { --ac: var(--ac-review); --acl: var(--acl-review); --acg: var(--acg-review); --grp: var(--grp-review); }
 [data-category='dreame'] { --ac: var(--ac-dreame); --acl: var(--acl-dreame); --acg: var(--acg-dreame); --grp: var(--grp-dreame); }

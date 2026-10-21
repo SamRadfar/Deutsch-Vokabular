@@ -42,6 +42,12 @@ export type FirebaseConfigResult =
      * otherwise only with VITE_PERSONAL_WORDS_SYNC=true after those rules were deployed.
      */
     personalWordsSync: boolean;
+    /**
+     * Cloud sync of the account's categories (users/{uid}/categories). Needs the v2.0.2 rules on the
+     * target project: on with the emulators, otherwise only with VITE_CATEGORY_SYNC=true after those
+     * rules were deployed. Off = categories stay on this device (queued for upload).
+     */
+    categorySync: boolean;
   }
   | { status: 'missing'; missing: string[] }
   | { status: 'invalid'; problems: string[] };
@@ -107,6 +113,8 @@ export function readFirebaseConfig(env: Env = import.meta.env as Env): FirebaseC
   if (!ENVIRONMENTS.includes(environment)) problems.push('VITE_FIREBASE_ENV must be one of: emulator, development, production');
   const personalSyncFlag = str(env.VITE_PERSONAL_WORDS_SYNC);
   if (personalSyncFlag && personalSyncFlag !== 'true' && personalSyncFlag !== 'false') problems.push('VITE_PERSONAL_WORDS_SYNC must be true or false');
+  const categorySyncFlag = str(env.VITE_CATEGORY_SYNC);
+  if (categorySyncFlag && categorySyncFlag !== 'true' && categorySyncFlag !== 'false') problems.push('VITE_CATEGORY_SYNC must be true or false');
   if (!/^[a-z0-9-]{4,40}$/.test(id)) problems.push('VITE_FIREBASE_PROJECT_ID has an unexpected format');
   if ((FORBIDDEN_PROJECT_IDS as readonly string[]).includes(id)) {
     problems.push('VITE_FIREBASE_PROJECT_ID is the legacy app\'s production project; v2 must use its own project');
@@ -154,5 +162,9 @@ export function readFirebaseConfig(env: Env = import.meta.env as Env): FirebaseC
         firestorePort: Number(str(env.VITE_FIREBASE_FIRESTORE_EMULATOR_PORT) || 8080),
       }
     : null;
-  return { status: 'configured', environment, options, emulators, personalWordsSync: environment === 'emulator' || personalSyncFlag === 'true' };
+  return {
+    status: 'configured', environment, options, emulators,
+    personalWordsSync: environment === 'emulator' || personalSyncFlag === 'true',
+    categorySync: environment === 'emulator' || categorySyncFlag === 'true',
+  };
 }

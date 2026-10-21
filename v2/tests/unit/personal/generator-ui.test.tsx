@@ -10,7 +10,7 @@ import { fakeSpeech, mockMatchMedia, waitForLearnedCheckboxes } from '../../help
 import { createFakeAi } from '../../helpers/fakeAi';
 import { ALICE } from '../../helpers/fakeAuth';
 import { createFakeServices } from '../../helpers/fakeServices';
-import { storedWords } from '../../helpers/personal';
+import { storedCategories, storedWords } from '../../helpers/personal';
 
 beforeEach(() => mockMatchMedia(() => false));
 
@@ -53,6 +53,7 @@ describe('AI vocabulary generator', () => {
     const preview = await screen.findByTestId('gen-preview');
     expect(ai.generateCalls[0]).toEqual({ topic: 'Kleidung und Mode', level: 'A1-A2', count: 15 });
     expect(await storedWords(env.local, ALICE.uid)).toEqual([]); // nothing saved before confirming
+    expect(await storedCategories(env.local, ALICE.uid)).toEqual([]); // no category created by a preview
     const rows = within(preview).getAllByTestId('gen-row');
     expect(rows).toHaveLength(4);
     expect(within(preview).getByTestId('gen-stopped')).toHaveTextContent('فقط 4 از 25 واژه ساخته شد');
@@ -71,19 +72,30 @@ describe('AI vocabulary generator', () => {
     await user.click(within(preview).getByTestId('gen-import'));
     await screen.findByTestId('gen-done');
     expect(screen.getByTestId('gen-done')).toHaveTextContent('2 واژه به «واژه‌های من» در دستهٔ «Kleidung und Mode» اضافه شد');
+    // A real main category + the AI subcategory of the imported rows only (removed/unselected rows create nothing).
+    const cats = await storedCategories(env.local, ALICE.uid);
+    const main = cats.find((c) => c.parentId === null)!;
+    expect(cats.map((c) => [c.name, c.parentId === null ? null : 'main']).sort()).toEqual([['Kleidung und Mode', null], ['Oberbekleidung', 'main']]);
+    const sub = cats.find((c) => c.parentId === main.id)!;
+    expect(main.id).toMatch(/^uc_[0-9a-f]{20}$/);
     const saved = await storedWords(env.local, ALICE.uid);
     expect(saved.map((w) => [w.lemma, w.fa, w.placement]).sort()).toEqual([
-      ['Hose', 'شلوار بلند', { category: 'my:Kleidung und Mode', subtab: 'Oberbekleidung' }],
-      ['Jacke', 'کاپشن', { category: 'my:Kleidung und Mode', subtab: 'Oberbekleidung' }],
+      ['Hose', 'شلوار بلند', { category: main.id, subtab: sub.id }],
+      ['Jacke', 'کاپشن', { category: main.id, subtab: sub.id }],
     ]);
     await user.click(screen.getByRole('button', { name: 'نمایش واژه‌ها' }));
-    expect(screen.getByTestId('pw-collection')).toHaveValue('Kleidung und Mode');
+    expect(screen.getByTestId('pw-collection')).toHaveValue(main.id);
     expect(screen.getByTestId('pw-count')).toHaveTextContent('2 از 2');
     expect(document.querySelector('article[data-personal-id]')).toHaveTextContent('Kleidung und Mode › Oberbekleidung');
 
     // The new category is a practice scope in review.
     await user.click(screen.getByRole('link', { name: 'مرور' }));
     await waitFor(() => expect(screen.getByRole('option', { name: /^Kleidung und Mode \(2\)/ })).toBeInTheDocument());
+    // …and a main tab in the words browser, with its subcategory as a tab.
+    await user.click(screen.getByRole('link', { name: 'واژه‌ها' }));
+    await user.click(screen.getByRole('tab', { name: 'Kleidung und Mode' }));
+    expect(screen.getByRole('tab', { name: /Oberbekleidung/ })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('rowheader', { name: 'die Jacke' })).toBeInTheDocument();
   });
 
   it('says honestly when the AI service is not configured (no fake generation)', async () => {

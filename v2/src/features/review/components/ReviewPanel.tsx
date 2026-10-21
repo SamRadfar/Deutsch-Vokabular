@@ -1,3 +1,4 @@
+import { useCategories } from '../../categories/useCategories';
 import '../review.css';
 import { useMemo, useState } from 'react';
 import { CATEGORY_KEYS, type Category } from '../../../models/vocabulary';
@@ -24,7 +25,7 @@ interface Props {
 
 function initialChoice(): SetupChoice {
   const p = readReviewPreferences();
-  const known = p.scope && (([...CATEGORY_KEYS, PERSONAL_KEY] as readonly string[]).includes(p.scope) || (p.scope.startsWith('my:') && p.scope.length <= 40));
+  const known = p.scope && (([...CATEGORY_KEYS, PERSONAL_KEY] as readonly string[]).includes(p.scope) || /^uc_[0-9a-f]{20}$/.test(p.scope));
   const scope: ReviewScope = known ? (p.scope as ReviewScope) : 'all';
   return { mode: p.mode ?? 'all', scope, size: p.size === undefined ? DEFAULT_SESSION_SIZE : p.size, autoSpeak: p.autoSpeak ?? true };
 }
@@ -34,7 +35,8 @@ export function ReviewPanel({ categories, active, random }: Props) {
   const backend = useReviewBackend();
   const cards = usePracticeCards(categories); // built-in + personal words
   const { snapshot: personal } = usePersonal();
-  const scopes = useMemo(() => practiceScopes(categories, personal?.words ?? []), [categories, personal]);
+  const { catalog } = useCategories(categories);
+  const scopes = useMemo(() => practiceScopes(categories, personal?.words.length ?? 0, catalog), [categories, personal, catalog]);
   const cardsById = useMemo(() => new Map(cards.map((c) => [c.entry.id, c])), [cards]);
   const [choice, setChoice] = useState(initialChoice);
   const session = useFlashcardSession(backend);

@@ -25,6 +25,8 @@ import { useMediaQuery } from '../hooks/useMediaQuery';
 import { useSection, type Section } from './sections';
 import type { EntryProgress } from '../features/vocabulary/components/LearnedCheckbox';
 import { useVocabularyNavigation } from '../features/vocabulary/useVocabularyNavigation';
+import { browseCategories } from '../features/categories/catalog';
+import { useCategories } from '../features/categories/useCategories';
 import type { VocabularyRepository } from '../services/content/vocabularyRepository';
 import { LibraryGate, useLibrary } from '../features/library/LibraryGate';
 import { EmptyState } from '../components/EmptyState/EmptyState';
@@ -103,7 +105,12 @@ function AppContent({ repository, environmentLabel, theme, onToggleTheme: toggle
   const hasLibrary = repository.categories.length > 0;
   // Legacy progress import needs the owner library's id registry (library/id-registry).
   const migration = hasLibrary && library ? () => setMigrationOpen(true) : undefined;
-  const nav = useVocabularyNavigation(repository.categories);
+  const { vocab: personalVocab, snapshot: personal } = usePersonal();
+  // Built-in categories (+ the user's subcategories and words) followed by the user's own main categories.
+  const { user: userCategories } = useCategories(repository.categories);
+  const browse = useMemo(() => browseCategories(repository.categories, userCategories, personal?.words ?? []),
+    [repository.categories, userCategories, personal]);
+  const nav = useVocabularyNavigation(browse);
   const category = nav.activeCategory;
   const progress = useProgress();
   const { section, navigate } = useSection();
@@ -118,7 +125,6 @@ function AppContent({ repository, environmentLabel, theme, onToggleTheme: toggle
   const [search, setSearch] = useState<WordsSearchState>({ query: '', filters: NO_FILTERS });
   const [focusEntryId, setFocusEntryId] = useState<string | null>(null);
   const [focusPersonalId, setFocusPersonalId] = useState<string | null>(null);
-  const { vocab: personalVocab, snapshot: personal } = usePersonal();
   // Practice panels stay mounted once opened, so a running session survives a look at another section.
   const [mounted, setMounted] = useState<ReadonlySet<Section>>(() => new Set([section]));
   useEffect(() => { setMounted((m) => (m.has(section) ? m : new Set([...m, section]))); }, [section]);
@@ -143,7 +149,7 @@ function AppContent({ repository, environmentLabel, theme, onToggleTheme: toggle
   const showPersonal = useCallback((id: string) => {
     const w = personal?.byId.get(id);
     const placement = w?.placement;
-    const category = placement ? repository.getCategory(placement.category as CategoryKey) : undefined;
+    const category = placement ? browse.find((c) => c.key === placement.category) : undefined;
     if (placement && category?.subtabs.some((s) => s.id === placement.subtab)) {
       nav.show(category.key, placement.subtab);
       setFocusEntryId(id);
@@ -151,7 +157,7 @@ function AppContent({ repository, environmentLabel, theme, onToggleTheme: toggle
     }
     setFocusPersonalId(id);
     navigate('mine');
-  }, [personal, repository, nav.show, navigate]);
+  }, [personal, browse, nav.show, navigate]);
 
   /** Category tabs (and dashboard rows): browsing a category leaves search mode. */
   const selectCategory = useCallback((key: string) => {
@@ -205,8 +211,8 @@ function AppContent({ repository, environmentLabel, theme, onToggleTheme: toggle
             eyebrow={['واژه‌نامهٔ تخصصی آلمانی', 'B2 / C1']}
             title="واژه‌ها"
             description={hasLibrary
-              ? `${repository.totalEntries.toLocaleString('fa-IR')} واژه در ${repository.categories.length.toLocaleString('fa-IR')} دسته — جستجو، مرور و علامت‌گذاری واژه‌های یادگرفته.`
-              : 'کتابخانهٔ این حساب هنوز دسته‌ای ندارد.'}
+              ? `${repository.totalEntries.toLocaleString('fa-IR')} واژه در ${browse.length.toLocaleString('fa-IR')} دسته — جستجو، مرور و علامت‌گذاری واژه‌های یادگرفته.`
+              : browse.length ? `${browse.length.toLocaleString('fa-IR')} دستهٔ شخصی — جستجو، مرور و علامت‌گذاری واژه‌های یادگرفته.` : 'کتابخانهٔ این حساب هنوز دسته‌ای ندارد.'}
             compact={!wide}
           />
         ) : null}
@@ -217,10 +223,11 @@ function AppContent({ repository, environmentLabel, theme, onToggleTheme: toggle
             <button type="button" className="btn btn--primary" onClick={() => navigate('mine')}>رفتن به «واژه‌های من»</button>
           </div>
         ) : null}
-        {section === 'words' && category ? <MainNavigation categories={repository.categories} activeId={category.key} onSelect={selectCategory} /> : null}
+        {section === 'words' && category ? <MainNavigation categories={browse} activeId={category.key} onSelect={selectCategory} /> : null}
         {section === 'words' && category ? (
           <WordsSection
             categories={repository.categories}
+            browse={browse}
             category={category}
             activeSubtabId={nav.activeSubtabId}
             onSelectSubtab={nav.selectSubtab}

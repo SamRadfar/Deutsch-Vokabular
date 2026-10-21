@@ -114,6 +114,38 @@ service cloud.firestore {
           && boundedString(d.deviceId, 64);
       }
 
+      // The account's own categories (features/categories): main categories (parentId null) and
+      // subcategories below a user main category ("uc_…") or below a built-in category key. Owner
+      // only; documents are never removed (deleted: true is a final tombstone), like customWords.
+      // Built-in categories live in the read-only library and can never be written here.
+      match /categories/{categoryId} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid) && validCategory(categoryId, request.resource.data);
+        allow update: if isOwner(uid) && validCategory(categoryId, request.resource.data)
+          && resource.data.deleted == false
+          && request.resource.data.createdAt == resource.data.createdAt;
+        allow delete: if false;
+      }
+
+      function validCategory(categoryId, d) {
+        let fields = ['schemaVersion', 'id', 'name', 'parentId', 'sort', 'deleted', 'createdAt', 'clientUpdatedAt', 'updatedAt', 'opId', 'deviceId'];
+        return categoryId.matches('^uc_[0-9a-f]{20}$')
+          && d.keys().hasAll(fields) && d.keys().hasOnly(fields)
+          && d.schemaVersion == 1
+          && d.id == categoryId
+          && boundedString(d.name, 60)
+          && (d.parentId == null
+            || (d.parentId is string && d.parentId != categoryId
+              && (d.parentId.matches('^uc_[0-9a-f]{20}$') || d.parentId.matches('^[a-z][a-z0-9-]{1,39}$'))))
+          && d.sort is int && d.sort >= 0 && d.sort <= 1000000
+          && d.deleted is bool
+          && d.createdAt is int && d.createdAt >= 0 && d.createdAt < 10000000000000
+          && d.clientUpdatedAt is int && d.clientUpdatedAt >= 0 && d.clientUpdatedAt < 10000000000000
+          && d.updatedAt == request.time
+          && boundedString(d.opId, 64)
+          && boundedString(d.deviceId, 64);
+      }
+
       // The account's vocabulary library (built-in categories; features/library/format.ts). Only the
       // owner can read it; NO client can write it — it is imported once by the product owner with
       // scripts/library-import.mjs (IAM-authorized, verified uid, create-only). Other accounts have

@@ -1,4 +1,4 @@
-import { Bot, Dumbbell, GraduationCap, HardHat, HeartPulse, Landmark, Star, Thermometer, type LucideIcon } from 'lucide-react';
+import { Bot, Dumbbell, Folder, GraduationCap, HardHat, HeartPulse, Landmark, Star, Thermometer, type LucideIcon } from 'lucide-react';
 
 /** Line icon per category (UI only; replaces the emoji prefix of the content labels). */
 export const CATEGORY_ICONS: Record<string, LucideIcon> = {
@@ -12,4 +12,5 @@ export const CATEGORY_ICONS: Record<string, LucideIcon> = {
   mine: Star,
 };
 
-export const categoryIcon = (key: string): LucideIcon | undefined => CATEGORY_ICONS[key];
+/** Own categories ("uc_…") share one folder icon. */
+export const categoryIcon = (key: string): LucideIcon | undefined => CATEGORY_ICONS[key] ?? (key.startsWith('uc_') ? Folder : undefined);

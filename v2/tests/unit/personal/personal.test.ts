@@ -10,7 +10,7 @@ import {
 } from '../../../src/features/personal/model';
 import { PersonalVocabulary } from '../../../src/features/personal/personalVocabulary';
 import { createDuplicateIndex } from '../../../src/features/personal/duplicates';
-import { withPersonalGroups, PERSONAL_GROUP_LABEL } from '../../../src/features/personal/browse';
+import { browseCategories, PERSONAL_GROUP_LABEL } from '../../../src/features/categories/catalog';
 import { mergeLearned, routeLearned } from '../../../src/features/personal/usePersonal';
 import { flattenCards, personalCards, selectCards } from '../../../src/features/review/deck';
 import { createSearchIndex, NO_FILTERS } from '../../../src/features/search/searchIndex';
@@ -192,12 +192,13 @@ describe('integration with the learning tools', () => {
     const arch = repo.getCategory('arch')!;
     const before = JSON.stringify(arch);
     const w = mk({ lemma: 'die Nachhaltigkeit', placement: { category: 'arch', subtab: arch.subtabs[1]!.id } });
-    const merged = withPersonalGroups(arch, [w, mk({ lemma: 'Ohne Platz' })]);
+    const [merged, fitness] = browseCategories([arch, repo.getCategory('fitness')!], [], [w, mk({ lemma: 'Ohne Platz' })]);
+    if (!merged || !fitness) throw new Error('missing');
     expect(merged).not.toBe(arch);
     expect(merged.subtabs[1]!.groups.at(-1)).toMatchObject({ label: PERSONAL_GROUP_LABEL, entries: [expect.objectContaining({ id: w.id, word: 'die Nachhaltigkeit' })] });
     expect(merged.subtabs[0]).toBe(arch.subtabs[0]);
     expect(JSON.stringify(arch)).toBe(before);
-    expect(withPersonalGroups(repo.getCategory('fitness')!, [w])).toBe(repo.getCategory('fitness'));
+    expect(fitness).toBe(repo.getCategory('fitness'));
   });
 
   it('stored records are validated on load', () => {

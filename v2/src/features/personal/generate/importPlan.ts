@@ -3,10 +3,9 @@
 //    preview twice (double click, retry after a failure, a second device) writes the SAME documents
 //    and PersonalVocabulary.addMany never overwrites an existing word;
 //  - rows are validated with the same rules as the word form (and the Firestore rules);
-//  - the target is a user-created category (new or existing), a built-in category, or none.
+//  - the destination (features/categories) is resolved by the caller into a placement per row.
 
 import type { GeneratedEntry } from '../../../../ai-worker/src/contract';
-import { collectionPlacement, DEFAULT_SUBCATEGORY } from '../collections';
 import { articleLooksWrong, suggestedArticle } from './articleHint';
 import type { DuplicateIndex, DuplicateMatch } from '../duplicates';
 import {
@@ -21,21 +20,17 @@ export interface DraftRow {
   selected: boolean;
 }
 
-export type ImportTarget =
-  | { kind: 'collection'; name: string }
-  | { kind: 'builtin'; category: string; subtab: string }
-  | { kind: 'none' };
+/** Where a row goes (resolved by the caller from the category destination at import time). */
+export type PlacementFor = (row: DraftRow) => PersonalWord['placement'];
 
 export function draftRows(entries: readonly GeneratedEntry[], duplicates: DuplicateIndex, newId: () => string = () => newPersonalId()): DraftRow[] {
   // Rows that duplicate a word the user already has start unselected (never imported silently).
   return entries.map((entry) => ({ id: newId(), entry, selected: duplicates.find(entry.lemma).length === 0 }));
 }
 
-export function rowInput(row: DraftRow, target: ImportTarget): PersonalWordInput {
+export function rowInput(row: DraftRow, placementFor: PlacementFor = () => null): PersonalWordInput {
   const e = row.entry;
-  const placement = target.kind === 'collection'
-    ? collectionPlacement(target.name, e.subcategory || DEFAULT_SUBCATEGORY)
-    : target.kind === 'builtin' ? { category: target.category, subtab: target.subtab } : null;
+  const placement = placementFor(row);
   return {
     article: e.article, lemma: e.lemma, type: e.type, grammar: e.grammar, fa: e.fa,
     example: e.example, exampleFa: e.exampleFa, pronunciationFa: '', placement,
@@ -44,7 +39,7 @@ export function rowInput(row: DraftRow, target: ImportTarget): PersonalWordInput
 
 /** Validation messages of a row (empty = importable). */
 export function rowErrors(row: DraftRow): FieldErrors {
-  return validateInput(normalizeInput(rowInput(row, { kind: 'none' })));
+  return validateInput(normalizeInput(rowInput(row)));
 }
 
 export interface ImportPlan {
@@ -53,11 +48,11 @@ export interface ImportPlan {
   invalid: string[];
 }
 
-export function buildImport(rows: readonly DraftRow[], target: ImportTarget, now: number): ImportPlan {
+export function buildImport(rows: readonly DraftRow[], placementFor: PlacementFor, now: number): ImportPlan {
   const words: PersonalWord[] = [];
   const invalid: string[] = [];
   rows.filter((r) => r.selected).forEach((row, i) => {
-    const input = normalizeInput(rowInput(row, target));
+    const input = normalizeInput(rowInput(row, placementFor));
     if (!isValidInput(validateInput(input))) { invalid.push(row.id); return; }
     // createdAt keeps the preview order (the list shows newest first).
     const at = now + (rows.length - i);

@@ -8,6 +8,7 @@ import { createFirestoreAccountRemote } from '../features/progress/accountRemote
 import { createDefaultLocalStore } from '../features/progress/localStore';
 import type { ProgressServices } from '../features/progress/ProgressProvider';
 import { createFirestoreCustomWordsRemote } from '../features/personal/firestoreCustomWordsRemote';
+import { createFirestoreCategoriesRemote } from '../features/categories/firestoreCategoriesRemote';
 import { createAiClient, type AiClient } from '../features/ai/aiClient';
 import { readAiEndpoint } from '../features/ai/config';
 import { createLibraryService, type LibraryService } from '../features/library/libraryService';
@@ -62,6 +63,8 @@ export function createAppServices(): AppServices {
       createLocalStore: createDefaultLocalStore,
       // Personal vocabulary sync needs the Phase 5A.1 rules on the project (config.personalWordsSync).
       createPersonalRemote: () => (config.personalWordsSync ? createFirestoreCustomWordsRemote(db) : null),
+      // Account categories need the v2.0.2 rules on the project (config.categorySync).
+      createCategoryRemote: () => (config.categorySync ? createFirestoreCategoriesRemote(db) : null),
     },
   };
 }

@@ -85,7 +85,7 @@ export function normalizeInput(input: PersonalWordInput): PersonalWordInput {
     example: cleanText(input.example),
     exampleFa: cleanText(input.exampleFa),
     pronunciationFa: cleanText(input.pronunciationFa),
-    // Own categories ("my:…", features/personal/collections.ts): the subcategory is never empty.
+    // Legacy own categories ("my:…", migrated by features/categories/migration.ts): never an empty subcategory.
     placement: input.placement && input.placement.category.startsWith('my:')
       ? { category: input.placement.category, subtab: cleanText(input.placement.subtab).slice(0, 60) || 'Allgemein' }
       : input.placement,

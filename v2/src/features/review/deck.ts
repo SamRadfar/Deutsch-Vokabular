@@ -3,17 +3,15 @@
 
 import type { Category, CategoryKey, VocabularyEntry, WordId } from '../../models/vocabulary';
 import { categoryName } from '../../models/vocabulary';
-import { collectionNameOf, isCollectionKey, wordCollection } from '../personal/collections';
+import { resolvePlacement, type CatalogMain } from '../categories/catalog';
 import { toEntry, type PersonalWord } from '../personal/model';
 
 export type ReviewMode = 'all' | 'unlearned' | 'learned' | 'again';
 
 /** Pseudo category of the user's personal words in decks, search and filters. */
 export const PERSONAL_KEY = 'mine';
-/** A user-created category of personal words ("my:<name>", features/personal/collections.ts). */
-export type CollectionKey = `my:${string}`;
-/** Built-in category, all personal words ("mine"), or one user-created category (a subset of "mine"). */
-export type PracticeCategoryKey = CategoryKey | typeof PERSONAL_KEY | CollectionKey;
+/** Built-in category, one of the account's own main categories ("uc_…"), or all personal words ("mine"). */
+export type PracticeCategoryKey = CategoryKey | typeof PERSONAL_KEY;
 export const PERSONAL_LABEL = 'واژه‌های من';
 export const REVIEW_MODES: readonly ReviewMode[] = ['all', 'unlearned', 'learned', 'again'];
 
@@ -24,8 +22,8 @@ export interface DeckCard {
   entry: VocabularyEntry;
   categoryKey: PracticeCategoryKey;
   categoryLabel: string;
-  /** Personal words in a user-created category: its name (the card's categoryKey stays "mine"). */
-  collection?: string;
+  /** A personal word (its categoryKey is its category, or "mine" without one). */
+  personal?: boolean;
   /** Accent theme of the category (CSS `data-category`). */
   theme: string;
   subtabId: string;
@@ -95,21 +93,25 @@ export function buildDeck(selected: readonly DeckCard[], size: number | null, ra
 
 /** A card belongs to a scope by its category, or (personal words) by its user-created category. */
 export function inPracticeScope(card: DeckCard, key: PracticeCategoryKey): boolean {
-  return card.categoryKey === key || (isCollectionKey(key) && card.collection === collectionNameOf(key));
+  return key === PERSONAL_KEY ? card.personal === true || card.categoryKey === PERSONAL_KEY : card.categoryKey === key;
 }
 
-/** Practice cards for personal words (after the built-in cards in `order`). */
-export function personalCards(words: readonly PersonalWord[], firstOrder: number): DeckCard[] {
+/**
+ * Practice cards for personal words (after the built-in cards in `order`). A word placed in a
+ * category (built-in or the account's own) belongs to that category in search, filters and
+ * practice; without one it belongs to "my words". Every personal card is also part of "mine".
+ */
+export function personalCards(words: readonly PersonalWord[], firstOrder: number, catalog: readonly CatalogMain[] = []): DeckCard[] {
   return words.map((w, i) => {
-    const c = wordCollection(w);
+    const r = resolvePlacement(w.placement, catalog);
     return {
       entry: toEntry(w),
-      categoryKey: PERSONAL_KEY,
-      categoryLabel: c ? c.name : PERSONAL_LABEL,
-      ...(c ? { collection: c.name } : {}),
-      theme: 'review',
-      subtabId: PERSONAL_KEY,
-      subtabLabel: c ? c.subcategory : w.placement ? 'Meine Wörter' : 'واژه‌های من',
+      personal: true,
+      categoryKey: (r ? r.main.id : PERSONAL_KEY) as PracticeCategoryKey,
+      categoryLabel: r ? r.main.name : PERSONAL_LABEL,
+      theme: r ? r.main.theme : 'review',
+      subtabId: r ? r.sub?.id ?? '_' : PERSONAL_KEY,
+      subtabLabel: r ? r.sub?.name ?? 'Meine Wörter' : 'واژه‌های من',
       order: firstOrder + i,
     };
   });

@@ -36,7 +36,13 @@ async function addWord(user: User, f: { type?: string; article?: string; lemma: 
   await user.type(q.getByLabelText(/واژه یا عبارت آلمانی/), f.lemma);
   await user.type(q.getByLabelText(/معنی فارسی/), f.fa);
   if (f.example) await user.type(q.getByLabelText(/جملهٔ مثال آلمانی/), f.example);
-  if (f.category) await user.selectOptions(q.getByLabelText(/نمایش در دسته/), f.category);
+  if (f.category) {
+    // Shared destination picker: existing category → its first subcategory.
+    await user.click(q.getByRole('radio', { name: 'افزودن به دسته موجود' }));
+    await user.selectOptions(q.getByLabelText('دسته اصلی'), f.category);
+    const sub = q.getByLabelText('زیرمجموعه') as HTMLSelectElement;
+    await user.selectOptions(sub, sub.options[1]!);
+  }
   await user.click(q.getByRole('button', { name: 'افزودن واژه' }));
 }
 

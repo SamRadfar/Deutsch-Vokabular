@@ -126,8 +126,8 @@ describe('IndexedDB schema upgrade v1 → current', () => {
     });
 
     const db = await openProgressDb(factory);
-    expect(db.version).toBe(5);
-    expect([...db.objectStoreNames].sort()).toEqual(['custom-confirmed', 'custom-pending', 'meta', 'personal-words', 'progress-confirmed', 'progress-pending', 'review-state', 'shadowing-exposure']);
+    expect(db.version).toBe(6);
+    expect([...db.objectStoreNames].sort()).toEqual(['category-confirmed', 'category-pending', 'custom-confirmed', 'custom-pending', 'meta', 'personal-words', 'progress-confirmed', 'progress-pending', 'review-state', 'shadowing-exposure']);
     const store = createIndexedDbStore(Promise.resolve(db));
     expect((await store.load('alice')).confirmed).toEqual([{ wordId: A, learned: true, serverUpdatedAt: 5, opId: 'o1', origin: 'toggle' }]);
     expect(await store.getMeta('__device__', 'deviceId')).toBe('device-1');
@@ -143,12 +143,12 @@ describe('IndexedDB schema upgrade v1 → current', () => {
     first.close = () => { closed = true; originalClose(); };
     // Simulate a newer app version opening the same database in another tab.
     const upgraded = await new Promise<IDBDatabase>((resolve, reject) => {
-      const open = factory.open(DB_NAME, 6);
+      const open = factory.open(DB_NAME, 7);
       open.onsuccess = () => resolve(open.result);
       open.onerror = () => reject(open.error);
       open.onblocked = () => reject(new Error('blocked'));
     });
     expect(closed).toBe(true);
-    expect(upgraded.version).toBe(6);
+    expect(upgraded.version).toBe(7);
   });
 });
