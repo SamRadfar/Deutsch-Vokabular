@@ -268,13 +268,14 @@ describe('offline state', () => {
     Object.defineProperty(Navigator.prototype, 'onLine', { configurable: true, get: () => false });
     try {
       act(() => { window.dispatchEvent(new Event('offline')); });
-      expect(screen.getByTestId('offline-banner')).toHaveTextContent('آفلاین هستید');
+      // Slow CI runners: the banner may render a tick after the event.
+      expect(await screen.findByTestId('offline-banner')).toHaveTextContent('آفلاین هستید');
       expect(screen.getByTestId('offline-banner')).toHaveTextContent('پس از اتصال همگام می‌شوند');
     } finally {
       Object.defineProperty(Navigator.prototype, 'onLine', onLine);
       act(() => { window.dispatchEvent(new Event('online')); });
     }
-    expect(screen.queryByTestId('offline-banner')).toBeNull();
+    await waitFor(() => expect(screen.queryByTestId('offline-banner')).toBeNull());
   });
 });
 
