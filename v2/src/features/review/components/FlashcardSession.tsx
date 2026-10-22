@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, Check, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, PictureInPicture2, X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import type { WordId } from '../../../models/vocabulary';
 import { usePronunciation } from '../../pronunciation/PronunciationProvider';
@@ -17,6 +17,8 @@ interface Props {
   onAnswer(result: ReviewResult): void;
   dispatch(action: SessionAction): void;
   onRestart(): void;
+  /** Floating flashcard window (Document Picture-in-Picture). */
+  floating?: { open(): void; close(): void; state: 'closed' | 'pip' | 'inpage'; supported: boolean };
 }
 
 /** Keys work on any keyboard layout (KeyboardEvent.code), e.g. also with a Persian layout. */
@@ -28,7 +30,7 @@ const KEYS: Record<string, 'flip' | 'next' | 'previous' | 'know' | 'again' | 'sp
   KeyS: 'speak', Escape: 'end',
 };
 
-export function FlashcardSession({ state, cardsById, active, autoSpeak, onAnswer, dispatch, onRestart }: Props) {
+export function FlashcardSession({ state, cardsById, active, autoSpeak, onAnswer, dispatch, onRestart, floating }: Props) {
   const id = state.cards[state.index]!;
   const card = cardsById.get(id);
   const { toggle, speakingKey } = usePronunciation();
@@ -95,6 +97,21 @@ export function FlashcardSession({ state, cardsById, active, autoSpeak, onAnswer
         <p className="fc-count" data-testid="fc-count"><span dir="ltr">{state.index + 1} / {total}</span></p>
         <button type="button" className="fc-tool" onClick={onRestart}>شروع دوباره</button>
       </div>
+      {floating ? (
+        <div className="fc-float-row">
+          <button type="button" className="fc-tool sh-float-btn" data-testid="review-floating-toggle"
+            onClick={floating.state === 'closed' ? floating.open : floating.close} aria-pressed={floating.state !== 'closed'}
+            title={floating.supported ? 'کارت کوچک همیشه‌رو، جدا از مرورگر (Picture-in-Picture)' : 'این مرورگر پنجرهٔ شناور ندارد'}>
+            <PictureInPicture2 aria-hidden="true" /> {floating.state === 'closed' ? 'پنجره شناور' : 'بستن پنجره شناور'}
+          </button>
+          {floating.state === 'pip' ? <span className="fc-float-note" role="status">این جلسه در پنجرهٔ شناور هم باز است؛ هر دو یک جلسه‌اند.</span> : null}
+          {floating.state === 'inpage' ? (
+            <span className="fc-float-note fc-float-note--warn" role="note" data-testid="review-floating-unsupported">
+              این مرورگر «پنجرهٔ شناور» (Document Picture-in-Picture) ندارد یا اجازه نداد. برای کارت همیشه‌رو روی برنامه‌های دیگر، از Chrome یا Edge روی کامپیوتر استفاده کنید.
+            </span>
+          ) : null}
+        </div>
+      ) : null}
       <div className="fc-progress" role="progressbar" aria-label="پاسخ‌داده‌شده" aria-valuemin={0} aria-valuemax={total} aria-valuenow={answered}
         aria-valuetext={`${answered} از ${total} کارت پاسخ داده شد`}>
         <span style={{ width: `${total ? (answered / total) * 100 : 0}%` }} />

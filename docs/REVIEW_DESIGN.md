@@ -110,3 +110,36 @@ deliberately **not** part of Phase 4A.
 | — | Know/don't know had no effect on progress | §3 |
 
 The legacy app itself is unchanged.
+
+## Floating flashcard (Document Picture-in-Picture)
+
+During a session, «پنجره شناور» opens a small (≈ 340 × 420) always-on-top window in Chrome / Edge on
+desktop. The window stays visible when the main browser is minimized.
+
+**One session.** The card is rendered into the window with a React portal from the running
+`useFlashcardSession`.
+- The window and the page share the card, the side, the order and the answers.
+- «بلدم» / «دوباره» call the same `session.answer` (existing review backend and learned semantics), so nothing is counted twice.
+- «قبلی» / «بعدی» never rate a card.
+- The card never advances by itself.
+
+**Keyboard** works only while the window has focus, on its own document:
+- Space / Enter: flip.
+- ← →: previous / next.
+- 1: «دوباره».
+- 2: «بلدم».
+
+**Lifecycle**
+- Closing the window keeps the session; reopening shows the current card.
+- At the end of the session, the window shows the result.
+- Going back to the setup closes the window.
+- The panel is keyed by account, so sign-out or an account switch closes the window at once.
+
+**Shared infrastructure.** `features/floating` (`documentPip.ts`, `useFloatingWindow.ts`) serves
+Shadowing and Review. A page has one PiP window, and opening it for one feature replaces the other
+feature's window; that feature's session keeps running in the page. Browsers without Document PiP
+get a clear explanation.
+
+**Tests**
+- `tests/e2e/review-floating.spec.ts`, using a real PiP window in Chromium.
+- `tests/desktop/pip-desktop.spec.ts`, on real Windows with Chrome and Edge: the main window minimized, the floating window topmost, no focus stealing.

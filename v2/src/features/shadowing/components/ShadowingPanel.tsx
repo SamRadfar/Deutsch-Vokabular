@@ -1,7 +1,7 @@
 import { useCategories } from '../../categories/useCategories';
 import { subScopes, validSub } from '../../categories/practiceSubs';
 import '../shadowing.css';
-import '../floating/floating.css';
+import '../../floating/floating.css';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import type { Category, WordId } from '../../../models/vocabulary';
@@ -18,7 +18,7 @@ import { buildShadowingQueue, selectShadowingCards } from '../queue';
 import { sanitizePreferences, type ShadowingPreferences } from '../settings';
 import { useShadowingBackend } from '../useShadowingBackend';
 import { createWakeLockPort, type WakeLockPort } from '../wakeLock';
-import { useFloatingPlayer } from '../floating/useFloatingPlayer';
+import { useFloatingPlayer } from '../../floating/useFloatingWindow';
 import { FloatingCard } from './FloatingCard';
 import { ShadowingSession } from './ShadowingSession';
 import { ShadowingSetup } from './ShadowingSetup';

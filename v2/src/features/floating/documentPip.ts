@@ -1,7 +1,8 @@
 // Document Picture-in-Picture (Chrome / Edge 116+ on desktop): a real, separate, always-on-top
 // browser window that stays visible when the main window is minimized or another application is
-// in front. The window shares this page's JavaScript realm, so the floating card is rendered with a
-// React portal from the running shadowing session — one session state, one audio pipeline.
+// in front. The window shares this page's JavaScript realm, so a floating card is rendered with a
+// React portal from the running session (Shadowing or flashcard review) — one session state.
+// A page can have only ONE such window: each feature owns it in turn (useFloatingWindow).
 //
 // https://developer.chrome.com/docs/web-platform/document-picture-in-picture
 
@@ -50,16 +51,25 @@ export function mirrorRootAttributes(from: Document, to: Document): () => void {
   return () => observer.disconnect();
 }
 
+/** Which feature a floating window belongs to. */
+const owners = new WeakMap<Window, string>();
+export const pipOwner = (win: Window): string | undefined => owners.get(win);
+
 /**
- * Opens the floating window (or returns the one already open — never two). Must be called from a
- * user click: the browser refuses Picture-in-Picture without user activation.
+ * Opens the floating window for `owner`, or returns that owner's window if it is already open
+ * (never two). Another feature's window is replaced (the browser allows one per page). Must be
+ * called from a user click: the browser refuses Picture-in-Picture without user activation.
  */
-export async function openPipWindow(size: { width: number; height: number }, host: PipHost = window as unknown as PipHost, doc: Document = document): Promise<Window> {
+export async function openPipWindow(
+  size: { width: number; height: number }, host: PipHost = window as unknown as PipHost, doc: Document = document,
+  opts: { owner: string; title: string } = { owner: 'shadowing', title: 'Deutsch Vokabular · Shadowing' },
+): Promise<Window> {
   const api = host.documentPictureInPicture;
   if (!api) throw new Error('Document Picture-in-Picture is not supported');
-  if (api.window) return api.window;
+  if (api.window && owners.get(api.window) === opts.owner) return api.window;
   const win = await api.requestWindow({ width: size.width, height: size.height });
-  win.document.title = 'Deutsch Vokabular · Shadowing';
+  owners.set(win, opts.owner);
+  win.document.title = opts.title;
   copyStyles(doc, win.document);
   win.document.body.classList.add('sh-float-doc');
   return win;

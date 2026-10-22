@@ -1,8 +1,8 @@
 // Floating player: timers follow the visible window (a minimized main window is throttled by the
 // browser; the Picture-in-Picture window is not), and the window helpers copy styles and theme.
 import { describe, expect, it, vi } from 'vitest';
-import { copyStyles, mirrorRootAttributes, openPipWindow, pipSupported } from '../../../src/features/shadowing/floating/documentPip';
-import { MovableTimers } from '../../../src/features/shadowing/floating/useFloatingPlayer';
+import { copyStyles, mirrorRootAttributes, openPipWindow, pipOwner, pipSupported } from '../../../src/features/floating/documentPip';
+import { MovableTimers } from '../../../src/features/floating/useFloatingWindow';
 
 function fakeWindow() {
   let next = 1;
@@ -61,11 +61,20 @@ describe('Document Picture-in-Picture helpers', () => {
     expect(pipSupported({ documentPictureInPicture: { requestWindow: async () => window, window: null } })).toBe(true);
   });
 
-  it('reuses an open window instead of opening a second one', async () => {
-    const existing = {} as Window;
-    const requestWindow = vi.fn();
-    await expect(openPipWindow({ width: 340, height: 420 }, { documentPictureInPicture: { requestWindow, window: existing } })).resolves.toBe(existing);
-    expect(requestWindow).not.toHaveBeenCalled();
+  it("reuses its own open window; another feature's window is replaced, never a second one", async () => {
+    const pipDoc = () => document.implementation.createHTMLDocument('pip');
+    const shadowWin = { document: pipDoc(), close: vi.fn() } as unknown as Window;
+    const reviewWin = { document: pipDoc(), close: vi.fn() } as unknown as Window;
+    const api = { window: null as Window | null, requestWindow: vi.fn() };
+    api.requestWindow.mockImplementation(async () => (api.window = api.requestWindow.mock.calls.length === 1 ? shadowWin : reviewWin));
+    const host = { documentPictureInPicture: api };
+    await expect(openPipWindow({ width: 340, height: 420 }, host, document, { owner: 'shadowing', title: 'S' })).resolves.toBe(shadowWin);
+    await expect(openPipWindow({ width: 340, height: 420 }, host, document, { owner: 'shadowing', title: 'S' })).resolves.toBe(shadowWin);
+    expect(api.requestWindow).toHaveBeenCalledTimes(1);
+    await expect(openPipWindow({ width: 340, height: 420 }, host, document, { owner: 'review', title: 'Deutsch Vokabular · مرور' })).resolves.toBe(reviewWin);
+    expect(api.requestWindow).toHaveBeenCalledTimes(2);
+    expect(reviewWin.document.title).toBe('Deutsch Vokabular · مرور');
+    expect(pipOwner(reviewWin)).toBe('review');
   });
 
   it('copies stylesheets and mirrors the theme into the floating document', () => {

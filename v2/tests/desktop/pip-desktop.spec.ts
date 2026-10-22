@@ -114,3 +114,46 @@ test('the real speech engine keeps reporting while the window is minimized (sile
   console.log('speech while minimized:', result.join(' | '));
   expect(result.some((l) => l.startsWith('end'))).toBe(true);
 });
+
+test('floating flashcard review: usable with the main window minimized, stays on top, no focus stealing', async ({ page }) => {
+  test.setTimeout(180_000);
+  await installSpeechMock(page, 50);
+  await page.goto('./');
+  await page.evaluate(() => { document.title = 'DV-REVIEW-WINDOW'; });
+  await page.getByRole('link', { name: 'مرور', exact: true }).click();
+  await page.getByLabel('دسته', { exact: true }).selectOption('fitness');
+  await page.getByLabel('زیرمجموعه', { exact: true }).selectOption('training');
+  await page.getByLabel('تعداد کارت در جلسه').selectOption('10');
+  await page.getByRole('button', { name: 'شروع مرور (10 کارت)' }).click();
+  await page.evaluate(() => { document.title = 'DV-REVIEW-WINDOW'; });
+  await page.getByTestId('review-floating-toggle').click();
+  await expect.poll(() => pip(page, '[data-testid="rf-pos"]')).toBe('1 / 10');
+
+  const cdp = await page.context().newCDPSession(page);
+  const { windowId } = await cdp.send('Browser.getWindowForTarget');
+  await cdp.send('Browser.setWindowBounds', { windowId, bounds: { windowState: 'minimized' } });
+  await expect.poll(() => windows('DV-REVIEW-WINDOW').find(isFrame)?.iconic).toBe(true);
+  const before = windows('DV-REVIEW-WINDOW');
+  console.log('review windows after minimizing:', JSON.stringify(before));
+  expect(before.some((w) => !isFrame(w) && !w.iconic && w.topmost), 'a visible always-on-top floating window').toBe(true);
+
+  // The card waits for the user (no auto-advance), then flips and rates inside the floating window.
+  await page.waitForTimeout(3000);
+  expect(await pip(page, '[data-testid="rf-pos"]')).toBe('1 / 10');
+  const click = (id: string) => page.evaluate((t) => {
+    (window as unknown as { documentPictureInPicture: { window: Window } }).documentPictureInPicture.window.document.querySelector<HTMLElement>(`[data-testid="${t}"]`)!.click();
+  }, id);
+  await click('rf-face');
+  await expect.poll(() => pip(page, '[data-testid="rf-fa"]')).not.toBeNull();
+  await click('rf-know');
+  await expect.poll(() => pip(page, '[data-testid="rf-pos"]')).toBe('2 / 10');
+  await click('rf-again');
+  await expect.poll(() => pip(page, '[data-testid="rf-pos"]')).toBe('3 / 10');
+
+  const after = windows('DV-REVIEW-WINDOW');
+  console.log('review windows after rating:', JSON.stringify(after));
+  const main = after.find(isFrame);
+  expect(main?.iconic, 'main window still minimized').toBe(true);
+  expect(main?.foreground, 'main window did not take the foreground').toBe(false);
+  expect(after.some((w) => !isFrame(w) && !w.iconic && w.topmost)).toBe(true);
+});

@@ -144,3 +144,70 @@ body.sh-float-doc .sh-float-root { height: 100vh; }
 }
 .sh-float__fa.is-speaking, .sh-float__exfa.is-speaking { color: var(--tp); background: color-mix(in srgb, #0e7c66 14%, transparent); border-radius: var(--r-sm); box-shadow: inset 3px 0 0 #0e7c66; }
 .sh-float__exfa { padding: 2px 6px; }
+
+/* Floating flashcard review (same window and tokens as the shadowing card). */
+.rf {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+  height: 100%;
+  padding: clamp(10px, 3.5vw, 16px);
+  font-family: var(--fp);
+  color: var(--tp);
+  background: var(--panel);
+}
+.rf__top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.rf__meta { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--fn); font-size: var(--fs-2xs, 11px); color: var(--tm); text-align: end; }
+.rf__tally { display: flex; justify-content: center; gap: 14px; margin: 0; font-family: var(--fn); font-size: var(--fs-xs); font-weight: 700; }
+.rf__tally svg.lucide { width: 13px; height: 13px; vertical-align: -2px; }
+.rf__card {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 12px;
+  background: var(--sf);
+  border: 1px solid var(--br);
+  border-top: 3px solid var(--ac, var(--brand));
+  border-radius: var(--r-lg, 16px);
+  cursor: pointer;
+  text-align: center;
+}
+.rf__card.is-flipped { background: color-mix(in srgb, var(--sf) 92%, var(--ac, var(--brand)) 8%); }
+.rf__card p { margin: 0; }
+.rf__front, .rf__back { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.rf__word { font-family: var(--fn); font-size: clamp(22px, 8vw, 34px); font-weight: 750; line-height: 1.2; overflow-wrap: anywhere; }
+.rf__word--small { font-size: clamp(15px, 5vw, 19px); color: var(--ts); }
+.rf__fa { font-size: clamp(17px, 6vw, 22px); font-weight: 700; line-height: 1.6; }
+.rf__gram { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.rf__ex { font-family: var(--fn); font-size: var(--fs-sm); font-style: italic; line-height: 1.5; color: var(--ts); }
+.rf__exfa { font-size: var(--fs-sm); line-height: 1.7; color: var(--ts); }
+.rf__tap { font-size: var(--fs-2xs, 11px); color: var(--tm); }
+.rf__prev { margin: 0; font-size: var(--fs-2xs, 11px); text-align: center; }
+.rf__flip, .rf__close {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 36px; padding: 0 12px;
+  font: inherit; font-size: var(--fs-sm); font-weight: 650;
+  color: var(--tp); background: var(--sfalt); border: 1px solid var(--br); border-radius: var(--r-md); cursor: pointer;
+}
+.rf__flip svg.lucide { width: 15px; height: 15px; }
+.rf__answers { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.rf__answers .fc-answer { min-height: 40px; padding: 4px 8px; }
+.rf__nav { display: flex; justify-content: space-between; gap: 8px; }
+.rf__nav button {
+  display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 10px;
+  font: inherit; font-size: var(--fs-xs); color: var(--ts); background: transparent; border: 1px solid var(--br); border-radius: var(--r-md); cursor: pointer;
+}
+.rf__nav button:disabled { opacity: 0.45; cursor: default; }
+.rf__nav svg.lucide { width: 14px; height: 14px; }
+.rf button:focus-visible, .rf__card:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.rf--done { justify-content: center; align-items: stretch; text-align: center; }
+.rf__done-title { margin: 0; font-size: var(--fs-lg, 18px); font-weight: 750; }
+
+/* Review page: the «پنجره شناور» row of a running session. */
+.fc-float-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.fc-float-note { font-size: var(--fs-xs); color: var(--tm); }
+.fc-float-note--warn { color: var(--warn, #b7791f); }

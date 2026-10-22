@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { Timers } from '../player';
+import type { Timers } from '../shadowing/player';
 import { mirrorRootAttributes, openPipWindow, pipSupported, type PipHost } from './documentPip';
 
 export type FloatingState =
@@ -52,17 +52,41 @@ export class MovableTimers implements Timers {
   }
 }
 
+/**
+ * The one floating window of the page and the feature that holds it. Opening it for another
+ * feature first closes the current holder's window (its card returns into the page); the active
+ * session of that feature is not touched.
+ */
+let holder: { owner: string; close: () => void } | null = null;
+
+export interface FloatingWindowOptions {
+  /** Feature id ("shadowing", "review"). */
+  owner: string;
+  /** Title of the floating window. */
+  title: string;
+  /** Class of the React portal container inside the window. */
+  rootClass?: string;
+}
+
+const SHADOWING: FloatingWindowOptions = { owner: 'shadowing', title: 'Deutsch Vokabular · Shadowing', rootClass: 'sh-float-root' };
+
 export interface FloatingPlayer {
   state: FloatingState;
   supported: boolean;
   /** Call from the click handler (user activation is required). */
   open(): void;
   close(): void;
-  /** Timers for the session player (follow the floating window). */
+  /** Timers for a session player (follow the floating window). */
   timers: MovableTimers;
 }
 
+/** Shadowing's floating player (kept for its callers). */
 export function useFloatingPlayer(host: PipHost = window as unknown as PipHost): FloatingPlayer {
+  return useFloatingWindow(SHADOWING, host);
+}
+
+export function useFloatingWindow(options: FloatingWindowOptions, host: PipHost = window as unknown as PipHost): FloatingPlayer {
+  const { owner, title, rootClass = 'sh-float-root' } = options;
   const supported = pipSupported(host);
   const [state, setState] = useState<FloatingState>({ kind: 'closed' });
   const winRef = useRef<Window | null>(null);
@@ -72,27 +96,33 @@ export function useFloatingPlayer(host: PipHost = window as unknown as PipHost):
   const close = useCallback(() => {
     const w = winRef.current;
     winRef.current = null;
+    if (holder?.owner === owner) holder = null;
     timers.rehome();
     try { w?.close(); } catch { /* already closed */ }
     setState({ kind: 'closed' });
-  }, [timers]);
+  }, [timers, owner]);
 
   const open = useCallback(() => {
+    // One floating window per page: another feature's window closes first.
+    if (holder && holder.owner !== owner) holder.close();
+    holder = { owner, close };
     if (!supported) { setState({ kind: 'inpage', reason: 'unsupported' }); return; }
     if (winRef.current || opening.current) return; // never a second window
     opening.current = true;
-    openPipWindow(FLOATING_SIZE, host).then((win) => {
+    openPipWindow(FLOATING_SIZE, host, document, { owner, title }).then((win) => {
       opening.current = false;
       if (winRef.current === win) return;
+      if (holder?.owner !== owner) { try { win.close(); } catch { /* closed */ } return; } // replaced meanwhile
       winRef.current = win;
       const container = win.document.createElement('div');
-      container.className = 'sh-float-root';
+      container.className = rootClass;
       win.document.body.append(container);
       const unmirror = mirrorRootAttributes(document, win.document);
       win.addEventListener('pagehide', () => {
         unmirror();
         if (winRef.current !== win) return;
         winRef.current = null;
+        if (holder?.owner === owner) holder = null;
         timers.rehome(); // pauses continue in the main window
         setState({ kind: 'closed' });
       }, { once: true });
@@ -102,11 +132,15 @@ export function useFloatingPlayer(host: PipHost = window as unknown as PipHost):
       opening.current = false;
       setState({ kind: 'inpage', reason: 'refused' });
     });
-  }, [supported, host, timers]);
+  }, [supported, host, timers, owner, title, rootClass, close]);
 
-  // Leaving the shadowing session (end, sign-out, account switch, unmount) closes the window, so no
+  // Leaving the session (end, sign-out, account switch, unmount) closes the window, so no
   // vocabulary stays visible on the desktop.
-  useEffect(() => () => { try { winRef.current?.close(); } catch { /* closed */ } winRef.current = null; }, []);
+  useEffect(() => () => {
+    try { winRef.current?.close(); } catch { /* closed */ }
+    winRef.current = null;
+    if (holder?.owner === owner) holder = null;
+  }, [owner]);
 
   return { state, supported, open, close, timers };
 }
