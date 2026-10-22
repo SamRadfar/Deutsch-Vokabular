@@ -102,6 +102,20 @@ describe('shadowing — locked-screen audio mode', () => {
     Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'visible' });
   });
 
+  it('a subcategory filter: the prepared lock-screen audio contains exactly those words', async () => {
+    voiceState.downloaded = true;
+    storePrefs({ playback: 'audio', size: 50, categories: ['fitness'], subcategory: 'ernaehrung', exampleRepeats: 0 });
+    const { getBundledRepository } = await import('../../../src/services/content/bundled');
+    const sub = getBundledRepository().getCategory('fitness')!.subtabs.find((s) => s.id === 'ernaehrung')!;
+    const words = new Set(sub.groups.flatMap((g) => g.entries.map((e) => e.word)));
+    const { user } = await openShadowing();
+    await vi.waitFor(() => expect(screen.getByTestId('sh-voice')).toHaveAttribute('data-state', 'ready'));
+    expect(screen.getByRole('radio', { name: /^Erholung/ })).toBeChecked();
+    await user.click(screen.getByRole('button', { name: `آماده‌سازی جلسه (${words.size} واژه)` }));
+    await vi.waitFor(() => screen.getByTestId('sh-lockmode'), { timeout: 10_000 });
+    expect(new Set(voiceState.synthesized)).toEqual(words);
+  });
+
   it('live speech mode stays the default and still pauses when the page is hidden', async () => {
     storePrefs({ size: 5, categories: ['fitness'] });
     const { user } = await openShadowing();

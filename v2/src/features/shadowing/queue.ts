@@ -10,11 +10,15 @@ export function exposureWeight(count: number): number {
   return count <= 0 ? 3 : count < 3 ? 2 : 1;
 }
 
+/** `subtab` (one main category selected) narrows the words to that subcategory; null = all of them. */
 export function selectShadowingCards(
-  cards: readonly DeckCard[], mode: ReviewMode, categories: ReadonlySet<PracticeCategoryKey>, progress: DeckProgress,
+  cards: readonly DeckCard[], mode: ReviewMode, categories: ReadonlySet<PracticeCategoryKey>, progress: DeckProgress, subtab: string | null = null,
 ): DeckCard[] {
   const keys = [...categories];
-  return selectCards(cards, mode, 'all', progress).filter((c) => categories.has(c.categoryKey) || keys.some((k) => inPracticeScope(c, k)));
+  const sub = categories.size === 1 ? subtab : null;
+  return selectCards(cards, mode, 'all', progress)
+    .filter((c) => categories.has(c.categoryKey) || keys.some((k) => inPracticeScope(c, k)))
+    .filter((c) => sub === null || c.subtabId === sub);
 }
 
 export function buildShadowingQueue(

@@ -2,6 +2,7 @@
 // Values read back from storage are sanitised: anything out of range falls back to the default.
 
 import { CATEGORY_KEYS } from '../../models/vocabulary';
+import { SUB_ID_PATTERN } from '../categories/practiceSubs';
 import { PERSONAL_KEY, type PracticeCategoryKey, type ReviewMode } from '../review/deck';
 
 const PRACTICE_KEYS: readonly PracticeCategoryKey[] = [...CATEGORY_KEYS, PERSONAL_KEY];
@@ -38,8 +39,10 @@ export type PlaybackMode = 'speech' | 'audio';
 
 export interface ShadowingChoice {
   mode: ReviewMode;
-  /** Selected categories; empty = none selected (start disabled). */
+  /** Selected categories; empty = none selected (start disabled). One = the active main category. */
   categories: PracticeCategoryKey[];
+  /** Subcategory of the single selected main category; null = all of its subcategories. */
+  subcategory: string | null;
   /** Items per session. */
   size: number;
 }
@@ -75,6 +78,7 @@ export const DEFAULT_PREFERENCES: ShadowingPreferences = {
   playback: 'speech',
   mode: 'all',
   categories: [...PRACTICE_KEYS],
+  subcategory: null,
   size: 30,
 };
 
@@ -104,6 +108,7 @@ export function sanitizePreferences(raw: unknown): ShadowingPreferences {
     playback: oneOf(['speech', 'audio'] as const, v.playback, d.playback),
     mode: oneOf(['all', 'unlearned', 'learned', 'again'] as const, v.mode, d.mode),
     categories,
+    subcategory: typeof v.subcategory === 'string' && SUB_ID_PATTERN.test(v.subcategory) ? v.subcategory : null,
     size: oneOf(SHADOWING_SIZES, v.size, d.size),
   };
 }

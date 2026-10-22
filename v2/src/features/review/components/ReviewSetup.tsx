@@ -5,18 +5,23 @@ import {
   type DeckCard, type DeckProgress, type PracticeCategoryKey, type ReviewMode, type ReviewScope,
 } from '../deck';
 import type { ReviewBackend } from '../useReviewBackend';
+import type { SubScope } from '../../categories/practiceSubs';
 
 export interface SetupChoice {
   mode: ReviewMode;
   scope: ReviewScope;
   size: number | null;
   autoSpeak: boolean;
+  /** Subcategory of the chosen main category; null = all subcategories. */
+  subtab: string | null;
 }
 
 interface Props {
   cards: readonly DeckCard[];
   /** Built-in categories, plus "my words" when the user has personal words. */
   scopes: ReadonlyArray<{ key: PracticeCategoryKey; label: string }>;
+  /** Subcategories of the chosen category ([] = no subcategory selector). */
+  subs: readonly SubScope[];
   backend: ReviewBackend;
   choice: SetupChoice;
   onChange(choice: SetupChoice): void;
@@ -30,10 +35,11 @@ const MODE_TEXT: Record<ReviewMode, { title: string; desc: string; empty: string
   again: { title: 'مرور دوباره', desc: 'واژه‌هایی که آخرین بار بلد نبودی', empty: 'فهرست «مرور دوباره» خالی است.' },
 };
 
-export function ReviewSetup({ cards, scopes, backend, choice, onChange, onStart }: Props) {
-  const ids = { scope: useId(), size: useId(), speak: useId() };
+export function ReviewSetup({ cards, scopes, subs, backend, choice, onChange, onStart }: Props) {
+  const ids = { scope: useId(), sub: useId(), size: useId(), speak: useId() };
   const progress: DeckProgress = { learned: backend.learned, againIds: backend.againIds };
-  const countFor = (mode: ReviewMode, scope: ReviewScope = choice.scope) => selectCards(cards, mode, scope, progress).length;
+  const countFor = (mode: ReviewMode, scope: ReviewScope = choice.scope, subtab: string | null = choice.subtab) =>
+    selectCards(cards, mode, scope, progress, scope === 'all' ? null : subtab).length;
   const available = modeAvailable(choice.mode, progress);
   const selected = available ? countFor(choice.mode) : 0;
   const sessionCount = choice.size === null ? selected : Math.min(selected, choice.size);
@@ -88,11 +94,20 @@ export function ReviewSetup({ cards, scopes, backend, choice, onChange, onStart 
           <div className="rv-options">
             <div className="rv-field">
               <label htmlFor={ids.scope}>دسته</label>
-              <select id={ids.scope} value={choice.scope} onChange={(e) => set({ scope: e.currentTarget.value as ReviewScope })}>
+              <select id={ids.scope} value={choice.scope} onChange={(e) => set({ scope: e.currentTarget.value as ReviewScope, subtab: null })}>
                 <option value="all">همهٔ دسته‌ها</option>
-                {scopes.map((c) => <option key={c.key} value={c.key}>{c.label}{available ? ` (${countFor(choice.mode, c.key)})` : ''}</option>)}
+                {scopes.map((c) => <option key={c.key} value={c.key}>{c.label}{available ? ` (${countFor(choice.mode, c.key, null)})` : ''}</option>)}
               </select>
             </div>
+            {choice.scope !== 'all' && subs.length ? (
+              <div className="rv-field">
+                <label htmlFor={ids.sub}>زیرمجموعه</label>
+                <select id={ids.sub} value={choice.subtab ?? ''} onChange={(e) => set({ subtab: e.currentTarget.value || null })}>
+                  <option value="">همه زیرمجموعه‌ها{available ? ` (${countFor(choice.mode, choice.scope, null)})` : ''}</option>
+                  {subs.map((s) => <option key={s.id} value={s.id}>{s.label}{available ? ` (${countFor(choice.mode, choice.scope, s.id)})` : ''}</option>)}
+                </select>
+              </div>
+            ) : null}
             <div className="rv-field">
               <label htmlFor={ids.size}>تعداد کارت در جلسه</label>
               <select id={ids.size} value={choice.size === null ? 'all' : String(choice.size)}

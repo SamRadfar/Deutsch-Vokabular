@@ -80,7 +80,6 @@ test('generate a word with AI → review → save → it syncs and appears in se
 
   // Shadowing
   await page.getByRole('link', { name: 'تلفظ', exact: true }).click();
-  await page.getByRole('button', { name: 'هیچ‌کدام' }).click();
   const chip = page.locator('label.sh-chip').filter({ hasText: 'واژه‌های من' });
   await chip.locator('input').check();
   await expect(chip.locator('.sh-chip__n')).toHaveText('1');

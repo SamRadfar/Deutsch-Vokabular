@@ -47,6 +47,18 @@ gets a fresh id, because the rules never revive a tombstone.
 After an AI import, «نمایش در زبانهٔ دسته» opens the words browser on the destination tab.
 «پیشرفت» lists your own main categories with their word and learned counts.
 
+## Practice filter (Shadowing, flashcards)
+
+`features/categories/practiceSubs.ts` gives the subcategories of one main category from the same
+catalog: built-in subtabs, own subcategories, and «مستقیم در این دسته» when personal words sit
+directly in the main category. A category without subcategories shows no second row.
+
+- **Shadowing** (`ShadowingSetup`): the «دسته‌بندی» chip row starts with «همهٔ دسته‌ها» and selects one main category. A second chip row directly below shows «همه زیرمجموعه‌ها» (default) and the subcategories. Changing the main category resets the subcategory.
+- **Filters:** the subcategory combines with «کدام واژه‌ها؟». Every count and the start button use the real number of matching words.
+- **Fixed session:** the queue is built once at start, and the live player, the prepared lock-screen audio and the floating window all play that queue.
+- **Flashcards** (`ReviewSetup`): a «زیرمجموعه» select appears under «دسته».
+- **Storage:** the choice is kept on the device (`subcategory` / `subtab`, sanitised). A subcategory that no longer exists means «همه».
+
 ## Compatibility
 
 The first generator version stored own categories as `placement.category = "my:<name>"`. After

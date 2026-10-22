@@ -21,20 +21,6 @@
 /* Category chips */
 .sh-cats { border: none; display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
 .sh-cats legend { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-.sh-cats__bulk { display: inline-flex; gap: 6px; }
-.sh-cats__bulk button {
-  min-height: 30px;
-  padding: 0 12px;
-  font-family: var(--fp);
-  font-size: var(--fs-xs);
-  font-weight: 600;
-  color: var(--ts);
-  background: var(--sfalt);
-  border: 1px solid var(--br);
-  border-radius: var(--r-pill);
-  cursor: pointer;
-}
-.sh-cats__bulk button:hover { color: var(--tp); border-color: var(--brs); }
 .sh-chip {
   position: relative;
   display: inline-flex;
@@ -59,6 +45,28 @@
 .sh-chip.is-selected { color: var(--tp); border-color: color-mix(in srgb, var(--ac) 60%, transparent); background: color-mix(in srgb, var(--sf) 85%, var(--ac) 15%); }
 .sh-chip.is-selected::before { opacity: 1; }
 .sh-chip__n { font-family: var(--fn); font-size: var(--fs-2xs); font-weight: 700; color: var(--tm); }
+/* Second row: the subcategories of the selected main category, directly below the main chips. */
+.sh-subs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+  margin: -6px 0 0;
+  padding: 10px 12px 0;
+  border: none;
+  border-inline-start: 2px solid color-mix(in srgb, var(--ac, var(--brand)) 45%, transparent);
+}
+.sh-chip--sub { min-height: 34px; padding: 0 11px; gap: 6px; font-size: var(--fs-xs); border-radius: var(--r-pill); }
+.sh-chip--sub::before { width: 6px; height: 6px; }
+.sh-chip--sub.is-own { border-style: dashed; }
+.sh-chip--sub.is-selected { border-style: solid; }
+.sh-chip > span[dir='auto'] { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 640px) {
+  /* Many subcategories: one swipeable row instead of a tall block. */
+  .sh-subs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
+  .sh-subs::-webkit-scrollbar { display: none; }
+  .sh-chip--sub { flex-shrink: 0; white-space: nowrap; }
+}
 
 .sh-pause { grid-column: 1 / -1; }
 .sh-pause input[type='range'] { width: 100%; min-height: 32px; }

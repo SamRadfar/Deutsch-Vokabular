@@ -47,6 +47,8 @@ export interface ReviewPreferences {
   size: number | null;
   /** Speak the German word when a card is turned (legacy behaviour). */
   autoSpeak: boolean;
+  /** Subcategory within `scope` (validated against the categories by the caller); null = all. */
+  subtab?: string | null;
 }
 
 export function readReviewPreferences(): Partial<ReviewPreferences> {
@@ -59,6 +61,7 @@ export function readReviewPreferences(): Partial<ReviewPreferences> {
     if (typeof v.scope === 'string' && v.scope.length <= 40) out.scope = v.scope;
     if (v.size === null || (typeof v.size === 'number' && Number.isInteger(v.size) && v.size > 0 && v.size <= 1000)) out.size = v.size;
     if (typeof v.autoSpeak === 'boolean') out.autoSpeak = v.autoSpeak;
+    if (typeof v.subtab === 'string' && /^[A-Za-z0-9_-]{1,60}$/.test(v.subtab)) out.subtab = v.subtab;
     return out;
   } catch {
     return {};

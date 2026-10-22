@@ -209,8 +209,7 @@ describe('my vocabulary — learning tools', () => {
     await openMine(user);
     await addWord(user, { lemma: 'die Probewortigkeit', fa: 'واژهٔ آزمایشی' });
     await user.click(link('تلفظ'));
-    await user.click(button('هیچ‌کدام'));
-    await user.click(screen.getByRole('checkbox', { name: /واژه‌های من/ }));
+    await user.click(screen.getByRole('radio', { name: /واژه‌های من/ }));
     await user.click(button('شروع تمرین (1 واژه)'));
     expect(speech.speak).toHaveBeenLastCalledWith('die Probewortigkeit', expect.anything());
   });

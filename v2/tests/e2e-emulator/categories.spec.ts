@@ -54,6 +54,17 @@ test('categories: create, assign, reload, second device, private to the account'
     // Reload: still there.
     await laptop.reload();
     await expectInBrowser(laptop);
+
+    // Shadowing: main chip → subcategory row → a session with exactly the matching word.
+    await laptop.getByRole('link', { name: 'تلفظ', exact: true }).click();
+    await laptop.locator('label.sh-chip').filter({ hasText: 'Reisen' }).locator('input').check();
+    const subs = laptop.getByTestId('sh-subs');
+    await expect(subs.getByRole('radio', { name: /همه زیرمجموعه‌ها/ })).toBeChecked();
+    await subs.locator('label').filter({ hasText: 'Gepäck' }).locator('input').check();
+    await expect(subs.locator('label').filter({ hasText: 'Gepäck' }).locator('.sh-chip__n')).toHaveText('1');
+    expect(await laptop.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true); // no sideways page scroll
+    await laptop.getByRole('button', { name: 'شروع تمرین (1 واژه)' }).click();
+    await expect(laptop.getByTestId('sh-stage')).toContainText('der Rucksack');
     expect(errors).toEqual([]);
 
     // Second device of the same account.

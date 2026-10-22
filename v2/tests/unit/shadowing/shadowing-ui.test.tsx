@@ -57,9 +57,7 @@ describe('shadowing — setup and preferences', () => {
     await user.selectOptions(screen.getByLabelText('تکرار واژه آلمانی'), '3');
     await user.selectOptions(screen.getByLabelText('تکرار جمله مثال آلمانی'), '0');
     await user.click(screen.getByRole('checkbox', { name: 'نمایش ترجمهٔ فارسی' }));
-    await user.click(button('هیچ‌کدام'));
-    expect(button('واژه‌ای برای تمرین نیست')).toBeDisabled();
-    await user.click(screen.getByRole('checkbox', { name: /Fitness/ }));
+    await user.click(screen.getByRole('radio', { name: /Fitness/ }));
     expect(JSON.parse(localStorage.getItem('dv2.pref.shadowing.v1')!)).toMatchObject({
       pauseSec: 6.5, rate: 0.55, wordRepeats: 3, exampleRepeats: 0, showTranslation: false, categories: ['fitness'],
     });
@@ -71,8 +69,8 @@ describe('shadowing — setup and preferences', () => {
     expect(screen.getByLabelText('سرعت گفتار آلمانی')).toHaveValue('0.55');
     expect(screen.getByLabelText('تکرار واژه آلمانی')).toHaveValue('3');
     expect(screen.getByText('6.5 ثانیه', { selector: 'output' })).toBeInTheDocument();
-    expect(screen.getByRole('checkbox', { name: /Fitness/ })).toBeChecked();
-    expect(screen.getByRole('checkbox', { name: /Dreame/ })).not.toBeChecked();
+    expect(screen.getByRole('radio', { name: /Fitness/ })).toBeChecked();
+    expect(screen.getByRole('radio', { name: /Dreame/ })).not.toBeChecked();
   });
 
   it('without speech synthesis the session cannot start and says why', async () => {

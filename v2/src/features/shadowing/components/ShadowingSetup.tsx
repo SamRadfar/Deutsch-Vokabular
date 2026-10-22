@@ -7,6 +7,7 @@ import { SequenceSettings } from './SequenceSettings';
 import { usePronunciation } from '../../pronunciation/PronunciationProvider';
 import { modeAvailable, REVIEW_MODES, type DeckCard, type DeckProgress, type PracticeCategoryKey, type ReviewMode } from '../../review/deck';
 import { selectShadowingCards } from '../queue';
+import type { SubScope } from '../../categories/practiceSubs';
 import { SHADOWING_SIZES, type ShadowingPreferences } from '../settings';
 import type { ShadowingBackend } from '../useShadowingBackend';
 import { formatDuration } from './format';
@@ -16,6 +17,8 @@ interface Props {
   cards: readonly DeckCard[];
   /** Built-in categories, plus "my words" when the user has personal words. */
   scopes: ReadonlyArray<{ key: PracticeCategoryKey; label: string; theme: string }>;
+  /** Subcategories of the selected main category ([] = no second row). */
+  subs: readonly SubScope[];
   backend: ShadowingBackend;
   prefs: ShadowingPreferences;
   onChange(prefs: ShadowingPreferences): void;
@@ -40,8 +43,8 @@ function useGermanVoice() {
   return { supported: service.supported, status };
 }
 
-export function ShadowingSetup({ cards, scopes, backend, prefs, onChange, onStart }: Props) {
-  const ids = { size: useId(), tr: useId() };
+export function ShadowingSetup({ cards, scopes, subs, backend, prefs, onChange, onStart }: Props) {
+  const ids = { size: useId(), tr: useId(), cat: useId(), sub: useId() };
   const voice = useGermanVoice();
   const { state: deviceVoice } = useOnDeviceVoice();
   const { state: faVoice } = useOnDeviceVoice(onDeviceVoiceStore('fa'));
@@ -49,15 +52,22 @@ export function ShadowingSetup({ cards, scopes, backend, prefs, onChange, onStar
   const { routed, openSoundSettings } = usePronunciation();
   const progress: DeckProgress = { learned: backend.learned, againIds: backend.againIds };
   const selectedCats = new Set(prefs.categories);
-  const count = (mode: ReviewMode, cats: ReadonlySet<PracticeCategoryKey> = selectedCats) => selectShadowingCards(cards, mode, cats, progress).length;
+  const count = (mode: ReviewMode, cats: ReadonlySet<PracticeCategoryKey> = selectedCats, sub: string | null = prefs.subcategory) =>
+    selectShadowingCards(cards, mode, cats, progress, sub).length;
+  const allKeys = scopes.map((c) => c.key);
+  const allSelected = allKeys.length > 0 && allKeys.every((k) => selectedCats.has(k));
+  const activeMain = prefs.categories.length === 1 ? prefs.categories[0]! : null;
+  const activeScope = scopes.find((c) => c.key === activeMain);
   const selected = modeAvailable(prefs.mode, progress) ? count(prefs.mode) : 0;
   const sessionCount = Math.min(selected, prefs.size);
   const audioMode = prefs.playback === 'audio';
   const canPlay = audioMode ? deviceVoice.kind === 'ready' : voice.supported || deviceVoice.kind === 'ready';
   const iosBrowserSpeech = !audioMode && Boolean(routed) && isAppleMobile() && routed?.route() === 'browser';
   const set = (patch: Partial<ShadowingPreferences>) => onChange({ ...prefs, ...patch });
-  const toggleCategory = (key: PracticeCategoryKey, on: boolean) =>
-    set({ categories: on ? [...prefs.categories.filter((k) => k !== key), key] : prefs.categories.filter((k) => k !== key) });
+  // One main category at a time (its subcategories appear below); «همهٔ دسته‌ها» selects them all.
+  // Changing the main category always resets the subcategory to «همه زیرمجموعه‌ها».
+  const selectMain = (key: PracticeCategoryKey) => set({ categories: [key], subcategory: null });
+  const modeOk = modeAvailable(prefs.mode, progress);
 
   return (
     <section className="sh-setup" aria-labelledby="sh-title" lang="fa" dir="rtl">
@@ -110,26 +120,43 @@ export function ShadowingSetup({ cards, scopes, backend, prefs, onChange, onStar
             })}
           </fieldset>
 
-          <fieldset className="sh-cats">
-            <legend>
-              دسته‌ها
-              <span className="sh-cats__bulk">
-                <button type="button" onClick={() => set({ categories: scopes.map((c) => c.key) })}>همه</button>
-                <button type="button" onClick={() => set({ categories: [] })}>هیچ‌کدام</button>
-              </span>
-            </legend>
+          <fieldset className="sh-cats" data-testid="sh-cats">
+            <legend>دسته‌بندی</legend>
+            <label className={`sh-chip${allSelected ? ' is-selected' : ''}`}>
+              <input type="radio" name={ids.cat} checked={allSelected} onChange={() => set({ categories: allKeys, subcategory: null })} />
+              <span>همهٔ دسته‌ها</span>
+              <span className="sh-chip__n">{modeOk ? count(prefs.mode, new Set(allKeys), null) : 0}</span>
+            </label>
             {scopes.map((c) => {
-              const on = selectedCats.has(c.key);
-              const n = modeAvailable(prefs.mode, progress) ? count(prefs.mode, new Set([c.key])) : 0;
+              const on = !allSelected && selectedCats.has(c.key);
+              const n = modeOk ? count(prefs.mode, new Set([c.key]), null) : 0;
               return (
                 <label key={c.key} className={`sh-chip${on ? ' is-selected' : ''}`} data-category={c.theme}>
-                  <input type="checkbox" checked={on} onChange={(e) => toggleCategory(c.key, e.currentTarget.checked)} />
-                  <span lang="de" dir="ltr">{c.label}</span>
+                  <input type="radio" name={ids.cat} checked={on && activeMain === c.key} onChange={() => selectMain(c.key)} />
+                  <span lang="de" dir="auto">{c.label}</span>
                   <span className="sh-chip__n">{n}</span>
                 </label>
               );
             })}
           </fieldset>
+
+          {activeMain && subs.length ? (
+            <fieldset className="sh-subs" data-testid="sh-subs" data-category={activeScope?.theme}>
+              <legend className="visually-hidden">زیرمجموعه‌های {activeScope?.label}</legend>
+              <label className={`sh-chip sh-chip--sub${prefs.subcategory === null ? ' is-selected' : ''}`}>
+                <input type="radio" name={ids.sub} checked={prefs.subcategory === null} onChange={() => set({ subcategory: null })} />
+                <span>همه زیرمجموعه‌ها</span>
+                <span className="sh-chip__n">{modeOk ? count(prefs.mode, selectedCats, null) : 0}</span>
+              </label>
+              {subs.map((sub) => (
+                <label key={sub.id} className={`sh-chip sh-chip--sub${prefs.subcategory === sub.id ? ' is-selected' : ''}${sub.own ? ' is-own' : ''}`}>
+                  <input type="radio" name={ids.sub} checked={prefs.subcategory === sub.id} onChange={() => set({ subcategory: sub.id })} />
+                  <span dir="auto">{sub.label}</span>
+                  <span className="sh-chip__n">{modeOk ? count(prefs.mode, selectedCats, sub.id) : 0}</span>
+                </label>
+              ))}
+            </fieldset>
+          ) : null}
         </div>
 
         <div className="rv-side">
@@ -152,7 +179,7 @@ export function ShadowingSetup({ cards, scopes, backend, prefs, onChange, onStar
           <PlaybackMode mode={prefs.playback} onMode={(playback) => set({ playback })} />
 
           {modeAvailable(prefs.mode, progress) && selected === 0 ? (
-            <p className="rv-empty" role="status">{prefs.categories.length === 0 ? 'دست‌کم یک دسته را انتخاب کنید.' : 'در این انتخاب واژه‌ای نیست.'}</p>
+            <p className="rv-empty" role="status" data-testid="sh-empty">{prefs.categories.length === 0 ? 'یک دسته را انتخاب کنید.' : 'در این انتخاب (دسته، زیرمجموعه و «کدام واژه‌ها؟») واژه‌ای نیست.'}</p>
           ) : null}
           <button type="button" className="fc-primary rv-start" onClick={onStart} disabled={sessionCount === 0 || !canPlay || needsPersian}>
             {sessionCount === 0 ? 'واژه‌ای برای تمرین نیست' : audioMode ? `آماده‌سازی جلسه (${sessionCount} واژه)` : `شروع تمرین (${sessionCount} واژه)`}

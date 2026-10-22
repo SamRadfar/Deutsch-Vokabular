@@ -60,9 +60,10 @@ export function modeAvailable(mode: ReviewMode, progress: DeckProgress): boolean
   return progress.learned !== null;
 }
 
-export function selectCards(cards: readonly DeckCard[], mode: ReviewMode, scope: ReviewScope, progress: DeckProgress): DeckCard[] {
+/** `subtab` narrows a main-category scope to one subcategory (null = all subcategories). */
+export function selectCards(cards: readonly DeckCard[], mode: ReviewMode, scope: ReviewScope, progress: DeckProgress, subtab: string | null = null): DeckCard[] {
   if (!modeAvailable(mode, progress)) return [];
-  const inScope = scope === 'all' ? cards : cards.filter((c) => inPracticeScope(c, scope));
+  const inScope = scope === 'all' ? cards : cards.filter((c) => inPracticeScope(c, scope) && (subtab === null || c.subtabId === subtab));
   switch (mode) {
     case 'all': return [...inScope];
     case 'unlearned': return inScope.filter((c) => !progress.learned!.has(c.entry.id));

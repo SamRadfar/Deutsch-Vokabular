@@ -13,6 +13,10 @@ import type { PersonalWord } from '../../../src/features/personal/model';
 import { PersonalVocabulary } from '../../../src/features/personal/personalVocabulary';
 import { createMemoryStore } from '../../../src/features/progress/localStore';
 import type { Category } from '../../../src/models/vocabulary';
+import { subScopes, validSub } from '../../../src/features/categories/practiceSubs';
+import { personalCards, selectCards, type DeckCard } from '../../../src/features/review/deck';
+import { selectShadowingCards } from '../../../src/features/shadowing/queue';
+import { sanitizePreferences } from '../../../src/features/shadowing/settings';
 
 const LIB = [
   { key: 'arch', label: '🏛️ Architektur', theme: 'arch', subtabs: [
@@ -249,5 +253,46 @@ describe('legacy "my:" categories (first generator version) — compatibility mi
     const docs = (s: CategoryStore) => s.getSnapshot().categories.map((c) => [c.id, c.createdAt]).sort();
     expect(docs(b.cats)).toEqual(docs(a.cats));
     for (const d of [a, b]) { d.vocab.stop(); d.cats.stop(); }
+  });
+});
+
+describe('practice subcategory filter (Shadowing / flashcards)', () => {
+  it('lists built-in + own subs (+ "directly" when used); filters with the learning status', async () => {
+    const cats = await setup();
+    const holz = cats.create('Holzbau', 'arch', KEYS);
+    const reisen = cats.create('Reisen', null, KEYS);
+    if (!holz.ok || !reisen.ok) throw new Error('create');
+    const catalog = buildCatalog(LIB, cats.getSnapshot().categories);
+    const lib: DeckCard[] = [{ entry: LIB[0]!.subtabs[0]!.groups[0]!.entries[0]!, categoryKey: 'arch', categoryLabel: 'Architektur', theme: 'arch', subtabId: 'grund', subtabLabel: 'Grundbegriffe', order: 0 }];
+    const mine = personalCards([
+      word({ lemma: 'Balken', placement: { category: 'arch', subtab: holz.category.id } }),
+      word({ lemma: 'Fuge', learned: true, placement: { category: 'arch', subtab: 'grund' } }),
+      word({ lemma: 'Lot', placement: { category: 'arch', subtab: DIRECT_SUBTAB } }),
+    ], 10, catalog);
+    const cards = [...lib, ...mine];
+    const subs = subScopes(catalog, 'arch', cards);
+    expect(subs.map((s) => [s.id, s.own])).toEqual([['grund', false], ['ent', false], [holz.category.id, true], [DIRECT_SUBTAB, true]]);
+    expect(subScopes(catalog, reisen.category.id, cards)).toEqual([]); // no subs → no row
+    expect(subScopes(catalog, 'mine', cards)).toEqual([]);
+    expect(validSub(subs, 'gone')).toBeNull();
+
+    const learned = new Set(mine.filter((c) => c.entry.word.endsWith('Fuge')).map((c) => c.entry.id));
+    const progress = { learned, againIds: new Set<string>() };
+    const words = (list: DeckCard[]) => list.map((c) => c.entry.word).sort();
+    expect(words(selectShadowingCards(cards, 'all', new Set(['arch']), progress, 'grund'))).toEqual(['die Fuge', 'die Wand']);
+    expect(words(selectShadowingCards(cards, 'learned', new Set(['arch']), progress, 'grund'))).toEqual(['die Fuge']);
+    expect(words(selectShadowingCards(cards, 'unlearned', new Set(['arch']), progress, holz.category.id))).toEqual(['die Balken']);
+    expect(words(selectShadowingCards(cards, 'all', new Set(['arch']), progress, DIRECT_SUBTAB))).toEqual(['die Lot']);
+    expect(selectShadowingCards(cards, 'all', new Set(['arch']), progress, null)).toHaveLength(4); // all = incl. direct
+    expect(selectShadowingCards(cards, 'all', new Set(['arch', 'fitness']), progress, 'grund')).toHaveLength(4); // sub only for ONE main
+    expect(words(selectCards(cards, 'all', 'arch', progress, holz.category.id))).toEqual(['die Balken']);
+    cats.stop();
+  });
+
+  it('stored subcategory is sanitised', () => {
+    expect(sanitizePreferences({ subcategory: 'uc_0123456789abcdef0123' }).subcategory).toBe('uc_0123456789abcdef0123');
+    expect(sanitizePreferences({ subcategory: '_' }).subcategory).toBe('_');
+    expect(sanitizePreferences({ subcategory: '<script>' }).subcategory).toBeNull();
+    expect(sanitizePreferences({}).subcategory).toBeNull();
   });
 });

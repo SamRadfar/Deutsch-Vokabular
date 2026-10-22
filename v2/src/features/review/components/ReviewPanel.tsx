@@ -1,4 +1,5 @@
 import { useCategories } from '../../categories/useCategories';
+import { subScopes, validSub } from '../../categories/practiceSubs';
 import '../review.css';
 import { useMemo, useState } from 'react';
 import { CATEGORY_KEYS, type Category } from '../../../models/vocabulary';
@@ -27,7 +28,7 @@ function initialChoice(): SetupChoice {
   const p = readReviewPreferences();
   const known = p.scope && (([...CATEGORY_KEYS, PERSONAL_KEY] as readonly string[]).includes(p.scope) || /^uc_[0-9a-f]{20}$/.test(p.scope));
   const scope: ReviewScope = known ? (p.scope as ReviewScope) : 'all';
-  return { mode: p.mode ?? 'all', scope, size: p.size === undefined ? DEFAULT_SESSION_SIZE : p.size, autoSpeak: p.autoSpeak ?? true };
+  return { mode: p.mode ?? 'all', scope, size: p.size === undefined ? DEFAULT_SESSION_SIZE : p.size, autoSpeak: p.autoSpeak ?? true, subtab: p.subtab ?? null };
 }
 
 /** The "🔄 مرور" tab: setup → flashcard session → summary. */
@@ -43,16 +44,19 @@ export function ReviewPanel({ categories, active, random }: Props) {
 
   const progress: DeckProgress = { learned: backend.learned, againIds: backend.againIds };
   // A remembered personal mode falls back to "all" while it is unavailable (signed out, loading).
-  const shown: SetupChoice = modeAvailable(choice.mode, progress) ? choice : { ...choice, mode: 'all' };
+  const withMode: SetupChoice = modeAvailable(choice.mode, progress) ? choice : { ...choice, mode: 'all' };
+  // Subcategories of the chosen category (built-in + own); a vanished one means "all".
+  const subs = useMemo(() => subScopes(catalog, withMode.scope === 'all' ? null : withMode.scope, cards), [catalog, withMode.scope, cards]);
+  const shown: SetupChoice = { ...withMode, subtab: validSub(subs, withMode.subtab) };
 
   const start = () => {
     writeReviewPreferences(shown);
-    session.start(buildDeck(selectCards(cards, shown.mode, shown.scope, progress), shown.size, random));
+    session.start(buildDeck(selectCards(cards, shown.mode, shown.scope, progress, shown.subtab), shown.size, random));
   };
 
   const state = session.state;
   if (!state) {
-    return <ReviewSetup cards={cards} scopes={scopes} backend={backend} choice={shown} onChange={setChoice} onStart={start} />;
+    return <ReviewSetup cards={cards} scopes={scopes} subs={subs} backend={backend} choice={shown} onChange={setChoice} onStart={start} />;
   }
 
   const restart = () => session.start(shuffle(state.cards, random));

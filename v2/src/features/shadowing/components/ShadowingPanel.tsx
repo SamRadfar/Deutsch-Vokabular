@@ -1,4 +1,5 @@
 import { useCategories } from '../../categories/useCategories';
+import { subScopes, validSub } from '../../categories/practiceSubs';
 import '../shadowing.css';
 import '../floating/floating.css';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
@@ -100,7 +101,12 @@ export function ShadowingPanel({ categories, active, random, wakeLock }: Props) 
 
   const progress: DeckProgress = { learned: backend.learned, againIds: backend.againIds };
   // A remembered personal mode falls back to "all" while it is unavailable (signed out, loading).
-  const shown: ShadowingPreferences = modeAvailable(prefs.mode, progress) ? prefs : { ...prefs, mode: 'all' };
+  const withMode: ShadowingPreferences = modeAvailable(prefs.mode, progress) ? prefs : { ...prefs, mode: 'all' };
+  // Subcategories of the one selected main category (built-in + own, live from the catalog); a
+  // remembered subcategory that no longer exists there means "all subcategories".
+  const activeMain = withMode.categories.length === 1 ? withMode.categories[0]! : null;
+  const subs = useMemo(() => subScopes(catalog, activeMain, cards), [catalog, activeMain, cards]);
+  const shown: ShadowingPreferences = { ...withMode, subcategory: validSub(subs, withMode.subcategory) };
 
   const onItemCompleted = (id: WordId) => backendRef.current.recordItem?.(id);
   const onFinished = (s: PlayerSnapshot) => backendRef.current.recordSession?.(!s.endedEarly, (s.finishedAt ?? 0) - (s.startedAt ?? s.finishedAt ?? 0));
@@ -149,7 +155,8 @@ export function ShadowingPanel({ categories, active, random, wakeLock }: Props) 
   };
 
   const startNew = () => {
-    const selected = selectShadowingCards(cards, shown.mode, new Set(shown.categories), progress);
+    // The session's words are fixed here (live player, prepared audio and the floating window all use this queue).
+    const selected = selectShadowingCards(cards, shown.mode, new Set(shown.categories), progress, shown.subcategory);
     begin(buildShadowingQueue(selected, backend.exposure ?? EMPTY_EXPOSURE, shown.size, random));
   };
 
@@ -182,7 +189,7 @@ export function ShadowingPanel({ categories, active, random, wakeLock }: Props) 
   }
 
   if (!session || !snap) {
-    return <ShadowingSetup cards={cards} scopes={scopes} backend={backend} prefs={shown} onChange={updatePrefs} onStart={startNew} />;
+    return <ShadowingSetup cards={cards} scopes={scopes} subs={subs} backend={backend} prefs={shown} onChange={updatePrefs} onStart={startNew} />;
   }
 
   if (snap.status === 'finished') {

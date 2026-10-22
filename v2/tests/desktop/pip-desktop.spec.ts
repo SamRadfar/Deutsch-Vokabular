@@ -4,6 +4,7 @@
 // foreground) — no screenshots. Run: npm run test:desktop   (starts the emulators; not part of CI)
 
 import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import type { Page } from '@playwright/test';
 import { expect, test } from '../e2e/fixtures';
@@ -35,10 +36,18 @@ test('floating card: always on top, keeps updating with the main window minimize
   await page.getByLabel('تکرار واژه آلمانی').selectOption('1');
   await page.getByLabel('تکرار جمله مثال آلمانی').selectOption('1');
   await page.getByRole('slider').fill('3');
+  // A filtered session: main category → one subcategory (the floating card must show only its words).
+  await page.locator('label.sh-chip').filter({ hasText: 'Fitness' }).locator('input').check();
+  await page.getByTestId('sh-subs').locator('label').filter({ hasText: 'Erholung' }).locator('input').check();
+  const vocab = JSON.parse(readFileSync(fileURLToPath(new URL('../../src/data/vocabulary/vocabulary.v1.json', import.meta.url)), 'utf8')) as {
+    categories: Array<{ key: string; subtabs: Array<{ id: string; groups: Array<{ entries: Array<{ word: string }> }> }> }>;
+  };
+  const subWords = new Set(vocab.categories.find((c) => c.key === 'fitness')!.subtabs.find((x) => x.id === 'ernaehrung')!.groups.flatMap((g) => g.entries.map((e) => e.word)));
   await page.getByRole('button', { name: 'شروع تمرین (5 واژه)' }).click();
   await page.evaluate(() => { document.title = 'DV-MAIN-WINDOW'; });
   await page.getByTestId('floating-toggle').click();
   await expect.poll(() => pip(page, '[data-testid="floating-pos"]')).toBe('1 / 5');
+  expect(subWords.has((await pip(page, '[data-testid="floating-word"]')) ?? '')).toBe(true);
 
   // Minimize the main browser window (like the user would).
   const cdp = await page.context().newCDPSession(page);
@@ -57,6 +66,7 @@ test('floating card: always on top, keeps updating with the main window minimize
   // The session continues while minimized and the card follows it.
   const spokenAtMinimize = await page.evaluate(() => window.__spoken.length);
   await expect.poll(() => pip(page, '[data-testid="floating-pos"]'), { timeout: 60_000, intervals: [500] }).toBe('3 / 5');
+  expect(subWords.has((await pip(page, '[data-testid="floating-word"]')) ?? '')).toBe(true);
   expect(await page.evaluate(() => window.__spoken.length)).toBeGreaterThan(spokenAtMinimize + 2);
 
   const after = windows();
